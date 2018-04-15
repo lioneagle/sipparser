@@ -1,0 +1,78 @@
+*.py[cod]
+
+test.db
+test.txt
+sina.html
+
+#sublime
+*.sublime-project
+*.sublime-workspace
+
+#golang
+pkg
+bin
+*.out
+*_cover.out
+*.exe
+*_coverage.html
+*_cpu.out
+*.png
+log_file
+*.svg
+*.csv
+*.std
+*.log
+sipp_gui_client
+sipp_gui_server
+test_temp
+*.bak
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+pkg
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+######################
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+dist
+MANIFEST
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
