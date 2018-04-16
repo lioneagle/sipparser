@@ -422,6 +422,141 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
 	return addr, true
 }
 
+/* Parse quoted-string
+ *
+ * RFC3261 Section 25.1, page 222
+ *
+ * quoted-string  =  SWS DQUOTE *(qdtext / quoted-pair ) DQUOTE
+ * qdtext         =  LWS / %x21 / %x23-5B / %x5D-7E
+ *                 / UTF8-NONASCII
+ * quoted-pair  =  "\" (%x00-09 / %x0B-0C
+ *               / %x0E-7F)
+ */
+func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (addr AbnfPtr, ok bool) {
+	src := context.parseSrc
+	newPos := context.parsePos
+	len1 := AbnfPos(len(src))
+
+	newPos, ok = ParseSWS(src, newPos)
+	if !ok {
+		context.parsePos = newPos
+		return ABNF_PTR_NIL, false
+	}
+
+	if src[newPos] != '"' {
+		context.parsePos = newPos
+		context.AddError(newPos, "no DQUOTE for quoted-string begin")
+		return ABNF_PTR_NIL, false
+	}
+	newPos++
+
+	used := this.used
+	addr = AbnfPtr(this.used)
+
+	for (newPos < len1) && (src[newPos] != '"') {
+		v := src[newPos]
+		if IsLwsChar(v) {
+			var ok bool
+
+			context.parsePos = newPos
+			ok = this.ParseAndCopyLWS(context)
+			if !ok {
+				context.AddError(context.parsePos, "wrong LWS in quoted-string")
+				return ABNF_PTR_NIL, false
+			}
+			newPos = context.parsePos
+		} else if IsSipQuotedText(v) {
+			this.mem[used] = v
+			used++
+			newPos++
+		} else if v == '\\' {
+			if (newPos + 1) >= len1 {
+				context.parsePos = newPos
+				context.AddError(context.parsePos, "no char after '\\' in quoted-string")
+				return ABNF_PTR_NIL, false
+			}
+			this.mem[used] = v
+			this.mem[used+1] = src[newPos+1]
+			used += 2
+			newPos += 2
+		} else {
+			context.parsePos = newPos
+			context.AddError(context.parsePos, "not qdtext or quoted-pair in quoted-string")
+			return ABNF_PTR_NIL, false
+		}
+	}
+
+	if newPos >= len1 {
+		context.parsePos = newPos
+		context.AddError(context.parsePos, "no DQUOTE for quoted-string end")
+		return ABNF_PTR_NIL, false
+	}
+
+	newPos++
+	this.mem[used] = 0
+	used++
+	this.stat.allocNum++
+	this.stat.allocNumOk++
+	this.stat.allocReqBytes = used - this.used
+	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
+	context.parsePos = newPos
+	return addr, true
+}
+
+func (this *MemAllocator) ParseAndCopyLWS(context *ParseContext) (ok bool) {
+	src := context.parseSrc
+	newPos := context.parsePos
+	len1 := AbnfPos(len(src))
+	used := this.used
+
+	for ; newPos < len1; newPos++ {
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
+			break
+		} else {
+			this.mem[used] = src[newPos]
+			used++
+		}
+	}
+
+	if (newPos + 1) >= len1 {
+		context.parsePos = newPos
+		this.used = used
+		return true
+	}
+
+	if (src[newPos] == '\r') && (src[newPos+1] == '\n') {
+		this.mem[used] = src[newPos]
+		this.mem[used+1] = src[newPos]
+		newPos += 2
+		used += 2
+
+		if newPos >= len1 {
+			context.parsePos = newPos
+			this.used = used
+			return false
+		}
+
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
+			context.parsePos = newPos
+			this.used = used
+			return false
+		}
+
+		for ; newPos < len1; newPos++ {
+			if (src[newPos] != ' ') && (src[newPos] != '\t') {
+				context.parsePos = newPos
+				this.used = used
+				return true
+			}
+			this.mem[used] = src[newPos]
+			used++
+		}
+	}
+	context.parsePos = newPos
+	this.used = used
+	return true
+}
+
 func (this *MemAllocator) Alloc(size uint32) (addr AbnfPtr) {
 	this.stat.allocNum++
 	this.stat.allocReqBytes += size

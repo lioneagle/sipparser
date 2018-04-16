@@ -204,6 +204,74 @@ func TestMemParseAndAllocEscapable(t *testing.T) {
 	}
 }
 
+func TestMemParseAndAllocSipQuotedStringParseOK(t *testing.T) {
+	testdata := []struct {
+		src    string
+		ok     bool
+		wanted string
+	}{
+		{"\"\"", true, "\"\""},
+		{"\"abc\"", true, "\"abc\""},
+		{"\"abc\\00\"", true, "\"abc\\00\""},
+		{" \t\r\n \"abc\\00\\\"\"", true, "\"abc\\00\\\"\""},
+		{" \t\r\n\t\"abc\\0b\"", true, "\"abc\\0b\""},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+
+			addr, ok := context.allocator.ParseAndAllocSipQuotedString(context)
+			buf := NewAbnfByteBuffer(nil)
+			EncodeSipQuotedString(context, buf, addr)
+
+			test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			test.EXPECT_EQ(t, buf.String(), v.wanted, "")
+		})
+	}
+}
+
+func TestMemParseAndAllocSipQuotedStringNOK(t *testing.T) {
+
+	testdata := []struct {
+		src    string
+		newPos int
+	}{
+		{"abc\"", 0},
+		{"\r\n\"abc\\00\"", 0},
+		{"\r\n \"abc\\", len("\r\n\"abc\\")},
+		{"\r\n \"abc\r\n\\", len("\r\n \"abc\r\n")},
+		{"\r\n \"abc", len("\r\n \"abc")},
+		{"\r\n \"abc€", len("\r\n \"abc") + 1},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+
+			addr, ok := context.allocator.ParseAndAllocSipQuotedString(context)
+
+			test.EXPECT_FALSE(t, ok, "")
+			test.EXPECT_EQ(t, addr, ABNF_PTR_NIL, "")
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+		})
+	}
+}
+
 func BenchmarkMemAlloc(b *testing.B) {
 	b.StopTimer()
 	allocator := NewMemAllocator(1024 * 128)
@@ -263,5 +331,23 @@ func BenchmarkParseAndAllocCStringEscapable1(b *testing.B) {
 		context.allocator.FreeAll()
 		context.SetParsePos(0)
 		context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
+	}
+}
+
+func BenchmarkParseAndAllocSipQuotedString(b *testing.B) {
+	b.StopTimer()
+	src := []byte("\"0123456789\"")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		context.allocator.ParseAndAllocSipQuotedString(context)
 	}
 }

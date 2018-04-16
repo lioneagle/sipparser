@@ -66,6 +66,75 @@ func TestAllocCStringWithUnescape(t *testing.T) {
 	test.EXPECT_EQ(t, addr.CString(context), "0123456789", "")
 }
 
+func TestParseLWS2(t *testing.T) {
+	testdata := []struct {
+		src    string
+		newPos AbnfPos
+		ok     bool
+	}{
+		{"", 0, true},
+		{"  \t", 3, true},
+		{"\r\n \t", 4, true},
+		{"\r\n\t ", 4, true},
+		{"\t  \r\n\t ", 7, true},
+		{"     \t\t\t\t\t\r\n    ", 16, true},
+		{"     \t\t\t\t\t\r\n    xy", 16, true},
+
+		{"\t  \r\n", 5, false},
+		{"\t  \r\nab", 5, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			newPos, ok := ParseLWS_2([]byte(v.src), 0)
+
+			test.EXPECT_EQ(t, ok, v.ok, "")
+			test.EXPECT_EQ(t, newPos, v.newPos, "")
+		})
+	}
+}
+
+func TestParseLWS1(t *testing.T) {
+	testdata := []struct {
+		src    string
+		newPos AbnfPos
+		ok     bool
+	}{
+		{"", 0, true},
+		{"  \t", 3, true},
+		{"\r\n \t", 4, true},
+		{"\r\n\t ", 4, true},
+		{"\t  \r\n\t ", 7, true},
+		{"     \t\t\t\t\t\r\n    ", 16, true},
+		{"     \t\t\t\t\t\r\n    xy", 16, true},
+
+		{"\t  \r\n", 5, false},
+		{"\t  \r\nab", 5, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			//t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024)
+			context.SetParseSrc([]byte(v.src))
+
+			ok := ParseLWS(context)
+
+			test.EXPECT_EQ(t, ok, v.ok, "")
+			test.EXPECT_EQ(t, context.parsePos, v.newPos, "")
+		})
+	}
+
+}
+
 func BenchmarkEqualNoCaseEqual1(b *testing.B) {
 	b.StopTimer()
 	var s1 = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -655,5 +724,113 @@ func BenchmarkParseEscapable2(b *testing.B) {
 		context.allocator.FreeAll()
 		context.SetParsePos(0)
 		ParseEscapable2(context, src, 0, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
+	}
+}
+
+func BenchmarkParseLWS1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("     \t\t\t\t\t\r\n    ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLWS(context)
+	}
+}
+
+func BenchmarkParseLWS2(b *testing.B) {
+	b.StopTimer()
+	src := []byte("     \t\t\t\t\t\r\n    ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLWS_2(src, 0)
+	}
+}
+
+func BenchmarkParseSWS1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("     \t\t\t\t\t\r\n    ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWS_2(context)
+	}
+}
+
+func BenchmarkParseSWS1_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWS_2(context)
+	}
+}
+
+func BenchmarkParseSWS2(b *testing.B) {
+	b.StopTimer()
+	src := []byte("     \t\t\t\t\t\r\n    ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWS(src, 0)
+	}
+}
+
+func BenchmarkParseSWS2_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWS(src, 0)
 	}
 }

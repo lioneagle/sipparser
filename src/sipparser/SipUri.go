@@ -27,27 +27,27 @@ type SipUriKnownParamInfo struct {
 }
 
 const (
-	SIP_URI_PARAM_USER      = 0
-	SIP_URI_PARAM_TRANSPORT = 1
-	SIP_URI_PARAM_LR        = 2
-	SIP_URI_PARAM_METHOD    = 3
-	SIP_URI_PARAM_MADDR     = 4
-	SIP_URI_PARAM_TTL       = 5
+	SIP_URI_KNOWN_PARAM_USER      = 0
+	SIP_URI_KNOWN_PARAM_TRANSPORT = 1
+	SIP_URI_KNOWN_PARAM_LR        = 2
+	SIP_URI_KNOWN_PARAM_METHOD    = 3
+	SIP_URI_KNOWN_PARAM_MADDR     = 4
+	SIP_URI_KNOWN_PARAM_TTL       = 5
 
-	SIP_URI_PARAM_MAX_NUM = iota
+	SIP_URI_KNOWN_PARAM_MAX_NUM = iota
 )
 
 var g_SipUriKnownParamInfo = []SipUriKnownParamInfo{
-	{[]byte("user\000"), SIP_URI_PARAM_USER},
-	{[]byte("transport\000"), SIP_URI_PARAM_TRANSPORT},
-	{[]byte("lr\000"), SIP_URI_PARAM_LR},
-	{[]byte("method\000"), SIP_URI_PARAM_METHOD},
-	{[]byte("maddr\000"), SIP_URI_PARAM_MADDR},
-	{[]byte("ttl\000"), SIP_URI_PARAM_TTL},
+	{[]byte("user\000"), SIP_URI_KNOWN_PARAM_USER},
+	{[]byte("transport\000"), SIP_URI_KNOWN_PARAM_TRANSPORT},
+	{[]byte("lr\000"), SIP_URI_KNOWN_PARAM_LR},
+	{[]byte("method\000"), SIP_URI_KNOWN_PARAM_METHOD},
+	{[]byte("maddr\000"), SIP_URI_KNOWN_PARAM_MADDR},
+	{[]byte("ttl\000"), SIP_URI_KNOWN_PARAM_TTL},
 }
 
 type SipUriKnownParams struct {
-	params [SIP_URI_PARAM_MAX_NUM]AbnfPtr
+	params [SIP_URI_KNOWN_PARAM_MAX_NUM]AbnfPtr
 }
 
 func SizeofSipUriKnownParams() int {
@@ -144,7 +144,7 @@ func (this *SipUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer
 
 	knownParams := this.knownParams.GetSipUriKnownParams(context)
 
-	for i := 0; i < SIP_URI_PARAM_MAX_NUM; i++ {
+	for i := 0; i < SIP_URI_KNOWN_PARAM_MAX_NUM; i++ {
 		if knownParams.params[i] != ABNF_PTR_NIL {
 			buf.WriteByte(';')
 			param := knownParams.params[i].GetUriParam(context)

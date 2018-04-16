@@ -306,11 +306,12 @@ func ParseUInt8(src []byte, pos AbnfPos) (digit uint8, num uint32, newPos AbnfPo
 	return uint8(digit1), uint32(newPos - pos), newPos, true
 }
 
+/* RFC3261 Section 25.1, page 220
+ *
+ * HCOLON  =  *( SP / HTAB ) ":" SWS
+ */
 func ParseHcolon(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
-	/* RFC3261 Section 25.1, page 220
-	 *
-	 * HCOLON  =  *( SP / HTAB ) ":" SWS
-	 */
+
 	//ref := AbnfRef{}
 	//newPos = ref.ParseWspChar(src, pos)
 	//newPos = (&AbnfRef{}).ParseWspChar(src, pos)
@@ -356,18 +357,19 @@ func ParseSWSMarkCanOmmit(context *ParseContext, src []byte, pos AbnfPos, mark b
 	return newPos, true, ok
 }
 
+/* RFC3261 Section 25.1, page 220
+ *
+ * STAR    =  SWS "*" SWS ; asterisk
+ * SLASH   =  SWS "/" SWS ; slash
+ * EQUAL   =  SWS "=" SWS ; equal
+ * LPAREN  =  SWS "(" SWS ; left parenthesis
+ * RPAREN  =  SWS ")" SWS ; right parenthesis
+ * COMMA   =  SWS "," SWS ; comma
+ * SEMI    =  SWS ";" SWS ; semicolon
+ * COLON   =  SWS ":" SWS ; colon
+ */
 func ParseSWSMark(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, ok bool) {
-	/* RFC3261 Section 25.1, page 220
-	 *
-	 * STAR    =  SWS "*" SWS ; asterisk
-	 * SLASH   =  SWS "/" SWS ; slash
-	 * EQUAL   =  SWS "=" SWS ; equal
-	 * LPAREN  =  SWS "(" SWS ; left parenthesis
-	 * RPAREN  =  SWS ")" SWS ; right parenthesis
-	 * COMMA   =  SWS "," SWS ; comma
-	 * SEMI    =  SWS ";" SWS ; semicolon
-	 * COLON   =  SWS ":" SWS ; colon
-	 */
+
 	newPos = pos
 	newPos, ok = ParseSWS(src, newPos)
 	if !ok {
@@ -387,6 +389,33 @@ func ParseSWSMark(context *ParseContext, src []byte, pos AbnfPos, mark byte) (ne
 	return ParseSWS(src, newPos+1)
 }
 
+/* Parse SWS
+ *
+ * RFC3261 Section 25.1, page 220
+ *
+ * SWS  =  [LWS] ; sep whitespace
+ */
+func ParseSWS_2(context *ParseContext) (ok bool) {
+	src := context.parseSrc
+
+	if context.parsePos >= AbnfPos(len(src)) {
+		return true
+	}
+
+	if !IsLwsChar(src[context.parsePos]) {
+		/*if (src[context.parsePos] != ' ') && (src[context.parsePos] != '\t') &&
+		(src[context.parsePos] != '\r') && (src[context.parsePos] != '\n') {*/
+		return true
+	}
+
+	pos := context.parsePos
+	ok = ParseLWS(context)
+	if !ok {
+		context.parsePos = pos
+	}
+	return true
+}
+
 func ParseSWS(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 	/* RFC3261 Section 25.1, page 220
 	 *
@@ -401,33 +430,76 @@ func ParseSWS(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 		return newPos, true
 	}
 
-	newPos1, ok := ParseLWS(src, newPos)
+	newPos1, ok := ParseLWS_2(src, newPos)
 	if ok {
 		newPos = newPos1
 	}
 	return newPos, true
 }
 
-func ParseLWS(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
-	/* RFC3261 Section 25.1, page 220
-	 *
-	 * LWS  =  [*WSP CRLF] 1*WSP ; linear whitespace
-	 * WSP  =  ( SP | HTAB )
-	 *
-	 * NOTE:
-	 *
-	 * 1. this defination of LWS is different from that in RFC2616 (HTTP/1.1)
-	 *    RFC2616 Section 2.2, page 16:
-	 *
-	 *    LWS  = [CRLF] 1*( SP | HTAB )
-	 *
-	 * 2. WSP's defination is from RFC2234 Section 6.1, page 12
-	 *
-	 */
+/* Parse LWS
+ *
+ * RFC3261 Section 25.1, page 220
+ *
+ * LWS  =  [*WSP CRLF] 1*WSP ; linear whitespace
+ * WSP  =  ( SP | HTAB )
+ *
+ * NOTE:
+ *
+ * 1. this defination of LWS is different from that in RFC2616 (HTTP/1.1)
+ *    RFC2616 Section 2.2, page 16:
+ *
+ *    LWS  = [CRLF] 1*( SP | HTAB )
+ *
+ * 2. WSP's defination is from RFC2234 Section 6.1, page 12
+ *
+ */
+func ParseLWS(context *ParseContext) (ok bool) {
+	src := context.parseSrc
+	newPos := context.parsePos
+	len1 := AbnfPos(len(src))
+
+	for ; newPos < len1; newPos++ {
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
+			break
+		}
+	}
+
+	if (newPos + 1) >= len1 {
+		context.parsePos = newPos
+		return true
+	}
+
+	if (src[newPos] == '\r') && (src[newPos+1] == '\n') {
+		newPos += 2
+
+		if newPos >= len1 {
+			context.parsePos = newPos
+			return false
+		}
+
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
+			context.parsePos = newPos
+			return false
+		}
+
+		for ; newPos < len1; newPos++ {
+			if (src[newPos] != ' ') && (src[newPos] != '\t') {
+				context.parsePos = newPos
+				return true
+			}
+		}
+	}
+	context.parsePos = newPos
+	return true
+}
+
+func ParseLWS_2(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 	//newPos = eatWsp(src, pos)
 	len1 := AbnfPos(len(src))
 	for newPos = pos; newPos < len1; newPos++ {
-		if !IsWspChar(src[newPos]) {
+		//if !IsWspChar(src[newPos]) {
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
 			break
 		}
 	}
@@ -445,15 +517,17 @@ func ParseLWS(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 			return newPos, false
 		}
 
-		if !IsWspChar(src[newPos]) {
+		//if !IsWspChar(src[newPos]) {
+		if (src[newPos] != ' ') && (src[newPos] != '\t') {
 			//return newPos, &AbnfError{"LWS parse: no WSP after CRLF in LWS", src, newPos}
 			return newPos, false
 		}
 
 		//newPos = eatWsp(src, newPos)
 		for ; newPos < len1; newPos++ {
-			if !IsWspChar(src[newPos]) {
-				break
+			//if !IsWspChar(src[newPos]) {
+			if (src[newPos] != ' ') && (src[newPos] != '\t') {
+				return newPos, true
 			}
 		}
 	}
@@ -471,12 +545,13 @@ func eatWsp(src []byte, pos AbnfPos) (newPos AbnfPos) {
 	return newPos
 }
 
+/* RFC3261 Section 25.1, page 221
+ *
+ * LAQUOT  =  SWS "<"; left angle quote
+ *
+ */
 func ParseLeftAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
-	/* RFC3261 Section 25.1, page 221
-	 *
-	 * LAQUOT  =  SWS "<"; left angle quote
-	 *
-	 */
+
 	newPos = pos
 	len1 := AbnfPos(len(src))
 
@@ -503,12 +578,13 @@ func ParseLeftAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos
 	return newPos + 1, true
 }
 
+/* RFC3261 Section 25.1, page 221
+ *
+ * RAQUOT  =  ">" SWS ; right angle quote
+ *
+ */
 func ParseRightAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
-	/* RFC3261 Section 25.1, page 221
-	 *
-	 * RAQUOT  =  ">" SWS ; right angle quote
-	 *
-	 */
+
 	newPos = pos
 	if newPos >= AbnfPos(len(src)) {
 		context.AddError(newPos, "RAQUOT parse: reach end at begining")

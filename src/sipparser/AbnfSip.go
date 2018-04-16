@@ -9,19 +9,6 @@ const ABNF_SIP_CONTENT_LENGTH_SPACE = 10
 const ABNF_SIP_CONTENT_LENGTH_PRINT_FMT = "%10d"
 const ABNF_SIP_DEFAULT_BOUNDARY = "sip-unique-boundary-aasdasdewfd"
 
-const (
-	ABNF_UNKNOWN_URI   = int32(0)
-	ABNF_SIP_URI       = int32(1)
-	ABNF_SIPS_URI      = int32(2)
-	ABNF_TEL_URI       = int32(3)
-	ABNF_ABSOULUTE_URI = int32(4)
-)
-
-const (
-	ABNF_SIP_ADDR_SPEC = int32(0)
-	ABNF_SIP_NAME_ADDR = int32(1)
-)
-
 type SipHeaderIndexType uint32
 
 const (
@@ -136,6 +123,10 @@ func (this AbnfPtr) GetSipUri(context *ParseContext) *SipUri {
 
 func (this AbnfPtr) GetSipUriKnownParams(context *ParseContext) *SipUriKnownParams {
 	return (*SipUriKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
+func (this AbnfPtr) GetSipAddr(context *ParseContext) *SipAddr {
+	return (*SipAddr)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
 /*
