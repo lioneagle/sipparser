@@ -81,6 +81,7 @@ func (this *SipAddr) ParseWithoutInit(context *ParseContext, parseAddrSpecParam 
 	ok = this.ParseScheme(context)
 	if !ok {
 		this.addrType = ABNF_SIP_NAME_ADDR
+		context.parsePos = begin
 		return this.ParseNameAddrWithoutInit(context)
 	}
 
@@ -193,12 +194,13 @@ func (this *SipAddr) parseTokens(context *ParseContext) (ok bool) {
 
 		ref := AbnfRef{}
 		context.parsePos = ref.Parse(src, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
-		newPos, ok = ParseLWS(context)
+		ok = ParseLWS(context)
 		if !ok {
 			context.parsePos = newPos
 			context.AddError(newPos, "wrong LWS for display-name")
 			return false
 		}
+		newPos = context.parsePos
 	}
 
 	context.parsePos = newPos
