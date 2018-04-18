@@ -1,6 +1,7 @@
 package sipparser
 
 import (
+	//"fmt"
 	"unsafe"
 )
 
@@ -46,6 +47,38 @@ func (this *SipAddr) memAddr() uintptr {
 func (this *SipAddr) hasDisplayName() bool { return this.displayName == ABNF_PTR_NIL }
 func (this *SipAddr) IsSipUri() bool       { return this.uriType == ABNF_URI_SIP }
 func (this *SipAddr) IsSipsUri() bool      { return this.uriType == ABNF_URI_SIPS }
+
+func (this *SipAddr) String(context *ParseContext) string {
+	return AbnfEncoderToString(context, this)
+}
+
+func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+	if this.addrType == ABNF_SIP_NAME_ADDR {
+		if this.displayName != ABNF_PTR_NIL {
+			if this.displayNameIsQuotedString {
+				buf.WriteByte('"')
+				this.displayName.WriteCString(context, buf)
+				buf.WriteByte('"')
+			} else {
+				this.displayName.WriteCString(context, buf)
+			}
+		}
+		buf.WriteByte('<')
+	}
+
+	if this.addr != ABNF_PTR_NIL {
+		switch this.uriType {
+		case ABNF_URI_SIP:
+			fallthrough
+		case ABNF_URI_SIPS:
+			this.addr.GetSipUri(context).Encode(context, buf)
+		}
+	}
+
+	if this.addrType == ABNF_SIP_NAME_ADDR {
+		buf.WriteByte('>')
+	}
+}
 
 /* RFC3261 Section 25.1, page 222
  *
@@ -121,11 +154,16 @@ func (this *SipAddr) ParseNameAddrWithoutInit(context *ParseContext) (ok bool) {
 		return false
 	}
 
-	return this.parsAddrSpecAfterScheme(context, true)
+	ok = this.parsAddrSpecAfterScheme(context, true)
+	if !ok {
+		return false
+	}
+
+	return ParseRightAngleQuote(context)
 }
 
 func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
-	switch this.addrType {
+	switch this.uriType {
 	case ABNF_URI_SIP:
 		this.addr = NewSipUri(context)
 		if this.addr == ABNF_PTR_NIL {
@@ -233,7 +271,7 @@ func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
 			((src[pos+1] | 0x20) == 'p') {
 			if src[pos+2] == ':' {
 				context.parsePos = pos + 3
-				this.addrType = ABNF_URI_SIP
+				this.uriType = ABNF_URI_SIP
 				return true
 			}
 			if (src[pos+2] | 0x20) == 's' {
@@ -243,7 +281,7 @@ func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
 				}
 				if src[pos+3] == ':' {
 					context.parsePos = pos + 4
-					this.addrType = ABNF_URI_SIPS
+					this.uriType = ABNF_URI_SIPS
 					return true
 				}
 			}
@@ -257,7 +295,7 @@ func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
 			((src[pos+1] | 0x20) == 'l') {
 			if src[pos+2] == ':' {
 				context.parsePos = pos + 3
-				this.addrType = ABNF_URI_TEL
+				this.uriType = ABNF_URI_TEL
 				return true
 			}
 		}
@@ -270,7 +308,7 @@ func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
 			((src[pos+1] | 0x20) == 'n') {
 			if src[pos+2] == ':' {
 				context.parsePos = pos + 3
-				this.addrType = ABNF_URI_URN
+				this.uriType = ABNF_URI_URN
 				return true
 			}
 		}
@@ -293,7 +331,7 @@ func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
 			return false
 		}
 		context.parsePos++
-		this.addrType = ABNF_URI_ABSOLUTE
+		this.uriType = ABNF_URI_ABSOLUTE
 		return true
 	}
 
