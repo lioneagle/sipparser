@@ -5,11 +5,12 @@ import (
 )
 
 const (
-	ABNF_URI_UNKNOWN   = byte(0)
-	ABNF_URI_SIP       = byte(1)
-	ABNF_URI_SIPS      = byte(2)
-	ABNF_URI_TEL       = byte(3)
-	ABNF_URI_ABSOULUTE = byte(4)
+	ABNF_URI_UNKNOWN  = byte(0)
+	ABNF_URI_ABSOLUTE = byte(1)
+	ABNF_URI_SIP      = byte(2)
+	ABNF_URI_SIPS     = byte(3)
+	ABNF_URI_TEL      = byte(4)
+	ABNF_URI_URN      = byte(5)
 )
 
 const (
@@ -21,8 +22,9 @@ type SipAddr struct {
 	addrType                  byte
 	uriType                   byte
 	displayNameIsQuotedString bool
+	scheme                    AbnfPtr
 	displayName               AbnfPtr
-	uri                       AbnfPtr
+	addr                      AbnfPtr
 }
 
 func SizeofSipAddr() int {
@@ -44,3 +46,254 @@ func (this *SipAddr) memAddr() uintptr {
 func (this *SipAddr) hasDisplayName() bool { return this.displayName == ABNF_PTR_NIL }
 func (this *SipAddr) IsSipUri() bool       { return this.uriType == ABNF_URI_SIP }
 func (this *SipAddr) IsSipsUri() bool      { return this.uriType == ABNF_URI_SIPS }
+
+/* RFC3261 Section 25.1, page 222
+ *
+ * name-addr =  [ display-name ] LAQUOT addr-spec RAQUOT
+ * addr-spec      =  SIP-URI / SIPS-URI / absoluteURI
+ * RAQUOT  =  ">" SWS ; right angle quote
+ * LAQUOT  =  SWS "<"; left angle quote
+ */
+func (this *SipAddr) Parse(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+	this.Init()
+	return this.ParseWithoutInit(context, parseAddrSpecParam)
+}
+
+/* RFC3261 Section 25.1, page 222
+ *
+ * name-addr =  [ display-name ] LAQUOT addr-spec RAQUOT
+ * addr-spec      =  SIP-URI / SIPS-URI / absoluteURI
+ * RAQUOT  =  ">" SWS ; right angle quote
+ * LAQUOT  =  SWS "<"; left angle quote
+ */
+func (this *SipAddr) ParseWithoutInit(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+	begin := context.parsePos
+	if context.parsePos >= AbnfPos(len(context.parseSrc)) {
+		context.AddError(context.parsePos, "no value for sip addr")
+		return false
+	}
+
+	if context.parseSrc[context.parsePos] == '<' || context.parseSrc[context.parsePos] == '"' {
+		this.addrType = ABNF_SIP_NAME_ADDR
+		return this.ParseNameAddrWithoutInit(context)
+	}
+
+	ok = this.ParseScheme(context)
+	if !ok {
+		this.addrType = ABNF_SIP_NAME_ADDR
+		return this.ParseNameAddrWithoutInit(context)
+	}
+
+	this.addrType = ABNF_SIP_ADDR_SPEC
+
+	return this.parsAddrSpecAfterScheme(context, parseAddrSpecParam)
+
+}
+
+func (this *SipAddr) ParseNameAddrWithoutInit(context *ParseContext) (ok bool) {
+	context.parsePos, ok = ParseSWS(context.parseSrc, context.parsePos)
+	if !ok {
+		return false
+	}
+
+	if context.parsePos >= AbnfPos(len(context.parseSrc)) {
+		context.AddError(context.parsePos, "no value for sip addr")
+		return false
+	}
+
+	if context.parseSrc[context.parsePos] != '<' {
+		ok = this.parseDisplayName(context)
+		if !ok {
+			return false
+		}
+
+		ok = ParseLeftAngleQuote(context)
+		if !ok {
+			return false
+		}
+	} else {
+		context.parsePos++
+	}
+
+	ok = this.ParseScheme(context)
+	if !ok {
+		return false
+	}
+
+	return this.parsAddrSpecAfterScheme(context, true)
+}
+
+func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+	switch this.addrType {
+	case ABNF_URI_SIP:
+		this.addr = NewSipUri(context)
+		if this.addr == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "no mem for new sip uri")
+			return false
+		}
+		uri := this.addr.GetSipUri(context)
+		uri.SetSipUri()
+		if parseAddrSpecParam {
+			return uri.ParseAfterSchemeWithoutInit(context)
+		}
+		return uri.ParseAfterSchemeWithoutParam(context)
+
+	case ABNF_URI_SIPS:
+		this.addr = NewSipUri(context)
+		if this.addr == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "no mem for new sips uri")
+			return false
+		}
+		uri := this.addr.GetSipUri(context)
+		uri.SetSipsUri()
+		if parseAddrSpecParam {
+			return uri.ParseAfterSchemeWithoutInit(context)
+		}
+		return uri.ParseAfterSchemeWithoutParam(context)
+	}
+	return false
+}
+
+/* RFC3261 Section 25.1, page 222
+ *
+ * display-name   =  *(token LWS)/ quoted-string
+ */
+func (this *SipAddr) parseDisplayName(context *ParseContext) (ok bool) {
+	len1 := AbnfPos(len(context.parseSrc))
+	if context.parsePos >= len1 {
+		return true
+	}
+
+	if IsSipToken(context.parseSrc[context.parsePos]) {
+		return this.parseTokens(context)
+	}
+
+	this.displayName, ok = context.allocator.ParseAndAllocSipQuotedString(context)
+	if !ok {
+		return false
+	}
+
+	this.displayNameIsQuotedString = true
+	return true
+
+}
+
+func (this *SipAddr) parseTokens(context *ParseContext) (ok bool) {
+	//TODO: parse and alloc mem in future
+	src := context.parseSrc
+	len1 := AbnfPos(len(context.parseSrc))
+	newPos := context.parsePos
+	this.displayNameIsQuotedString = false
+
+	nameBegin := newPos
+	for newPos < len1 {
+		if !IsSipToken(src[newPos]) {
+			break
+		}
+
+		ref := AbnfRef{}
+		context.parsePos = ref.Parse(src, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+		newPos, ok = ParseLWS(context)
+		if !ok {
+			context.parsePos = newPos
+			context.AddError(newPos, "wrong LWS for display-name")
+			return false
+		}
+	}
+
+	context.parsePos = newPos
+
+	this.displayName = AllocCString(context, src[nameBegin:newPos])
+	if this.displayName == ABNF_PTR_NIL {
+		context.AddError(newPos, "no mem for display-name")
+		return false
+	}
+	return true
+}
+
+func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
+	src := context.parseSrc
+	len1 := AbnfPos(len(context.parseSrc))
+	pos := context.parsePos
+	begin := context.parsePos
+
+	if pos >= len1 {
+		return false
+	}
+
+	switch src[pos] | 0x20 {
+	case 's':
+		pos++
+		if (pos + 2) >= len1 {
+			break
+		}
+		if ((src[pos] | 0x20) == 'i') &&
+			((src[pos+1] | 0x20) == 'p') {
+			if src[pos+2] == ':' {
+				context.parsePos = pos + 3
+				this.addrType = ABNF_URI_SIP
+				return true
+			}
+			if (src[pos+2] | 0x20) == 's' {
+				if (pos + 3) >= len1 {
+					context.parsePos = pos + 3
+					return false
+				}
+				if src[pos+3] == ':' {
+					context.parsePos = pos + 4
+					this.addrType = ABNF_URI_SIPS
+					return true
+				}
+			}
+		}
+	case 't':
+		pos++
+		if (pos + 2) >= len1 {
+			break
+		}
+		if ((src[pos] | 0x20) == 'e') &&
+			((src[pos+1] | 0x20) == 'l') {
+			if src[pos+2] == ':' {
+				context.parsePos = pos + 3
+				this.addrType = ABNF_URI_TEL
+				return true
+			}
+		}
+	case 'u':
+		pos++
+		if (pos + 2) >= len1 {
+			break
+		}
+		if ((src[pos] | 0x20) == 'r') &&
+			((src[pos+1] | 0x20) == 'n') {
+			if src[pos+2] == ':' {
+				context.parsePos = pos + 3
+				this.addrType = ABNF_URI_URN
+				return true
+			}
+		}
+	}
+
+	if IsAlpha(src[begin]) {
+		var ok bool
+
+		context.parsePos = begin
+		this.scheme, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_URI_SCHEME, ABNF_CHARSET_MASK_URI_SCHEME)
+		if !ok {
+			return false
+		}
+
+		if context.parsePos >= len1 {
+			return false
+		}
+
+		if src[context.parsePos] != ':' {
+			return false
+		}
+		context.parsePos++
+		this.addrType = ABNF_URI_ABSOLUTE
+		return true
+	}
+
+	return false
+}

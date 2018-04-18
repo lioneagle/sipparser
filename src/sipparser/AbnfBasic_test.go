@@ -834,3 +834,147 @@ func BenchmarkParseSWS2_2(b *testing.B) {
 		ParseSWS(src, 0)
 	}
 }
+
+func BenchmarkParseLeftAngleQuote1_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" <>")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLeftAngleQuote(context)
+	}
+}
+
+func BenchmarkParseLeftAngleQuote1_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte("  \r\n\t <>")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLeftAngleQuote(context)
+	}
+}
+
+func BenchmarkParseLeftAngleQuote2_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" <>")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLeftAngleQuote2(context, src, 0)
+	}
+}
+
+func BenchmarkParseLeftAngleQuote2_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte("  \r\n\t <>")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseLeftAngleQuote2(context, src, 0)
+	}
+}
+
+func BenchmarkParseRightAngleQuote1_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("> ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseRightAngleQuote(context)
+	}
+}
+
+func BenchmarkParseRightAngleQuote1_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(">  \r\n\t")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseRightAngleQuote(context)
+	}
+}
+
+func BenchmarkParseRightAngleQuote2_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("> ")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseRightAngleQuote2(context, src, 0)
+	}
+}
+
+func BenchmarkParseRightAngleQuote2_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(">  \r\n\t")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseRightAngleQuote2(context, src, 0)
+	}
+}

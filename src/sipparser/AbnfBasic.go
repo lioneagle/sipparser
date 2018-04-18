@@ -550,7 +550,40 @@ func eatWsp(src []byte, pos AbnfPos) (newPos AbnfPos) {
  * LAQUOT  =  SWS "<"; left angle quote
  *
  */
-func ParseLeftAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseLeftAngleQuote(context *ParseContext) (ok bool) {
+	len1 := AbnfPos(len(context.parseSrc))
+
+	if context.parsePos >= len1 {
+		context.AddError(context.parsePos, "LAQUOT parse: reach end at begining")
+		return false
+	}
+
+	ok = ParseSWS_2(context)
+	if !ok {
+		return false
+	}
+
+	if context.parsePos >= len1 {
+		context.AddError(context.parsePos, "LAQUOT parse: reach end before '<'")
+		return false
+	}
+
+	if context.parseSrc[context.parsePos] != '<' {
+		context.AddError(context.parsePos, "LAQUOT parse: no '<'")
+		return false
+	}
+
+	context.parsePos++
+
+	return true
+}
+
+/* RFC3261 Section 25.1, page 221
+ *
+ * LAQUOT  =  SWS "<"; left angle quote
+ *
+ */
+func ParseLeftAngleQuote2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	len1 := AbnfPos(len(src))
@@ -566,12 +599,12 @@ func ParseLeftAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos
 	}
 
 	if newPos >= len1 {
-		context.AddError(newPos, "LAQUOT parse: reach end before '<'")
+		context.AddError(newPos, "reach end before '<' for LAQUOT")
 		return newPos, false
 	}
 
 	if src[newPos] != '<' {
-		context.AddError(newPos, "LAQUOT parse: no '<'")
+		context.AddError(newPos, "no '<' for LAQUOT")
 		return newPos, false
 	}
 
@@ -583,7 +616,30 @@ func ParseLeftAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos
  * RAQUOT  =  ">" SWS ; right angle quote
  *
  */
-func ParseRightAngleQuote(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseRightAngleQuote(context *ParseContext) (ok bool) {
+	len1 := AbnfPos(len(context.parseSrc))
+
+	if context.parsePos >= len1 {
+		context.AddError(context.parsePos, "reach end at begining for RAQUOT")
+		return false
+	}
+
+	if context.parseSrc[context.parsePos] != '>' {
+		context.AddError(context.parsePos, "no '>' for RAQUOT")
+		return false
+	}
+
+	context.parsePos++
+
+	return ParseSWS_2(context)
+}
+
+/* RFC3261 Section 25.1, page 221
+ *
+ * RAQUOT  =  ">" SWS ; right angle quote
+ *
+ */
+func ParseRightAngleQuote2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	if newPos >= AbnfPos(len(src)) {
