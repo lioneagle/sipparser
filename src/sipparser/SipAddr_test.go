@@ -192,3 +192,53 @@ func BenchmarkSipAddrParseScheme(b *testing.B) {
 	//fmt.Printf("uri = %s\n", uri.String())
 	fmt.Printf("")
 }
+
+func BenchmarkSipAddrParseAddrSpec(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	remain := context.allocator.Used()
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		ptr := NewSipAddr(context)
+		addr := ptr.GetSipAddr(context)
+		addr.ParseWithoutInit(context, true)
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}
+
+func BenchmarkSipAddrParseNameAddr(b *testing.B) {
+	b.StopTimer()
+	v := []byte("\"string\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	remain := context.allocator.Used()
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		ptr := NewSipAddr(context)
+		addr := ptr.GetSipAddr(context)
+		addr.ParseWithoutInit(context, true)
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}

@@ -147,6 +147,10 @@ func (this AbnfPtr) GetUriHeader(context *ParseContext) *UriHeader {
 	return (*UriHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipGenericParam(context *ParseContext) *SipGenericParam {
+	return (*SipGenericParam)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

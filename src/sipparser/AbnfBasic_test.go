@@ -763,7 +763,7 @@ func BenchmarkParseLWS2(b *testing.B) {
 	}
 }
 
-func BenchmarkParseSWS1(b *testing.B) {
+func BenchmarkParseSWS1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
 	context := NewParseContext()
@@ -799,7 +799,7 @@ func BenchmarkParseSWS1_2(b *testing.B) {
 	}
 }
 
-func BenchmarkParseSWS2(b *testing.B) {
+func BenchmarkParseSWS2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
 	context := NewParseContext()
@@ -976,5 +976,77 @@ func BenchmarkParseRightAngleQuote2_2(b *testing.B) {
 		context.allocator.FreeAll()
 		context.SetParsePos(0)
 		ParseRightAngleQuote2(context, src, 0)
+	}
+}
+
+func BenchmarkParseSWSMark1_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("=")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWSMark(context, '=')
+	}
+}
+
+func BenchmarkParseSWSMark1_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" \r\n = \r\n\t")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWSMark(context, '=')
+	}
+}
+
+func BenchmarkParseSWSMark2_1(b *testing.B) {
+	b.StopTimer()
+	src := []byte("=")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWSMark_2(context, src, 0, '=')
+	}
+}
+
+func BenchmarkParseSWSMark2_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte(" \r\n = \r\n\t")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseSWSMark_2(context, src, 0, '=')
 	}
 }

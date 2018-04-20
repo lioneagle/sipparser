@@ -32,7 +32,6 @@ func NewUriParam(context *ParseContext) AbnfPtr {
 }
 
 func (this *UriParam) Encode(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
-
 	if this.name != ABNF_PTR_NIL {
 		this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
 
@@ -43,8 +42,26 @@ func (this *UriParam) Encode(context *ParseContext, buf *AbnfByteBuffer, charset
 	}
 }
 
+/* uri-parameters    =  *( ";" uri-parameter)
+ * uri-parameter     =  transport-param / user-param / method-param
+ *                      / ttl-param / maddr-param / lr-param / other-param
+ * transport-param   =  "transport="
+ *                      ( "udp" / "tcp" / "sctp" / "tls"
+ *                      / other-transport)
+ * other-transport   =  token
+ * user-param        =  "user=" ( "phone" / "ip" / other-user)
+ * other-user        =  token
+ * method-param      =  "method=" Method
+ * ttl-param         =  "ttl=" ttl
+ * maddr-param       =  "maddr=" host
+ * lr-param          =  "lr"
+ * other-param       =  pname [ "=" pvalue ]
+ * pname             =  1*paramchar
+ * pvalue            =  1*paramchar
+ * paramchar         =  param-unreserved / unreserved / escaped
+ * param-unreserved  =  "[" / "]" / "/" / ":" / "&" / "+" / "$"
+ */
 func (this *UriParam) Parse(context *ParseContext, charsets *CharsetInfo) (ok bool) {
-
 	var name AbnfPtr
 	var value AbnfPtr
 
@@ -76,7 +93,6 @@ func (this *UriParam) Parse(context *ParseContext, charsets *CharsetInfo) (ok bo
 }
 
 func ParseUriParams(context *ParseContext, charsets *CharsetInfo) (params AbnfPtr, ok bool) {
-
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
 		context.AddError(context.parsePos, "reach end after ';' for uri params")

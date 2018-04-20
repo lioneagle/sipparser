@@ -23,5 +23,6 @@ func printSize() {
 	fmt.Println("sizeof(SipUri)               =", unsafe.Sizeof(SipUri{}))
 	fmt.Println("sizeof(SipUriKnownParams)    =", unsafe.Sizeof(SipUriKnownParams{}))
 	fmt.Println("sizeof(SipAddr)              =", unsafe.Sizeof(SipAddr{}))
+	fmt.Println("sizeof(SipGenericParam)      =", unsafe.Sizeof(SipGenericParam{}))
 	fmt.Println("SIP_URI_KNOWN_PARAM_MAX_NUM  =", SIP_URI_KNOWN_PARAM_MAX_NUM)
 }

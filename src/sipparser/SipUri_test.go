@@ -15,8 +15,6 @@ func TestSipUriParseOK(t *testing.T) {
 		password  string
 		hostport  string
 		isSipsUri bool
-		//params   []string
-		//headers  []string
 	}{
 		{"sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa", "123", "", "abc.com", false},
 		{"Sip:123:tsdd@[1080::8:800:200c:417a]:5061", "123", "tsdd", "[1080::8:800:200c:417a]:5061", false},

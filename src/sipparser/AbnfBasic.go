@@ -337,7 +337,29 @@ func ParseHcolon(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos
 	return ParseSWS(src, newPos+1)
 }
 
-func ParseSWSMarkCanOmmit(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, matchMark bool, ok bool) {
+func ParseSWSMarkCanOmmit(context *ParseContext, mark byte) (matchMark bool, ok bool) {
+	src := context.parseSrc
+	ok = ParseSWS_2(context)
+	if !ok {
+		return false, true
+	}
+
+	if context.parsePos >= AbnfPos(len(src)) {
+		context.AddError(context.parsePos, "reach end before mark for SWSMark")
+		return false, false
+	}
+
+	if src[context.parsePos] != mark {
+		return false, true
+	}
+
+	context.parsePos++
+
+	ok = ParseSWS_2(context)
+	return true, ok
+}
+
+func ParseSWSMarkCanOmmit_2(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, matchMark bool, ok bool) {
 	newPos = pos
 	newPos, ok = ParseSWS(src, newPos)
 	if !ok {
@@ -368,7 +390,30 @@ func ParseSWSMarkCanOmmit(context *ParseContext, src []byte, pos AbnfPos, mark b
  * SEMI    =  SWS ";" SWS ; semicolon
  * COLON   =  SWS ":" SWS ; colon
  */
-func ParseSWSMark(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, ok bool) {
+func ParseSWSMark(context *ParseContext, mark byte) (ok bool) {
+	src := context.parseSrc
+
+	ok = ParseSWS_2(context)
+	if !ok {
+		return false
+	}
+
+	if context.parsePos >= AbnfPos(len(src)) {
+		context.AddError(context.parsePos, "reach end before mark for SWSMark")
+		return false
+	}
+
+	if src[context.parsePos] != mark {
+		context.AddError(context.parsePos, "not expected mark after SWS for SWSMark")
+		return false
+	}
+
+	context.parsePos++
+
+	return ParseSWS_2(context)
+}
+
+func ParseSWSMark_2(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	newPos, ok = ParseSWS(src, newPos)
