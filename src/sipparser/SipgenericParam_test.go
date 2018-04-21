@@ -132,7 +132,7 @@ func TestParseSipGenericParams(t *testing.T) {
 			}
 
 			buf := NewAbnfByteBuffer(nil)
-			EncodeSipGenericParams(context, buf, params, ';')
+			EncodeSipGenericParams(context, buf, params, ';', nil)
 
 			test.EXPECT_EQ(t, buf.String(), v.encode, "")
 		})
@@ -157,6 +157,31 @@ func BenchmarkParseSipGenericParams(b *testing.B) {
 		context.allocator.FreePart(remain)
 		context.SetParsePos(0)
 		ParseSipGenericParams(context, ';', nil)
+
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}
+
+func BenchmarkEncodeSipGenericParams(b *testing.B) {
+	b.StopTimer()
+	v := []byte(";transport=tcp;method=REGISTER")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	params, _ := ParseSipGenericParams(context, ';', nil)
+	remain := context.allocator.Used()
+	buf := NewAbnfByteBuffer(nil)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		EncodeSipGenericParams(context, buf, params, ';', nil)
 
 	}
 	//fmt.Printf("uri = %s\n", uri.String())

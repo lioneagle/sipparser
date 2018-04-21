@@ -7,15 +7,16 @@ import (
 )
 
 type ParseContext struct {
-	Errors                   AbnfErrors
-	EncodeHeaderShorName     bool
-	allocator                *MemAllocator
-	parseSrc                 []byte
-	parsePos                 AbnfPos
-	parseBegin               uintptr
-	parseEnd                 uintptr
-	ParseSipHeaderAsRaw      bool
-	ParseSetSipUriKnownParam bool
+	Errors                    AbnfErrors
+	EncodeHeaderShorName      bool
+	allocator                 *MemAllocator
+	parseSrc                  []byte
+	parsePos                  AbnfPos
+	parseBegin                uintptr
+	parseEnd                  uintptr
+	ParseSipHeaderAsRaw       bool
+	ParseSetSipUriKnownParam  bool
+	ParseSetSipFromKnownParam bool
 	//ParseSipKeyHeader    bool
 }
 

@@ -459,12 +459,14 @@ func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (a
 			var ok bool
 
 			context.parsePos = newPos
+			this.used = used
 			ok = this.ParseAndCopyLWS(context)
 			if !ok {
 				context.AddError(context.parsePos, "wrong LWS in quoted-string")
 				return ABNF_PTR_NIL, false
 			}
 			newPos = context.parsePos
+			used = this.used
 		} else if IsSipQuotedText(v) {
 			this.mem[used] = v
 			used++
@@ -500,6 +502,7 @@ func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (a
 	this.stat.allocReqBytes = used - this.used
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
+
 	return addr, true
 }
 

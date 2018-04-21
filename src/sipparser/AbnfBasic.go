@@ -310,7 +310,35 @@ func ParseUInt8(src []byte, pos AbnfPos) (digit uint8, num uint32, newPos AbnfPo
  *
  * HCOLON  =  *( SP / HTAB ) ":" SWS
  */
-func ParseHcolon(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseHcolon(context *ParseContext) (ok bool) {
+	src := context.parseSrc
+	len1 := AbnfPos(len(src))
+	newPos := context.parsePos
+
+	for ; newPos < len1; newPos++ {
+		if !IsWspChar(src[newPos]) {
+			break
+		}
+	}
+
+	if newPos >= len1 {
+		context.parsePos = newPos
+		context.AddError(newPos, "HCOLON parse: reach end before ':'")
+		return false
+	}
+
+	if src[newPos] != ':' {
+		context.parsePos = newPos
+		context.AddError(newPos, "HCOLON parse: no ':' after *( SP / HTAB )")
+		return false
+	}
+
+	context.parsePos = newPos + 1
+
+	return ParseSWS_2(context)
+}
+
+func ParseHcolon2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	//ref := AbnfRef{}
 	//newPos = ref.ParseWspChar(src, pos)

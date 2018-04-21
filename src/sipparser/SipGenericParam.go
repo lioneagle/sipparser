@@ -50,7 +50,8 @@ func (this *SipGenericParam) Encode(context *ParseContext, buf *AbnfByteBuffer) 
 		if this.value != ABNF_PTR_NIL {
 			buf.WriteByte('=')
 			if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN {
-				this.value.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+				//this.value.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+				this.value.WriteCString(context, buf)
 			} else if this.valueType == SIP_GENERIC_VALUE_TYPE_QUOTED_STRING {
 				EncodeSipQuotedString(context, buf, this.value)
 			}
@@ -97,7 +98,8 @@ func (this *SipGenericParam) ParseValue(context *ParseContext) (ok bool) {
 	/* @@TODO: 目前解gen-value时，暂不考虑解析出host，因为一般没有必要解析出来，以后再考虑添加这个功能 */
 	v := context.parseSrc[context.parsePos]
 	if IsSipToken(v) {
-		this.value, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+		//this.value, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+		this.value, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 		if ok {
 			this.valueType = SIP_GENERIC_VALUE_TYPE_TOKEN
 		}
@@ -174,7 +176,11 @@ func ParseSipGenericParams(context *ParseContext, seperator byte, knownParams Kn
 	return params, true
 }
 
-func EncodeSipGenericParams(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr, seperator byte) {
+func EncodeSipGenericParams(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr, seperator byte, knownParams KnownSipGenericParams) {
+	if knownParams != nil {
+		knownParams.EncodeKnownParams(context, buf)
+	}
+
 	if params != ABNF_PTR_NIL {
 		param := params.GetSipGenericParam(context)
 

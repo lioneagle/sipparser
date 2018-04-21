@@ -164,7 +164,7 @@ func (this *SipUri) SetKnownParams(context *ParseContext, name AbnfPtr, param Ab
 	var knownParams *SipUriKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipUriKnownParams(context)
+		knownParams = this.knownParams.GetSipUriKnownParams(context)
 	}
 
 	len1 := len(g_SipUriKnownParamInfo)
@@ -172,9 +172,9 @@ func (this *SipUri) SetKnownParams(context *ParseContext, name AbnfPtr, param Ab
 		if name.CStringEqualNoCase(context, g_SipUriKnownParamInfo[i].name) {
 			if this.knownParams == ABNF_PTR_NIL {
 				this.knownParams = NewSipUriKnownParams(context)
-
+				knownParams = this.knownParams.GetSipUriKnownParams(context)
 			}
-			knownParams = this.knownParams.GetSipUriKnownParams(context)
+
 			knownParams.params[g_SipUriKnownParamInfo[i].index] = param
 			return true
 		}
@@ -189,32 +189,6 @@ func (this *SipUri) encodeScheme(buf *AbnfByteBuffer) {
 		buf.WriteString("sip:")
 	}
 }
-
-/*func (this *SipUri) encodeParams(context *ParseContext, buf *AbnfByteBuffer) {
-	param := this.params.GetSipUriParam(context)
-
-	for {
-		param.Encode(context, buf)
-		if param.next == ABNF_PTR_NIL {
-			return
-		}
-		buf.WriteByte(';')
-		param = param.next.GetSipUriParam(context)
-	}
-}
-
-func (this *SipUri) encodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
-	header := this.headers.GetSipUriHeader(context)
-
-	for {
-		header.Encode(context, buf)
-		if header.next == ABNF_PTR_NIL {
-			return
-		}
-		buf.WriteByte('&')
-		header = header.next.GetSipUriHeader(context)
-	}
-}*/
 
 func (this *SipUri) Parse(context *ParseContext) (ok bool) {
 	this.Init()

@@ -220,7 +220,7 @@ func BenchmarkSipAddrParseAddrSpec(b *testing.B) {
 
 func BenchmarkSipAddrParseNameAddr(b *testing.B) {
 	b.StopTimer()
-	v := []byte("\"string\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
+	v := []byte("\"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	remain := context.allocator.Used()
@@ -238,7 +238,10 @@ func BenchmarkSipAddrParseNameAddr(b *testing.B) {
 		ptr := NewSipAddr(context)
 		addr := ptr.GetSipAddr(context)
 		addr.ParseWithoutInit(context, true)
+		/*if i == 0 {
+			fmt.Printf("uri = %s\n", addr.String(context))
+		}*/
 	}
-	//fmt.Printf("uri = %s\n", uri.String())
+
 	fmt.Printf("")
 }
