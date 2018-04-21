@@ -71,9 +71,9 @@ func (this *SipHeaderTo) EncodeValue(context *ParseContext, buf *AbnfByteBuffer)
 
 /* RFC3261
  *
- * From        =  ( "From" / "f" ) HCOLON from-spec
- * from-spec   =  ( name-addr / addr-spec )
- *                *( SEMI from-param )
+ * To        =  ( "To" / "t" ) HCOLON ( name-addr
+ *            / addr-spec ) *( SEMI to-param )
+ * to-param  =  tag-param / generic-param
  */
 func (this *SipHeaderTo) Parse(context *ParseContext) (ok bool) {
 	this.Init()
@@ -201,4 +201,21 @@ func (this *SipHeaderTo) parseHeaderName(context *ParseContext) (ok bool) {
 	}
 
 	return false
+}
+
+func ParseSipTo(context *ParseContext) (parsed AbnfPtr, ok bool) {
+	addr := NewSipHeaderTo(context)
+	if addr == ABNF_PTR_NIL {
+		context.AddError(context.parsePos, "no mem for To header")
+		return ABNF_PTR_NIL, false
+	}
+	ok = addr.GetSipHeaderTo(context).ParseValueWithoutInit(context)
+	return addr, ok
+}
+
+func EncodeSipToValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+	if parsed == ABNF_PTR_NIL {
+		return
+	}
+	parsed.GetSipHeaderTo(context).EncodeValue(context, buf)
 }

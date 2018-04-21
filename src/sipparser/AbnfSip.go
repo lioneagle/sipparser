@@ -167,6 +167,10 @@ func (this AbnfPtr) GetSipToKnownParams(context *ParseContext) *SipToKnownParams
 	return (*SipToKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderCallId(context *ParseContext) *SipHeaderCallId {
+	return (*SipHeaderCallId)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

@@ -7,21 +7,21 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestSipHeaderToParse(t *testing.T) {
+func TestSipHeaderCallIdParse(t *testing.T) {
 	testdata := []struct {
 		src    string
 		ok     bool
 		newPos int
 		encode string
 	}{
-		{"To: sip:abc@a.com;tag=1", true, len("To: sip:abc@a.com;tag=1"), "To: sip:abc@a.com;tag=1"},
-		{"t: <sip:abc@a.com;user=ip>;tag=1", true, len("t: <sip:abc@a.com;user=ip>;tag=1"), "To: <sip:abc@a.com;user=ip>;tag=1"},
-		{"tO: abc<sip:abc@a.com;user=ip>;tag=1", true, len("tO: abc<sip:abc@a.com;user=ip>;tag=1"), "To: abc<sip:abc@a.com;user=ip>;tag=1"},
-		//{"To: tel:+12358;tag=123", true, len("To: tel:+12358;tag=123"), "To: <tel:+12358>;tag=123"},
+		{"Call-ID: abc123@a.com", true, len("Call-ID: abc123@a.com"), "Call-ID: abc123@a.com"},
+		{"i: abc123", true, len("i: abc123"), "Call-ID: abc123"},
+		{"caLL-iD: abc123\r\n", true, len("Call-ID: abc123"), "Call-ID: abc123"},
 
-		{" To: <sip:abc@a.com>;tag=1", false, 0, "0"},
-		{"To1: <sip:abc@a.com>;tag=1", false, 0, ""},
-		{"To: ", false, len("To: "), ""},
+		{" Call-ID: abc123@", false, 0, ""},
+		{"Call-ID1: abc123@", false, 0, ""},
+		{"Call-ID: abc123@", false, len("Call-ID: abc123@"), ""},
+		{"Call-ID: @abc", false, len("Call-ID: "), ""},
 	}
 
 	for i, v := range testdata {
@@ -35,8 +35,8 @@ func TestSipHeaderToParse(t *testing.T) {
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 
-			addr := NewSipHeaderTo(context)
-			header := addr.GetSipHeaderTo(context)
+			addr := NewSipHeaderCallId(context)
+			header := addr.GetSipHeaderCallId(context)
 
 			ok := header.Parse(context)
 			if v.ok {
@@ -56,14 +56,14 @@ func TestSipHeaderToParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipHeaderToParse(b *testing.B) {
+func BenchmarkSipHeaderCallIdParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("To: <sip:6135000@24.15.255.4>")
+	v := []byte("Call-ID: 0009b7da-0352000f-30a69b83-0e7b53d6@24.15.255.101")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderTo(context)
-	header := addr.GetSipHeaderTo(context)
+	addr := NewSipHeaderCallId(context)
+	header := addr.GetSipHeaderCallId(context)
 	remain := context.allocator.Used()
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -79,14 +79,14 @@ func BenchmarkSipHeaderToParse(b *testing.B) {
 	fmt.Printf("")
 }
 
-func BenchmarkSipHeaderToEncode(b *testing.B) {
+func BenchmarkSipHeaderCallIdEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("To: <sip:6135000@24.15.255.4>")
+	v := []byte("Call-ID: 0009b7da-0352000f-30a69b83-0e7b53d6@24.15.255.101")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderTo(context)
-	header := addr.GetSipHeaderTo(context)
+	addr := NewSipHeaderCallId(context)
+	header := addr.GetSipHeaderCallId(context)
 	header.Parse(context)
 	remain := context.allocator.Used()
 	//buf := bytes.NewBuffer(make([]byte, 1024*1024))

@@ -28,7 +28,7 @@ func TestSipHeaderFromParse(t *testing.T) {
 		v := v
 
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
 
 			context := NewParseContext()
 			context.allocator = NewMemAllocator(1024 * 2)
