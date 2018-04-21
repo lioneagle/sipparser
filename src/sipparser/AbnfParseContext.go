@@ -17,6 +17,7 @@ type ParseContext struct {
 	ParseSipHeaderAsRaw       bool
 	ParseSetSipUriKnownParam  bool
 	ParseSetSipFromKnownParam bool
+	ParseSetSipToKnownParam   bool
 	//ParseSipKeyHeader    bool
 }
 

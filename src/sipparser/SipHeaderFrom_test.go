@@ -15,8 +15,8 @@ func TestSipHeaderFromParse(t *testing.T) {
 		encode string
 	}{
 		{"From: sip:abc@a.com;tag=1", true, len("From: sip:abc@a.com;tag=1"), "From: sip:abc@a.com;tag=1"},
-		{"From: <sip:abc@a.com;user=ip>;tag=1", true, len("From: <sip:abc@a.com;user=ip>;tag=1"), "From: <sip:abc@a.com;user=ip>;tag=1"},
-		{"From: abc<sip:abc@a.com;user=ip>;tag=1", true, len("From: abc<sip:abc@a.com;user=ip>;tag=1"), "From: abc<sip:abc@a.com;user=ip>;tag=1"},
+		{"f: <sip:abc@a.com;user=ip>;tag=1", true, len("f: <sip:abc@a.com;user=ip>;tag=1"), "From: <sip:abc@a.com;user=ip>;tag=1"},
+		{"frOm: abc<sip:abc@a.com;user=ip>;tag=1", true, len("frOm: abc<sip:abc@a.com;user=ip>;tag=1"), "From: abc<sip:abc@a.com;user=ip>;tag=1"},
 		//{"From: tel:+12358;tag=123", true, len("From: tel:+12358;tag=123"), "From: <tel:+12358>;tag=123"},
 
 		{" From: <sip:abc@a.com>;tag=1", false, 0, "0"},
@@ -58,9 +58,6 @@ func TestSipHeaderFromParse(t *testing.T) {
 
 func BenchmarkSipHeaderFromParse(b *testing.B) {
 	b.StopTimer()
-	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
-	//v := []byte("sip:biloxi.com")
-	//v := []byte("sip:abc@biloxi.com;transport=tcp")
 	//v := []byte("From: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	//v := []byte("From: \"User ID\" <sip:6140000@24.15.255.4>;tag=dab70900252036d7134be-4ec05abe")
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
@@ -86,7 +83,6 @@ func BenchmarkSipHeaderFromParse(b *testing.B) {
 
 func BenchmarkSipHeaderFromEncode(b *testing.B) {
 	b.StopTimer()
-	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
 	//v := []byte("From: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
 	//v := []byte("From:<sip:abc@biloxi.com>;tag=dab70900252036d7134be-4ec05abe")
@@ -116,7 +112,6 @@ func BenchmarkSipHeaderFromEncode(b *testing.B) {
 //*
 func BenchmarkSipHeaderFromString(b *testing.B) {
 	b.StopTimer()
-	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
