@@ -7,20 +7,19 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestSipHeaderCseqParse(t *testing.T) {
+func TestSipHeaderMaxForwardsParse(t *testing.T) {
 	testdata := []struct {
 		src    string
 		ok     bool
 		newPos int
 		encode string
 	}{
-		{"CSeq: 1234 INVITE", true, len("CSeq: 1234 INVITE"), "CSeq: 1234 INVITE"},
+		{"Max-Forwards: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
 
-		{" CSeq: ", false, 0, ""},
-		{"CSeq2: ", false, 0, ""},
-		{"CSeq: ", false, len("CSeq: "), ""},
-		{"CSeq: 1234", false, len("CSeq: 1234"), ""},
-		{"CSeq: 1234 \r\nINVITE", false, len("CSeq: 1234 \r\n"), ""},
+		{" Max-Forwards: 1234", false, 0, ""},
+		{"Max-Forwards2: 1234", false, 0, ""},
+		{"Max-Forwards: ", false, len("Max-Forwards: "), ""},
+		{"Max-Forwards: a123", false, len("Max-Forwards: "), ""},
 	}
 
 	for i, v := range testdata {
@@ -34,8 +33,8 @@ func TestSipHeaderCseqParse(t *testing.T) {
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 
-			addr := NewSipHeaderCseq(context)
-			header := addr.GetSipHeaderCseq(context)
+			addr := NewSipHeaderMaxForwards(context)
+			header := addr.GetSipHeaderMaxForwards(context)
 
 			ok := header.Parse(context)
 			if v.ok {
@@ -55,14 +54,14 @@ func TestSipHeaderCseqParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipHeaderCseqParse(b *testing.B) {
+func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("CSeq: 101 INVITE")
+	v := []byte("Max-Forwards: 70")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderCseq(context)
-	header := addr.GetSipHeaderCseq(context)
+	addr := NewSipHeaderMaxForwards(context)
+	header := addr.GetSipHeaderMaxForwards(context)
 	remain := context.allocator.Used()
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -77,14 +76,14 @@ func BenchmarkSipHeaderCseqParse(b *testing.B) {
 	//fmt.Println("header =", buf.String())
 }
 
-func BenchmarkSipHeaderCseqEncode(b *testing.B) {
+func BenchmarkSipHeaderMaxForwardsEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("CSeq: 101 INVITE")
+	v := []byte("Max-Forwards: 70")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderCseq(context)
-	header := addr.GetSipHeaderCseq(context)
+	addr := NewSipHeaderMaxForwards(context)
+	header := addr.GetSipHeaderMaxForwards(context)
 	header.Parse(context)
 	remain := context.allocator.Used()
 	//buf := bytes.NewBuffer(make([]byte, 1024*1024))

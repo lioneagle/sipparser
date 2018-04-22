@@ -179,6 +179,10 @@ func (this AbnfPtr) GetSipMethod(context *ParseContext) *SipMethod {
 	return (*SipMethod)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderMaxForwards(context *ParseContext) *SipHeaderMaxForwards {
+	return (*SipHeaderMaxForwards)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
@@ -294,9 +298,6 @@ func (this AbnfPtr) GetSipHeaderRoute(context *ParseContext) *SipHeaderRoute {
 	return (*SipHeaderRoute)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderMaxForwards(context *ParseContext) *SipHeaderMaxForwards {
-	return (*SipHeaderMaxForwards)(unsafe.Pointer(&context.allocator.mem[this]))
-}
 
 func (this AbnfPtr) GetSipMsgBody(context *ParseContext) *SipMsgBody {
 	return (*SipMsgBody)(unsafe.Pointer(&context.allocator.mem[this]))

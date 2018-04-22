@@ -128,14 +128,13 @@ func (this *SipHeaderCseq) parseHeaderName(context *ParseContext) (ok bool) {
 }
 
 func ParseSipCseq(context *ParseContext) (parsed AbnfPtr, ok bool) {
-	/*addr := NewSipHeaderCallId(context)
+	addr := NewSipHeaderCseq(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for CSeq header")
 		return ABNF_PTR_NIL, false
 	}
 	ok = addr.GetSipHeaderCseq(context).ParseValueWithoutInit(context)
-	return addr, ok*/
-	return ABNF_PTR_NIL, false
+	return addr, ok
 }
 
 func EncodeSipCseqValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
