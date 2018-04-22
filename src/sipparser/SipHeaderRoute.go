@@ -113,13 +113,6 @@ func (this *SipHeaderRoute) parseHeaderName(context *ParseContext) (ok bool) {
 
 	if src[pos]|0x20 == 'r' {
 		pos++
-		if pos >= len1 {
-			return false
-		}
-		if src[pos] == ':' || IsWspChar(src[pos]) {
-			context.parsePos = pos
-			return true
-		}
 
 		if (pos + 4) >= len1 {
 			return false
