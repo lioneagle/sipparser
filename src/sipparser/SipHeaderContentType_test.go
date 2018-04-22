@@ -7,20 +7,22 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestSipHeaderMaxForwardsParse(t *testing.T) {
+func TestSipHeaderContentTypeParse(t *testing.T) {
 	testdata := []struct {
 		src    string
 		ok     bool
 		newPos int
 		encode string
 	}{
-		{"Max-Forwards: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
-		{"max-foRwardS: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
+		{"Content-Type: application/sdp", true, len("Content-Type: application/sdp"), "Content-Type: application/sdp"},
+		{"conteNt-TypE: application/sdp", true, len("Content-Type: application/sdp"), "Content-Type: application/sdp"},
+		{"c: message/sip", true, len("c: message/sip"), "Content-Type: message/sip"},
 
-		{" Max-Forwards: 1234", false, 0, ""},
-		{"Max-Forwards2: 1234", false, 0, ""},
-		{"Max-Forwards: ", false, len("Max-Forwards: "), ""},
-		{"Max-Forwards: a123", false, len("Max-Forwards: "), ""},
+		{" Content-Type: abc", false, 0, ""},
+		{"Content-Type2: abc", false, 0, ""},
+		{"Content-Type: ", false, len("Content-Type: "), ""},
+		{"Content-Type: abc", false, len("Content-Type: abc"), ""},
+		{"Content-Type: abc/", false, len("Content-Type: abc/"), ""},
 	}
 
 	for i, v := range testdata {
@@ -34,8 +36,8 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 
-			addr := NewSipHeaderMaxForwards(context)
-			header := addr.GetSipHeaderMaxForwards(context)
+			addr := NewSipHeaderContentType(context)
+			header := addr.GetSipHeaderContentType(context)
 
 			ok := header.Parse(context)
 			if v.ok {
@@ -55,14 +57,14 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
+func BenchmarkSipHeaderContentTypeParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Max-Forwards: 70")
+	v := []byte("Content-Type: application/sdp")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderMaxForwards(context)
-	header := addr.GetSipHeaderMaxForwards(context)
+	addr := NewSipHeaderContentType(context)
+	header := addr.GetSipHeaderContentType(context)
 	remain := context.allocator.Used()
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -79,14 +81,14 @@ func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
 	//fmt.Printf("allocator.Used = %d, i= %d\n", context.allocator.Used(), i)
 }
 
-func BenchmarkSipHeaderMaxForwardsEncode(b *testing.B) {
+func BenchmarkSipHeaderContentTypeEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Max-Forwards: 70")
+	v := []byte("Content-Type: application/sdp")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderMaxForwards(context)
-	header := addr.GetSipHeaderMaxForwards(context)
+	addr := NewSipHeaderContentType(context)
+	header := addr.GetSipHeaderContentType(context)
 	header.Parse(context)
 	remain := context.allocator.Used()
 	//buf := bytes.NewBuffer(make([]byte, 1024*1024))

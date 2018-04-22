@@ -135,7 +135,7 @@ func (this *SipHeaderRoute) parseHeaderName(context *ParseContext) (ok bool) {
 func ParseSipRoute(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderRoute(context)
 	if addr == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for From header")
+		context.AddError(context.parsePos, "no mem for Route header")
 		return ABNF_PTR_NIL, false
 	}
 	ok = addr.GetSipHeaderRoute(context).ParseValueWithoutInit(context)

@@ -22,6 +22,7 @@ type ParseContext struct {
 	ParseSetSipRecordRouteKnownParam bool
 	ParseSetSipContactKnownParam     bool
 	ParseSetSipViaKnownParam         bool
+	ParseSetSipContentTypeKnownParam bool
 	//ParseSipKeyHeader    bool
 }
 

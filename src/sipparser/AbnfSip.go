@@ -219,6 +219,14 @@ func (this AbnfPtr) GetSipHeaderVia(context *ParseContext) *SipHeaderVia {
 	return (*SipHeaderVia)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipContentTypeKnownParams(context *ParseContext) *SipContentTypeKnownParams {
+	return (*SipContentTypeKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
+func (this AbnfPtr) GetSipHeaderContentType(context *ParseContext) *SipHeaderContentType {
+	return (*SipHeaderContentType)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
@@ -294,21 +302,6 @@ func (this AbnfPtr) GetSipGenericParams(context *ParseContext) *SipGenericParams
 
 
 
-func (this AbnfPtr) GetSipHeaderVia(context *ParseContext) *SipHeaderVia {
-	return (*SipHeaderVia)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-func (this AbnfPtr) GetSipHeaderTo(context *ParseContext) *SipHeaderTo {
-	return (*SipHeaderTo)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-
-
-func (this AbnfPtr) GetSipHeaderContentType(context *ParseContext) *SipHeaderContentType {
-	return (*SipHeaderContentType)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-
 
 func (this AbnfPtr) GetSipHeaderContentDisposition(context *ParseContext) *SipHeaderContentDisposition {
 	return (*SipHeaderContentDisposition)(unsafe.Pointer(&context.allocator.mem[this]))
@@ -316,13 +309,7 @@ func (this AbnfPtr) GetSipHeaderContentDisposition(context *ParseContext) *SipHe
 
 
 
-func (this AbnfPtr) GetSipHeaderCallId(context *ParseContext) *SipHeaderCallId {
-	return (*SipHeaderCallId)(unsafe.Pointer(&context.allocator.mem[this]))
-}
 
-func (this AbnfPtr) GetSipHeaderRecordRoute(context *ParseContext) *SipHeaderRecordRoute {
-	return (*SipHeaderRecordRoute)(unsafe.Pointer(&context.allocator.mem[this]))
-}
 
 
 

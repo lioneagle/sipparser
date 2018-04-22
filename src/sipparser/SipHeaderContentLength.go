@@ -135,7 +135,7 @@ func (this *SipHeaderContentLength) parseHeaderName(context *ParseContext) (ok b
 func ParseSipContentLength(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderContentLength(context)
 	if addr == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for Max-Forwards header")
+		context.AddError(context.parsePos, "no mem for Content-Length header")
 		return ABNF_PTR_NIL, false
 	}
 	ok = addr.GetSipHeaderContentLength(context).ParseValueWithoutInit(context)
