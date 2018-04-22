@@ -199,6 +199,14 @@ func (this AbnfPtr) GetSipHeaderRecordRoute(context *ParseContext) *SipHeaderRec
 	return (*SipHeaderRecordRoute)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipContactKnownParams(context *ParseContext) *SipContactKnownParams {
+	return (*SipContactKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
+func (this AbnfPtr) GetSipHeaderContact(context *ParseContext) *SipHeaderContact {
+	return (*SipHeaderContact)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
@@ -296,9 +304,7 @@ func (this AbnfPtr) GetSipHeaderContentDisposition(context *ParseContext) *SipHe
 	return (*SipHeaderContentDisposition)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderContact(context *ParseContext) *SipHeaderContact {
-	return (*SipHeaderContact)(unsafe.Pointer(&context.allocator.mem[this]))
-}
+
 
 func (this AbnfPtr) GetSipHeaderCallId(context *ParseContext) *SipHeaderCallId {
 	return (*SipHeaderCallId)(unsafe.Pointer(&context.allocator.mem[this]))

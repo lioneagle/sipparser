@@ -6,9 +6,10 @@ import (
 )
 
 type SipHeaderRecordRoute struct {
-	addr        AbnfPtr
+	addr        SipAddr
 	params      AbnfPtr
 	knownParams AbnfPtr
+	next        AbnfPtr
 }
 
 func SizeofSipHeaderRecordRoute() int {
@@ -37,9 +38,7 @@ func (this *SipHeaderRecordRoute) Encode(context *ParseContext, buf *AbnfByteBuf
 }
 
 func (this *SipHeaderRecordRoute) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
-	addr := this.addr.GetSipAddr(context)
-	addr.Encode(context, buf)
-
+	this.addr.Encode(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
 
@@ -76,13 +75,7 @@ func (this *SipHeaderRecordRoute) ParseValue(context *ParseContext) (ok bool) {
 }
 
 func (this *SipHeaderRecordRoute) ParseValueWithoutInit(context *ParseContext) (ok bool) {
-	this.addr = NewSipAddr(context)
-	if this.addr == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for sip-addr of Record-Route header")
-		return false
-	}
-
-	ok = this.addr.GetSipAddr(context).ParseNameAddrWithoutInit(context)
+	ok = this.addr.ParseNameAddrWithoutInit(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for Record-Route header")
 		return false

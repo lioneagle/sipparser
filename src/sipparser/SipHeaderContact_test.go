@@ -7,35 +7,37 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestSipHeaderMaxForwardsParse(t *testing.T) {
+func TestSipHeaderContactParse(t *testing.T) {
 	testdata := []struct {
 		src    string
 		ok     bool
 		newPos int
 		encode string
 	}{
-		{"Max-Forwards: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
-		{"max-foRwardS: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
+		{"Contact: *", true, len("Contact: *"), "Contact: *"},
+		{"Contact: sip:abc@a.com;tag=1", true, len("Contact: sip:abc@a.com;tag=1"), "Contact: sip:abc@a.com;tag=1"},
+		{"m: <sip:abc@a.com;user=ip>;tag=1", true, len("m: <sip:abc@a.com;user=ip>;tag=1"), "Contact: <sip:abc@a.com;user=ip>;tag=1"},
+		{"cOntact: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Contact: abc<sip:abc@a.com;user=ip>;tag=1"), "Contact: abc<sip:abc@a.com;user=ip>;tag=1"},
+		//{"Contact: tel:+12358;tag=123", true, len("Contact: tel:+12358;tag=123"), "Contact: <tel:+12358>;tag=123"},
 
-		{" Max-Forwards: 1234", false, 0, ""},
-		{"Max-Forwards2: 1234", false, 0, ""},
-		{"Max-Forwards: ", false, len("Max-Forwards: "), ""},
-		{"Max-Forwards: a123", false, len("Max-Forwards: "), ""},
+		{" Contact: <sip:abc@a.com>;tag=1", false, 0, "0"},
+		{"Contact1: <sip:abc@a.com>;tag=1", false, 0, ""},
+		{"Contact: ", false, len("Contact: "), ""},
 	}
 
 	for i, v := range testdata {
 		v := v
 
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
 
 			context := NewParseContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 
-			addr := NewSipHeaderMaxForwards(context)
-			header := addr.GetSipHeaderMaxForwards(context)
+			addr := NewSipHeaderContact(context)
+			header := addr.GetSipHeaderContact(context)
 
 			ok := header.Parse(context)
 			if v.ok {
@@ -55,14 +57,14 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
+func BenchmarkSipHeaderContactParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Max-Forwards: 70")
+	v := []byte("Contact: sip:6140000@24.15.255.101:5060")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderMaxForwards(context)
-	header := addr.GetSipHeaderMaxForwards(context)
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
 	remain := context.allocator.Used()
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -74,17 +76,19 @@ func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
 		context.SetParsePos(0)
 		header.Parse(context)
 	}
-	//fmt.Println("header =", buf.String())
+	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
 }
 
-func BenchmarkSipHeaderMaxForwardsEncode(b *testing.B) {
+func BenchmarkSipHeaderContactEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Max-Forwards: 70")
+	v := []byte("Contact: sip:6140000@24.15.255.101:5060")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderMaxForwards(context)
-	header := addr.GetSipHeaderMaxForwards(context)
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
 	header.Parse(context)
 	remain := context.allocator.Used()
 	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
@@ -99,5 +103,6 @@ func BenchmarkSipHeaderMaxForwardsEncode(b *testing.B) {
 		context.allocator.FreePart(remain)
 		header.Encode(context, buf)
 	}
+
 	//fmt.Println("header =", buf.String())
 }

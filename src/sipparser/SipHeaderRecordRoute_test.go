@@ -15,7 +15,7 @@ func TestSipHeaderRecordRouteParse(t *testing.T) {
 		encode string
 	}{
 		{"Record-Route: <sip:abc@a.com>;tag=1", true, len("Record-Route: <sip:abc@a.com>;tag=1"), "Record-Route: <sip:abc@a.com>;tag=1"},
-		{"Record-Route: <sip:abc@a.com;user=ip>;tag=1", true, len("Record-Route: <sip:abc@a.com;user=ip>;tag=1"), "Record-Route: <sip:abc@a.com;user=ip>;tag=1"},
+		{"REcord-roUte: <sip:abc@a.com;user=ip>;tag=1", true, len("Record-Route: <sip:abc@a.com;user=ip>;tag=1"), "Record-Route: <sip:abc@a.com;user=ip>;tag=1"},
 		{"Record-Route: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Record-Route: abc<sip:abc@a.com;user=ip>;tag=1"), "Record-Route: abc<sip:abc@a.com;user=ip>;tag=1"},
 		//{"Record-Route: <tel:+12358;tag=123>", true, len("Route: <tel:+12358;tag=123>"), "Record-Route: <tel:+12358;tag=123>"},
 
@@ -76,8 +76,9 @@ func BenchmarkSipHeaderRecordRouteParse(b *testing.B) {
 		context.SetParsePos(0)
 		header.Parse(context)
 	}
-	//fmt.Printf("uri = %s\n", uri.String())
-	fmt.Printf("")
+	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
 }
 
 func BenchmarkSipHeaderRecordRouteEncode(b *testing.B) {

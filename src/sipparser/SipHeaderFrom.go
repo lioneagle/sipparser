@@ -32,7 +32,7 @@ func NewSipFromKnownParams(context *ParseContext) AbnfPtr {
 }
 
 type SipHeaderFrom struct {
-	addr        AbnfPtr
+	addr        SipAddr
 	params      AbnfPtr
 	knownParams AbnfPtr
 }
@@ -63,9 +63,7 @@ func (this *SipHeaderFrom) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 }
 
 func (this *SipHeaderFrom) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
-	addr := this.addr.GetSipAddr(context)
-	addr.Encode(context, buf)
-
+	this.addr.Encode(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
 
@@ -104,13 +102,7 @@ func (this *SipHeaderFrom) ParseValue(context *ParseContext) (ok bool) {
 }
 
 func (this *SipHeaderFrom) ParseValueWithoutInit(context *ParseContext) (ok bool) {
-	this.addr = NewSipAddr(context)
-	if this.addr == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for sip-addr of From header")
-		return false
-	}
-
-	ok = this.addr.GetSipAddr(context).ParseWithoutInit(context, false)
+	ok = this.addr.ParseWithoutInit(context, false)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for From header")
 		return false
