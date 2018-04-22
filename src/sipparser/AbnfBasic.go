@@ -744,7 +744,17 @@ func IsOnlyCRLF(src []byte, pos AbnfPos) bool {
 	return (pos+2) == len1 && (src[pos] == '\r') && (src[pos+1] == '\n')
 }
 
-func ParseCRLF(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseCRLF(context *ParseContext) (ok bool) {
+	if ((context.parsePos + 1) < AbnfPos(len(context.parseSrc))) &&
+		(context.parseSrc[context.parsePos] == '\r') &&
+		(context.parseSrc[context.parsePos+1] == '\n') {
+		context.parsePos += 2
+		return true
+	}
+	return false
+}
+
+func ParseCRLF2(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 	if !IsCRLF(src, pos) {
 		//return pos, &AbnfError{"CRLF parse: wrong CRLF", src, pos}
 		return pos, false

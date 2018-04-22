@@ -107,18 +107,14 @@ func (this *SipAddr) ParseWithoutInit(context *ParseContext, parseAddrSpecParam 
 	}
 
 	if context.parseSrc[context.parsePos] == '<' || context.parseSrc[context.parsePos] == '"' {
-		this.addrType = ABNF_SIP_NAME_ADDR
 		return this.ParseNameAddrWithoutInit(context)
 	}
 
 	ok = this.ParseScheme(context)
 	if !ok {
-		this.addrType = ABNF_SIP_NAME_ADDR
 		context.parsePos = begin
 		return this.ParseNameAddrWithoutInit(context)
 	}
-
-	this.addrType = ABNF_SIP_ADDR_SPEC
 
 	return this.parsAddrSpecAfterScheme(context, parseAddrSpecParam)
 
@@ -159,7 +155,30 @@ func (this *SipAddr) ParseNameAddrWithoutInit(context *ParseContext) (ok bool) {
 		return false
 	}
 
-	return ParseRightAngleQuote(context)
+	ok = ParseRightAngleQuote(context)
+	if !ok {
+		return false
+	}
+
+	this.addrType = ABNF_SIP_NAME_ADDR
+
+	return true
+}
+
+func (this *SipAddr) parsAddrSpecWithoutInit(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+	ok = this.ParseScheme(context)
+	if !ok {
+		return false
+	}
+
+	ok = this.parsAddrSpecAfterScheme(context, true)
+	if !ok {
+		return false
+	}
+
+	this.addrType = ABNF_SIP_ADDR_SPEC
+
+	return true
 }
 
 func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpecParam bool) (ok bool) {

@@ -29,5 +29,9 @@ func printSize() {
 	fmt.Println("sizeof(SipMethod)            =", unsafe.Sizeof(SipMethod{}))
 	fmt.Println("sizeof(SipHeaderCallId)      =", unsafe.Sizeof(SipHeaderCallId{}))
 	fmt.Println("sizeof(SipHeaderCseq)        =", unsafe.Sizeof(SipHeaderCseq{}))
+	fmt.Println("sizeof(SipHeaderMaxForwards) =", unsafe.Sizeof(SipHeaderMaxForwards{}))
+	fmt.Println("sizeof(SipVersion)           =", unsafe.Sizeof(SipVersion{}))
+	fmt.Println("sizeof(SipStartLine)         =", unsafe.Sizeof(SipStartLine{}))
+	fmt.Println("sizeof(SipHeaderRoute)       =", unsafe.Sizeof(SipHeaderRoute{}))
 	fmt.Println("SIP_URI_KNOWN_PARAM_MAX_NUM  =", SIP_URI_KNOWN_PARAM_MAX_NUM)
 }
