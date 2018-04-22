@@ -171,6 +171,14 @@ func (this AbnfPtr) GetSipHeaderCallId(context *ParseContext) *SipHeaderCallId {
 	return (*SipHeaderCallId)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderCseq(context *ParseContext) *SipHeaderCseq {
+	return (*SipHeaderCseq)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
+func (this AbnfPtr) GetSipMethod(context *ParseContext) *SipMethod {
+	return (*SipMethod)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
@@ -257,9 +265,6 @@ func (this AbnfPtr) GetSipHeaderTo(context *ParseContext) *SipHeaderTo {
 }
 
 
-func (this AbnfPtr) GetSipHeaderCseq(context *ParseContext) *SipHeaderCseq {
-	return (*SipHeaderCseq)(unsafe.Pointer(&context.allocator.mem[this]))
-}
 
 func (this AbnfPtr) GetSipHeaderContentType(context *ParseContext) *SipHeaderContentType {
 	return (*SipHeaderContentType)(unsafe.Pointer(&context.allocator.mem[this]))
