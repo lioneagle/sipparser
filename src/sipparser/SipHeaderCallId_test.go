@@ -75,8 +75,9 @@ func BenchmarkSipHeaderCallIdParse(b *testing.B) {
 		context.SetParsePos(0)
 		header.Parse(context)
 	}
-	//fmt.Printf("uri = %s\n", uri.String())
-	fmt.Printf("")
+	//fmt.Printf("header = %s\n", header.String(context))
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
+	//fmt.Printf("allocator.Used = %d, i= %d\n", context.allocator.Used(), i)
 }
 
 func BenchmarkSipHeaderCallIdEncode(b *testing.B) {

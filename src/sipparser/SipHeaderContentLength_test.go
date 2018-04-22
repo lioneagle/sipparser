@@ -77,7 +77,9 @@ func BenchmarkSipHeaderContentLengthParse(b *testing.B) {
 		context.SetParsePos(0)
 		header.Parse(context)
 	}
-	//fmt.Println("header =", buf.String())
+	//fmt.Printf("header = %s\n", header.String(context))
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
+	//fmt.Printf("allocator.Used = %d, i= %d\n", context.allocator.Used(), i)
 }
 
 func BenchmarkSipHeaderContentLengthEncode(b *testing.B) {
