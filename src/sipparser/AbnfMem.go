@@ -174,6 +174,64 @@ func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetInd
 	return addr, true
 }
 
+func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+	charset := &g_charsets[charsetIndex]
+	newPos := context.parsePos
+	src := context.parseSrc
+	len1 := AbnfPos(len(src))
+
+	memEnd := uint32(cap(this.mem))
+	used := this.used
+	addr = AbnfPtr(this.used)
+
+	if newPos < pos {
+		if (uint32(pos-newPos) + used) >= memEnd {
+			context.AddError(newPos, "no mem")
+			return ABNF_PTR_NIL, false
+		}
+		/*copy(this.mem[used:], src[newPos:pos])
+		used += uint32(pos - newPos)
+		newPos = pos*/
+		for ; newPos < pos; newPos++ {
+			this.mem[used] = src[newPos]
+			used++
+		} //*/
+	}
+
+	if used >= memEnd {
+		context.AddError(newPos, "no mem")
+		return ABNF_PTR_NIL, false
+	}
+
+	for ; newPos < len1; newPos++ {
+		v := src[newPos]
+		if ((charset[v]) & mask) == 0 {
+			break
+		}
+		this.mem[used] = v
+		used++
+	}
+
+	if newPos <= context.parsePos {
+		context.AddError(newPos, "empty")
+		return ABNF_PTR_NIL, false
+	}
+
+	if used >= memEnd {
+		context.AddError(newPos, "no mem")
+		return ABNF_PTR_NIL, false
+	}
+
+	this.mem[used] = 0
+	used++
+	this.stat.allocNum++
+	this.stat.allocNumOk++
+	this.stat.allocReqBytes = used - this.used
+	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
+	context.parsePos = newPos
+	return addr, true
+}
+
 func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos

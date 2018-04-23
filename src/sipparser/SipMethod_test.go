@@ -64,7 +64,7 @@ func TestSipMethodParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipMethodParse(b *testing.B) {
+func BenchmarkSipMethodParse1(b *testing.B) {
 	b.StopTimer()
 	v := []byte("INVITE: sip:abc@a.com")
 	context := NewParseContext()
@@ -87,7 +87,30 @@ func BenchmarkSipMethodParse(b *testing.B) {
 	fmt.Printf("")
 }
 
-func BenchmarkSipMethodEncode(b *testing.B) {
+func BenchmarkSipMethodParse2(b *testing.B) {
+	b.StopTimer()
+	v := []byte("INVITExxxxxx: sip:abc@a.com")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	addr := NewSipMethod(context)
+	method := addr.GetSipMethod(context)
+	remain := context.allocator.Used()
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		method.Parse(context)
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}
+
+func BenchmarkSipMethodEncode1(b *testing.B) {
 	b.StopTimer()
 	v := []byte("INVITE: sip:abc@a.com")
 	context := NewParseContext()
