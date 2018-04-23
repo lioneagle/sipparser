@@ -227,6 +227,14 @@ func (this AbnfPtr) GetSipHeaderContentType(context *ParseContext) *SipHeaderCon
 	return (*SipHeaderContentType)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipContentDispositionKnownParams(context *ParseContext) *SipContentDispositionKnownParams {
+	return (*SipContentDispositionKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
+func (this AbnfPtr) GetSipHeaderContentDisposition(context *ParseContext) *SipHeaderContentDisposition {
+	return (*SipHeaderContentDisposition)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

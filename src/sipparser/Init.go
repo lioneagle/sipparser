@@ -40,7 +40,7 @@ func printSize() {
 	fmt.Println("sizeof(SipHeaderVia)                     =", unsafe.Sizeof(SipHeaderVia{}))
 	fmt.Println("sizeof(SipContentTypeKnownParams)        =", unsafe.Sizeof(SipContentTypeKnownParams{}))
 	fmt.Println("sizeof(SipHeaderContentType)             =", unsafe.Sizeof(SipHeaderContentType{}))
-	fmt.Println("sizeof(SipContentDispositionKnownParams) =", unsafe.Sizeof(SipContentTypeKnownParams{}))
-	fmt.Println("sizeof(SipHeaderContentDisposition)      =", unsafe.Sizeof(SipHeaderContentType{}))
+	fmt.Println("sizeof(SipContentDispositionKnownParams) =", unsafe.Sizeof(SipContentDispositionKnownParams{}))
+	fmt.Println("sizeof(SipHeaderContentDisposition)      =", unsafe.Sizeof(SipHeaderContentDisposition{}))
 	fmt.Println("SIP_URI_KNOWN_PARAM_MAX_NUM              =", SIP_URI_KNOWN_PARAM_MAX_NUM)
 }
