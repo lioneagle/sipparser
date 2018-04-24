@@ -35,11 +35,16 @@ func (this *UriParam) Encode(context *ParseContext, buf *AbnfByteBuffer, charset
 	if this.name != ABNF_PTR_NIL {
 		this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
 
-		if this.value != ABNF_PTR_NIL {
-			buf.WriteByte('=')
-			this.value.WriteCStringEscape(context, buf, charsets.valueCharsetIndex, charsets.valueMask)
-		}
+		this.EncodeValue(context, buf, charsets)
 	}
+}
+
+func (this *UriParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
+	if this.value != ABNF_PTR_NIL {
+		buf.WriteByte('=')
+		this.value.WriteCStringEscape(context, buf, charsets.valueCharsetIndex, charsets.valueMask)
+	}
+
 }
 
 /* uri-parameters    =  *( ";" uri-parameter)
@@ -208,4 +213,16 @@ func EncodeUriParamsEx(context *ParseContext, buf *AbnfByteBuffer, params AbnfPt
 			param = param.next.GetUriParam(context)
 		}
 	}
+}
+
+func GetUriParamByName(context *ParseContext, params AbnfPtr, name []byte) *UriParam {
+	for params != ABNF_PTR_NIL {
+		param := params.GetUriParam(context)
+		if param.name.CStringEqualNoCase(context, name) {
+			return param
+		}
+		params = param.next
+	}
+
+	return nil
 }

@@ -152,10 +152,11 @@ func (this *SipHeaderContentType) EncodeKnownParams(context *ParseContext, buf *
 	knownParams := this.knownParams.GetSipContentTypeKnownParams(context)
 
 	for i := 0; i < SIP_CONTENT_TYPE_KNOWN_PARAM_MAX_NUM; i++ {
-		if knownParams.params[i] != ABNF_PTR_NIL {
+		param := knownParams.params[i]
+		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
-			param := knownParams.params[i].GetSipGenericParam(context)
-			param.Encode(context, buf)
+			buf.Write(g_SipContentTypeKnownParamInfo[i].name)
+			param.GetSipGenericParam(context).EncodeValue(context, buf)
 		}
 	}
 }

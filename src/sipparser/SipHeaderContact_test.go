@@ -106,3 +106,107 @@ func BenchmarkSipHeaderContactEncode(b *testing.B) {
 
 	//fmt.Println("header =", buf.String())
 }
+
+func BenchmarkSipHeaderContactWith2KnownParamsParse(b *testing.B) {
+	b.StopTimer()
+	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.ParseSetSipContactKnownParam = true
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
+	remain := context.allocator.Used()
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		header.Parse(context)
+	}
+	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
+}
+
+func BenchmarkSipHeaderContactWith2UnknownParamsParse(b *testing.B) {
+	b.StopTimer()
+	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.ParseSetSipContactKnownParam = false
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
+	remain := context.allocator.Used()
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		header.Parse(context)
+	}
+	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
+}
+
+func BenchmarkSipHeaderContactWith2KnownParamsEncode(b *testing.B) {
+	b.StopTimer()
+	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.ParseSetSipContactKnownParam = true
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
+	header.Parse(context)
+	remain := context.allocator.Used()
+	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
+	buf := &AbnfByteBuffer{}
+	b.SetBytes(2)
+	b.ReportAllocs()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		header.Encode(context, buf)
+	}
+
+	//fmt.Println("header =", buf.String())
+}
+
+func BenchmarkSipHeaderContactWith2UnknownParamsEncode(b *testing.B) {
+	b.StopTimer()
+	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.ParseSetSipContactKnownParam = false
+	addr := NewSipHeaderContact(context)
+	header := addr.GetSipHeaderContact(context)
+	header.Parse(context)
+	remain := context.allocator.Used()
+	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
+	buf := &AbnfByteBuffer{}
+	b.SetBytes(2)
+	b.ReportAllocs()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		header.Encode(context, buf)
+	}
+
+	//fmt.Println("header =", buf.String())
+}

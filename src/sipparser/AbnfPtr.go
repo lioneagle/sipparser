@@ -52,7 +52,7 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 	for {
 		v1 := *((*byte)(unsafe.Pointer(p1)))
 		if v1 == 0 {
-			return p2 == (end2 - 1)
+			return p2 == end2
 		}
 
 		if p2 >= end2 {

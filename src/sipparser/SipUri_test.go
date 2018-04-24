@@ -555,4 +555,171 @@ func BenchmarkSipUriEncode2(b *testing.B) {
 	//fmt.Println("uri =", uri.String(context))
 }
 
+func BenchmarkGetUriParamByName(b *testing.B) {
+	b.StopTimer()
+	v := []byte("transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	context.ParseSetSipUriKnownParam = false
+	params, ok := ParseUriParams(context, &g_SipUriParamCharsetInfo)
+	if !ok {
+		fmt.Println("ParseUriParams failed")
+		return
+	}
+	name := []byte("user")
+	b.SetBytes(2)
+	b.ReportAllocs()
+
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		param := GetUriParamByName(context, params, name)
+		if param == nil {
+			fmt.Println("GetUriParamByName failed")
+			return
+		}
+	}
+}
+
+func BenchmarkSipUriWith4UnknownParamsParse(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.ParseSetSipUriKnownParam = false
+	remain := context.allocator.Used()
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		addr := NewSipUri(context)
+		uri := addr.GetSipUri(context)
+		uri.ParseWithoutInit(context)
+
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}
+
+func BenchmarkSipUriWith4KnownParamsParse(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.ParseSetSipUriKnownParam = true
+	remain := context.allocator.Used()
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		context.SetParsePos(0)
+		addr := NewSipUri(context)
+		uri := addr.GetSipUri(context)
+		uri.ParseWithoutInit(context)
+
+	}
+	//fmt.Printf("uri = %s\n", uri.String())
+	fmt.Printf("")
+}
+
+func BenchmarkSipUriWith4UnknownParamsEncode(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	addr := NewSipUri(context)
+	uri := addr.GetSipUri(context)
+	context.ParseSetSipUriKnownParam = false
+	uri.Parse(context)
+	remain := context.allocator.Used()
+	b.SetBytes(2)
+	b.ReportAllocs()
+
+	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
+	buf := &AbnfByteBuffer{}
+	//buf := &bytes.Buffer{}
+
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		uri.Encode(context, buf)
+	}
+
+	//fmt.Println("uri =", uri.String(context))
+}
+
+func BenchmarkSipUriWith4KnownParamsEncode(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	addr := NewSipUri(context)
+	uri := addr.GetSipUri(context)
+	context.ParseSetSipUriKnownParam = true
+	uri.Parse(context)
+	remain := context.allocator.Used()
+	b.SetBytes(2)
+	b.ReportAllocs()
+
+	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
+	buf := &AbnfByteBuffer{}
+	//buf := &bytes.Buffer{}
+
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		uri.Encode(context, buf)
+	}
+
+	//fmt.Println("uri =", uri.String(context))
+}
+
+func BenchmarkGetUriParamByIndex(b *testing.B) {
+	b.StopTimer()
+	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	context.SetParsePos(0)
+	addr := NewSipUri(context)
+	uri := addr.GetSipUri(context)
+	context.ParseSetSipUriKnownParam = true
+	uri.Parse(context)
+	b.SetBytes(2)
+	b.ReportAllocs()
+
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		param := uri.knownParams.GetSipUriKnownParams(context).params[SIP_URI_KNOWN_PARAM_USER]
+		if param == ABNF_PTR_NIL {
+			fmt.Println("GetUriParamByIndex failed")
+			return
+		}
+	}
+}
+
 //*/

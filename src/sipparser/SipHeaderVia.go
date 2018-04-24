@@ -201,10 +201,11 @@ func (this *SipHeaderVia) EncodeKnownParams(context *ParseContext, buf *AbnfByte
 	knownParams := this.knownParams.GetSipViaKnownParams(context)
 
 	for i := 0; i < SIP_VIA_KNOWN_PARAM_MAX_NUM; i++ {
-		if knownParams.params[i] != ABNF_PTR_NIL {
+		param := knownParams.params[i]
+		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
-			param := knownParams.params[i].GetSipGenericParam(context)
-			param.Encode(context, buf)
+			buf.Write(g_SipViaKnownParamInfo[i].name)
+			param.GetSipGenericParam(context).EncodeValue(context, buf)
 		}
 	}
 }

@@ -45,16 +45,18 @@ func (this *SipGenericParam) String(context *ParseContext) string {
 
 func (this *SipGenericParam) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	if this.name != ABNF_PTR_NIL {
-		this.name.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+		this.name.WriteCString(context, buf)
+		this.EncodeValue(context, buf)
+	}
+}
 
-		if this.value != ABNF_PTR_NIL {
-			buf.WriteByte('=')
-			if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN {
-				//this.value.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
-				this.value.WriteCString(context, buf)
-			} else if this.valueType == SIP_GENERIC_VALUE_TYPE_QUOTED_STRING {
-				EncodeSipQuotedString(context, buf, this.value)
-			}
+func (this *SipGenericParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+	if this.value != ABNF_PTR_NIL {
+		buf.WriteByte('=')
+		if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN {
+			this.value.WriteCString(context, buf)
+		} else if this.valueType == SIP_GENERIC_VALUE_TYPE_QUOTED_STRING {
+			EncodeSipQuotedString(context, buf, this.value)
 		}
 	}
 }

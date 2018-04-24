@@ -207,10 +207,11 @@ func (this *SipHeaderContact) EncodeKnownParams(context *ParseContext, buf *Abnf
 	knownParams := this.knownParams.GetSipContactKnownParams(context)
 
 	for i := 0; i < SIP_CONTACT_KNOWN_PARAM_MAX_NUM; i++ {
-		if knownParams.params[i] != ABNF_PTR_NIL {
+		param := knownParams.params[i]
+		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
-			param := knownParams.params[i].GetSipGenericParam(context)
-			param.Encode(context, buf)
+			buf.Write(g_SipContactKnownParamInfo[i].name)
+			param.GetSipGenericParam(context).EncodeValue(context, buf)
 		}
 	}
 }

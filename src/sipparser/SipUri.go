@@ -38,12 +38,12 @@ const (
 )
 
 var g_SipUriKnownParamInfo = []SipUriKnownParamInfo{
-	{[]byte("user\000"), SIP_URI_KNOWN_PARAM_USER},
-	{[]byte("transport\000"), SIP_URI_KNOWN_PARAM_TRANSPORT},
-	{[]byte("lr\000"), SIP_URI_KNOWN_PARAM_LR},
-	{[]byte("method\000"), SIP_URI_KNOWN_PARAM_METHOD},
-	{[]byte("maddr\000"), SIP_URI_KNOWN_PARAM_MADDR},
-	{[]byte("ttl\000"), SIP_URI_KNOWN_PARAM_TTL},
+	{[]byte("user"), SIP_URI_KNOWN_PARAM_USER},
+	{[]byte("transport"), SIP_URI_KNOWN_PARAM_TRANSPORT},
+	{[]byte("lr"), SIP_URI_KNOWN_PARAM_LR},
+	{[]byte("method"), SIP_URI_KNOWN_PARAM_METHOD},
+	{[]byte("maddr"), SIP_URI_KNOWN_PARAM_MADDR},
+	{[]byte("ttl"), SIP_URI_KNOWN_PARAM_TTL},
 }
 
 type SipUriKnownParams struct {
@@ -145,10 +145,11 @@ func (this *SipUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer
 	knownParams := this.knownParams.GetSipUriKnownParams(context)
 
 	for i := 0; i < SIP_URI_KNOWN_PARAM_MAX_NUM; i++ {
-		if knownParams.params[i] != ABNF_PTR_NIL {
+		param := knownParams.params[i]
+		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
-			param := knownParams.params[i].GetUriParam(context)
-			param.Encode(context, buf, &g_SipUriParamCharsetInfo)
+			buf.Write(g_SipUriKnownParamInfo[i].name)
+			param.GetUriParam(context).EncodeValue(context, buf, &g_SipUriParamCharsetInfo)
 		}
 	}
 }

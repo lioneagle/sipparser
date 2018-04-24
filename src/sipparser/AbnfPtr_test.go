@@ -1,11 +1,38 @@
 package sipparser
 
 import (
-	//"fmt"
+	"fmt"
 	"testing"
 
-	//"github.com/lioneagle/goutil/src/test"
+	"github.com/lioneagle/goutil/src/test"
 )
+
+func TestAbnfPtrCStringEqualNoCase(t *testing.T) {
+	testdata := []struct {
+		src string
+	}{
+		{"user"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+
+			//addr := AllocCString(context, []byte(v.src))
+			addr, ok := context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_PNAME, ABNF_CHARSET_MASK_SIP_PNAME)
+			test.ASSERT_NE(t, addr, ABNF_PTR_NIL, "")
+			test.ASSERT_TRUE(t, ok, "")
+			test.EXPECT_TRUE(t, addr.CStringEqualNoCase(context, []byte(v.src)), "")
+		})
+	}
+}
 
 func BenchmarkAbnfPtrStrlen(b *testing.B) {
 	b.StopTimer()
