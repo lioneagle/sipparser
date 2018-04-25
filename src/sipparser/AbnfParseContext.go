@@ -12,6 +12,7 @@ type ParseContext struct {
 	allocator                               *MemAllocator
 	parseSrc                                []byte
 	parsePos                                AbnfPos
+	srcLen                                  AbnfPos
 	parseBegin                              uintptr
 	parseEnd                                uintptr
 	ParseSipHeaderAsRaw                     bool
@@ -34,6 +35,7 @@ func NewParseContext() *ParseContext {
 func (this *ParseContext) SetParseSrc(src []byte) {
 	this.Errors.src = src
 	this.parseSrc = src
+	this.srcLen = AbnfPos(len(src))
 	if len(src) > 0 {
 		this.parseBegin = uintptr(unsafe.Pointer(&src[0]))
 		this.parseEnd = this.parseBegin + uintptr(len(src))
