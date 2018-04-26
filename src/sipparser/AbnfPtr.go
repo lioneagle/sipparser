@@ -1,6 +1,7 @@
 package sipparser
 
 import (
+	"encoding/binary"
 	//"fmt"
 	"reflect"
 	"strconv"
@@ -36,6 +37,7 @@ func (this AbnfPtr) CString(context *ParseContext) string {
 	if this == ABNF_PTR_NIL {
 		return ""
 	}
+
 	header := reflect.StringHeader{Data: this.GetUintptr(context), Len: this.Strlen(context)}
 	return *(*string)(unsafe.Pointer(&header))
 }
@@ -44,9 +46,45 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 	if this == ABNF_PTR_NIL {
 		return false
 	}
+	len1 := len(name)
+	len2 := this.Strlen(context)
+
+	if len1 != len2 {
+		return false
+	}
+
 	p1 := this.GetUintptr(context)
 	p2 := uintptr(unsafe.Pointer(&name[0]))
-	end2 := uintptr(unsafe.Pointer(&name[0])) + uintptr(len(name))
+	end := p1 + uintptr(len1)
+	end1 := p1 + uintptr((len1>>3)<<3)
+
+	for p1 < end1 {
+		if *((*int64)(unsafe.Pointer(p1))) != *((*int64)(unsafe.Pointer(p2))) {
+			break
+		}
+		p1 += 8
+		p2 += 8
+	}
+
+	for p1 < end {
+		if *((*byte)(unsafe.Pointer(p1))) != *((*byte)(unsafe.Pointer(p2))) {
+			break
+		}
+		p1++
+		p2++
+	}
+	for p1 < end {
+		if chars.ToLower(*((*byte)(unsafe.Pointer(p1)))) != chars.ToLower(*((*byte)(unsafe.Pointer(p2)))) {
+			return false
+		}
+		p1++
+		p2++
+	}
+	return true
+
+	/*p1 := this.GetUintptr(context)
+	p2 := uintptr(unsafe.Pointer(&name[0]))
+	end2 := uintptr(unsafe.Pointer(&name[0])) + uintptr(len1)
 
 	//*
 	for {
@@ -90,7 +128,7 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 			p1++
 			p2++
 		} //*/
-	return false
+	//return false
 }
 
 func (this AbnfPtr) WriteCString(context *ParseContext, buf *AbnfByteBuffer) {
@@ -173,55 +211,59 @@ func (this AbnfPtr) Strlen(context *ParseContext) int {
 		return 0
 	}
 
-	p := this.GetUintptr(context)
-	end1 := (this.GetUintptr(context) + 7) & uintptr(0xfffffffffffffff8)
-	//end1 := ((this.GetUintptr(context) + 7) >> 3) << 3
-	start := this.GetUintptr(context)
-	for p < end1 {
-		if *((*byte)(unsafe.Pointer(p))) == 0 {
-			break
-		}
-		p++
-	}
+	return int(binary.LittleEndian.Uint16(context.allocator.mem[this-2:]))
 
-	for {
-		v := *((*uint64)(unsafe.Pointer(p)))
-		if ((v - lomagic) & ^v & himagic) != 0 {
+	/*
+
+		p := this.GetUintptr(context)
+		end1 := (this.GetUintptr(context) + 7) & uintptr(0xfffffffffffffff8)
+		//end1 := ((this.GetUintptr(context) + 7) >> 3) << 3
+		start := this.GetUintptr(context)
+		for p < end1 {
 			if *((*byte)(unsafe.Pointer(p))) == 0 {
-				return int(p - start)
+				break
 			}
-
-			if *((*byte)(unsafe.Pointer(p + 1))) == 0 {
-				return int(p - start + 1)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 2))) == 0 {
-				return int(p - start + 2)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 3))) == 0 {
-				return int(p - start + 3)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 4))) == 0 {
-				return int(p - start + 4)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 5))) == 0 {
-				return int(p - start + 5)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 6))) == 0 {
-				return int(p - start + 6)
-			}
-
-			if *((*byte)(unsafe.Pointer(p + 7))) == 0 {
-				return int(p - start + 7)
-			}
+			p++
 		}
 
-		p += 8
-	}
+		for {
+			v := *((*uint64)(unsafe.Pointer(p)))
+			if ((v - lomagic) & ^v & himagic) != 0 {
+				if *((*byte)(unsafe.Pointer(p))) == 0 {
+					return int(p - start)
+				}
 
-	return int(p - start)
+				if *((*byte)(unsafe.Pointer(p + 1))) == 0 {
+					return int(p - start + 1)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 2))) == 0 {
+					return int(p - start + 2)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 3))) == 0 {
+					return int(p - start + 3)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 4))) == 0 {
+					return int(p - start + 4)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 5))) == 0 {
+					return int(p - start + 5)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 6))) == 0 {
+					return int(p - start + 6)
+				}
+
+				if *((*byte)(unsafe.Pointer(p + 7))) == 0 {
+					return int(p - start + 7)
+				}
+			}
+
+			p += 8
+		}
+
+		return int(p - start)*/
 }

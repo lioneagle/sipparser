@@ -2,6 +2,7 @@ package sipparser
 
 import (
 	"bytes"
+	"encoding/binary"
 	//"fmt"
 	"unsafe"
 
@@ -70,21 +71,27 @@ func ParseEscapableEnableEmpty(context *ParseContext, src []byte, pos AbnfPos, c
 func AllocCString(context *ParseContext, buf []byte) AbnfPtr {
 	len1 := uint32(len(buf))
 
-	addr := context.allocator.Alloc(len1 + 1)
+	addr := context.allocator.Alloc(len1 + 3)
 	if addr == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL
 	}
+	if buf != nil {
+		copy(context.allocator.mem[addr+2:], buf)
+	}
 
-	dest := addr.GetAsByteSlice(context, int(len1+1))
+	binary.LittleEndian.PutUint16(context.allocator.mem[addr:], uint16(len1))
+	context.allocator.mem[addr+2+AbnfPtr(len1)] = 0
+
+	/*dest := addr.GetAsByteSlice(context, int(len1+1))
 
 	if buf != nil {
 		copy(dest, buf)
 	}
-	dest[len1] = 0
-	return addr
+	dest[len1] = 0*/
+	return addr + 2
 }
 
-func AllocCString2(context *ParseContext, buf []byte) AbnfPtr {
+/*func AllocCString2(context *ParseContext, buf []byte) AbnfPtr {
 	len1 := uint32(len(buf))
 
 	addr := context.allocator.Alloc(len1 + 1)
@@ -101,6 +108,7 @@ func AllocCString2(context *ParseContext, buf []byte) AbnfPtr {
 
 	return addr
 }
+*/
 
 func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum int) AbnfPtr {
 	if escapeNum <= 0 {
@@ -109,12 +117,12 @@ func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum in
 
 	len1 := len(buf)
 
-	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum + 1))
+	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum + 1 + 2))
 	if addr == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL
 	}
 
-	dest := addr.GetAsByteSlice(context, len1-2*escapeNum+1)
+	dest := (addr + 2).GetAsByteSlice(context, len1-2*escapeNum+1)
 	j := 0
 	i := 0
 
@@ -141,8 +149,10 @@ func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum in
 		j++
 	}
 
+	binary.LittleEndian.PutUint16(context.allocator.mem[addr:], uint16(j))
+
 	dest[j] = 0
-	return addr
+	return addr + 2
 }
 
 func AllocCStringWithUnescapeNum2(context *ParseContext, buf []byte, escapeNum int) AbnfPtr {

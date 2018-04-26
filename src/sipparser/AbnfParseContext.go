@@ -15,6 +15,7 @@ type ParseContext struct {
 	srcLen                                  AbnfPos
 	parseBegin                              uintptr
 	parseEnd                                uintptr
+	parseCur                                uintptr
 	ParseSipHeaderAsRaw                     bool
 	ParseSetSipUriKnownParam                bool
 	ParseSetSipFromKnownParam               bool

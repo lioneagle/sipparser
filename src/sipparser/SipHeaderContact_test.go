@@ -135,6 +135,7 @@ func BenchmarkSipHeaderContactWith2KnownParamsParse(b *testing.B) {
 func BenchmarkSipHeaderContactWith2UnknownParamsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
+	//v := []byte("Contact: <sip:6140000@24.15.255.101:5060>")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)

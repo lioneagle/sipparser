@@ -44,7 +44,7 @@ func TestEncodeUIntWithWidth(t *testing.T) {
 	test.EXPECT_EQ(t, buf.String(), "       123", "")
 }
 
-func TestAllocCString(t *testing.T) {
+func TestAllocCString1(t *testing.T) {
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%39")
@@ -447,6 +447,7 @@ func BenchmarkAllocCString(b *testing.B) {
 	}
 }
 
+/*
 func BenchmarkAllocCString2(b *testing.B) {
 	b.StopTimer()
 	context := NewParseContext()
@@ -461,7 +462,7 @@ func BenchmarkAllocCString2(b *testing.B) {
 		AllocCString2(context, src)
 	}
 }
-
+*/
 func BenchmarkAllocCStringWithUnescapeNum(b *testing.B) {
 	b.StopTimer()
 	context := NewParseContext()

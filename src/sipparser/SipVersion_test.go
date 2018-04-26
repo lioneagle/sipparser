@@ -62,7 +62,7 @@ func TestSipVersionParse(t *testing.T) {
 
 func BenchmarkSipVersionParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("To: <sip:6135000@24.15.255.4>")
+	v := []byte("SIP/2.0")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
@@ -80,12 +80,12 @@ func BenchmarkSipVersionParse(b *testing.B) {
 		version.Parse(context)
 	}
 	//fmt.Printf("version = %s\n", version.String())
-	fmt.Printf("")
+	//fmt.Printf("")
 }
 
 func BenchmarkSipVersionEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("To: <sip:6135000@24.15.255.4>")
+	v := []byte("SIP/2.0")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)

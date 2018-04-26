@@ -148,7 +148,7 @@ func TestMemAllocatorUsed(t *testing.T) {
 	test.EXPECT_EQ(t, allocator.Used(), uint32(0), "")
 }
 
-func TestMemParseAndAllocEscapable(t *testing.T) {
+func TestMemParseAndAllocCStringEscapable(t *testing.T) {
 
 	testdata := []struct {
 		name         string
@@ -210,12 +210,12 @@ func TestMemParseAndAllocSipQuotedStringParseOK(t *testing.T) {
 		ok     bool
 		wanted string
 	}{
-		//{"\"\"", true, "\"\""},
+		{"\"\"", true, "\"\""},
 		{"\"User ID\"", true, "\"User ID\""},
-		/*{"\"abc\"", true, "\"abc\""},
+		{"\"abc\"", true, "\"abc\""},
 		{"\"abc\\00\"", true, "\"abc\\00\""},
 		{" \t\r\n \"abc\\00\\\"\"", true, "\"abc\\00\\\"\""},
-		{" \t\r\n\t\"abc\\0b\"", true, "\"abc\\0b\""},*/
+		{" \t\r\n\t\"abc\\0b\"", true, "\"abc\\0b\""},
 	}
 
 	for i, v := range testdata {

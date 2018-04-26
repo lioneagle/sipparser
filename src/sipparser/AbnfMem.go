@@ -1,6 +1,7 @@
 package sipparser
 
 import (
+	"encoding/binary"
 	//"fmt"
 	"reflect"
 	"strconv"
@@ -137,8 +138,8 @@ func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetInd
 	len1 := AbnfPos(len(src))
 
 	memEnd := uint32(cap(this.mem))
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	if used >= memEnd {
 		context.AddError(newPos, "no mem")
@@ -168,7 +169,8 @@ func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetInd
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - this.used - 2
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 	return addr, true
@@ -181,8 +183,8 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 	len1 := AbnfPos(len(src))
 
 	memEnd := uint32(cap(this.mem))
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	if newPos < pos {
 		if (uint32(pos-newPos) + used) >= memEnd {
@@ -226,7 +228,8 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - this.used - 2
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 	return addr, true
@@ -239,8 +242,8 @@ func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *ParseContext,
 	len1 := AbnfPos(len(src))
 
 	memEnd := uint32(cap(this.mem))
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	if used >= memEnd {
 		context.AddError(newPos, "no mem")
@@ -265,7 +268,8 @@ func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *ParseContext,
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - this.used - 2
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 	return addr, true
@@ -278,8 +282,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, c
 	len1 := AbnfPos(len(src))
 
 	memEnd := uint32(cap(this.mem))
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	if used >= memEnd {
 		context.AddError(newPos, "no mem")
@@ -308,7 +312,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, c
 
 				this.stat.allocNum++
 				this.stat.allocNumOk++
-				this.stat.allocReqBytes = used - this.used
+				this.stat.allocReqBytes = used - this.used - 2
+				binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 				this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 				context.parsePos = newPos
 				return addr, true
@@ -331,7 +336,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, c
 			used++
 			this.stat.allocNum++
 			this.stat.allocNumOk++
-			this.stat.allocReqBytes = used - this.used
+			this.stat.allocReqBytes = used - this.used - 2
+			binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 			this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 			context.parsePos = newPos
 			return addr, true
@@ -377,7 +383,9 @@ func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, c
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - this.used - 2
+
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 	return addr, true
@@ -390,8 +398,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
 	len1 := AbnfPos(len(src))
 
 	memEnd := uint32(cap(this.mem))
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	if used >= memEnd {
 		context.AddError(newPos, "no mem")
@@ -415,7 +423,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
 
 				this.stat.allocNum++
 				this.stat.allocNumOk++
-				this.stat.allocReqBytes = used - this.used
+				this.stat.allocReqBytes = used - this.used - 2
+				binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 				this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 				context.parsePos = newPos
 				return addr, true
@@ -433,7 +442,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
 			used++
 			this.stat.allocNum++
 			this.stat.allocNumOk++
-			this.stat.allocReqBytes = used - this.used
+			this.stat.allocReqBytes = used - this.used - 2
+			binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 			this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 			context.parsePos = newPos
 			return addr, true
@@ -474,7 +484,8 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - this.used - 2
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-3))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 	return addr, true
@@ -508,8 +519,8 @@ func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (a
 	}
 	newPos++
 
-	used := this.used
-	addr = AbnfPtr(this.used)
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
 
 	for (newPos < len1) && (src[newPos] != '"') {
 		v := src[newPos]
@@ -557,7 +568,8 @@ func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (a
 	used++
 	this.stat.allocNum++
 	this.stat.allocNumOk++
-	this.stat.allocReqBytes = used - this.used
+	this.stat.allocReqBytes = used - uint32(addr) - 1
+	binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(used-uint32(addr)-1))
 	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
 	context.parsePos = newPos
 
