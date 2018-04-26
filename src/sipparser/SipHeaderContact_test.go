@@ -77,6 +77,7 @@ func BenchmarkSipHeaderContactParse(b *testing.B) {
 		header.Parse(context)
 	}
 	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
 	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
 	//fmt.Println("remain =", remain)
 }
@@ -128,6 +129,7 @@ func BenchmarkSipHeaderContactWith2KnownParamsParse(b *testing.B) {
 		header.Parse(context)
 	}
 	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
 	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
 	//fmt.Println("remain =", remain)
 }
@@ -154,6 +156,7 @@ func BenchmarkSipHeaderContactWith2UnknownParamsParse(b *testing.B) {
 		header.Parse(context)
 	}
 	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
 	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
 	//fmt.Println("remain =", remain)
 }

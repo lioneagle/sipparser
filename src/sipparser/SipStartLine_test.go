@@ -100,7 +100,8 @@ func BenchmarkSipRequestLineParse(b *testing.B) {
 	}
 	//fmt.Printf("startLine = %s\n", startLine.String(context))
 	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
-	//fmt.Printf("allocator.Used = %d, i= %d\n", context.allocator.Used(), i)
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
 }
 
 func BenchmarkSipRequestLineEncode(b *testing.B) {
@@ -149,7 +150,9 @@ func BenchmarkSipStatusLineParse(b *testing.B) {
 		startLine.Parse(context)
 	}
 	//fmt.Printf("startLine = %s\n", startLine.String())
-	fmt.Printf("")
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
 }
 
 func BenchmarkSipStatusLineEncode(b *testing.B) {

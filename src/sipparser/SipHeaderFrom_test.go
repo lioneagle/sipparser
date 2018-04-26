@@ -77,7 +77,8 @@ func BenchmarkSipHeaderFromParse(b *testing.B) {
 		context.SetParsePos(0)
 		header.Parse(context)
 	}
-	//fmt.Printf("header = %s\n", header.String())
+	//fmt.Printf("header = %s\n", header.String(context))
+	//fmt.Printf("allocator.AllocNum = %d, i= %d\n", context.allocator.AllocNum(), i)
 	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
 	//fmt.Println("remain =", remain)
 }
