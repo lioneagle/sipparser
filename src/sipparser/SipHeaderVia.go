@@ -32,21 +32,33 @@ type SipViaKnownParams struct {
 }
 
 func SizeofSipViaKnownParams() int {
-	return int(unsafe.Sizeof(SipToKnownParams{}))
+	return int(unsafe.Sizeof(SipViaKnownParams{}))
 }
 
 func NewSipViaKnownParams(context *ParseContext) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipViaKnownParams()))
 }
 
+type SipSentProtocol struct {
+	name    AbnfPtr
+	version AbnfPtr
+}
+
+func SizeofSipSentProtocol() int {
+	return int(unsafe.Sizeof(SipSentProtocol{}))
+}
+
+func NewSipSentProtocol(context *ParseContext) AbnfPtr {
+	return context.allocator.AllocWithClear(uint32(SizeofSipSentProtocol()))
+}
+
 type SipHeaderVia struct {
-	protocolName    AbnfPtr
-	protocolVersion AbnfPtr
-	transport       AbnfPtr
-	sentBy          SipHostPort
-	params          AbnfPtr
-	knownParams     AbnfPtr
-	next            AbnfPtr
+	sentProtocol AbnfPtr
+	transport    AbnfPtr
+	sentBy       SipHostPort
+	params       AbnfPtr
+	knownParams  AbnfPtr
+	next         AbnfPtr
 }
 
 func SizeofSipHeaderVia() int {
@@ -75,10 +87,15 @@ func (this *SipHeaderVia) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 }
 
 func (this *SipHeaderVia) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
-	this.protocolName.WriteCString(context, buf)
-	buf.WriteByte('/')
-	this.protocolVersion.WriteCString(context, buf)
-	buf.WriteByte('/')
+	if !this.sentProtocol.IsAbnfPtr() {
+		buf.WriteString("SIP/2.0/")
+	} else {
+		sentProtocol := this.sentProtocol.GetSipSentProtocol(context)
+		sentProtocol.name.WriteCString(context, buf)
+		buf.WriteByte('/')
+		sentProtocol.version.WriteCString(context, buf)
+		buf.WriteByte('/')
+	}
 	this.transport.WriteCString(context, buf)
 	buf.WriteByte(' ')
 	this.sentBy.Encode(context, buf)
@@ -142,25 +159,8 @@ func (this *SipHeaderVia) ParseValue(context *ParseContext) (ok bool) {
 }
 
 func (this *SipHeaderVia) ParseValueWithoutInit(context *ParseContext) (ok bool) {
-	this.protocolName, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
-	if !ok {
-		context.AddError(context.parsePos, "wrong protocol-name for Via header")
-		return false
-	}
-
-	if !ParseSWSMark(context, '/') {
-		context.AddError(context.parsePos, "wrong SLASH after protocol-name for Via header")
-		return false
-	}
-
-	this.protocolVersion, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
-	if !ok {
-		context.AddError(context.parsePos, "wrong protocol-version for Via header")
-		return false
-	}
-
-	if !ParseSWSMark(context, '/') {
-		context.AddError(context.parsePos, "wrong SLASH after protocol-version for Via header")
+	if !this.parseSentProtocol(context) {
+		context.AddError(context.parsePos, "parse sent-protocol failed for Via header")
 		return false
 	}
 
@@ -187,6 +187,62 @@ func (this *SipHeaderVia) ParseValueWithoutInit(context *ParseContext) (ok bool)
 	}
 	if !ok {
 		context.AddError(context.parsePos, "parse generic-params failed for Via header")
+		return false
+	}
+
+	return true
+}
+
+func (this *SipHeaderVia) parseSentProtocol(context *ParseContext) (ok bool) {
+	if ((context.parsePos+6) < AbnfPos(len(context.parseSrc)) &&
+		(context.parseSrc[context.parsePos]|0x20) == 's') &&
+		((context.parseSrc[context.parsePos+1] | 0x20) == 'i') &&
+		((context.parseSrc[context.parsePos+2] | 0x20) == 'p') &&
+		(context.parseSrc[context.parsePos+3] == '/') &&
+		(context.parseSrc[context.parsePos+4] == '2') &&
+		(context.parseSrc[context.parsePos+5] == '.') &&
+		(context.parseSrc[context.parsePos+6] == '0') {
+
+		if ((context.parsePos + 7) < AbnfPos(len(context.parseSrc))) &&
+			!IsDigit(context.parseSrc[context.parsePos+7]) {
+			context.parsePos += 7
+			if !ParseSWSMark(context, '/') {
+				context.AddError(context.parsePos, "wrong SLASH after protocol-version for Via header")
+				return false
+			}
+
+			this.sentProtocol = AbnfPtrSetValue(AbnfPtr(SIP_VERSION_2_0))
+			return true
+		}
+	}
+
+	this.sentProtocol = NewSipSentProtocol(context)
+	if this.sentProtocol == ABNF_PTR_NIL {
+		context.AddError(context.parsePos, "no mem for sent-protocol for Via header")
+		return false
+	}
+
+	sentProtocol := this.sentProtocol.GetSipSentProtocol(context)
+
+	sentProtocol.name, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+	if !ok {
+		context.AddError(context.parsePos, "wrong protocol-name for Via header")
+		return false
+	}
+
+	if !ParseSWSMark(context, '/') {
+		context.AddError(context.parsePos, "wrong SLASH after protocol-name for Via header")
+		return false
+	}
+
+	sentProtocol.version, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+	if !ok {
+		context.AddError(context.parsePos, "wrong protocol-version for Via header")
+		return false
+	}
+
+	if !ParseSWSMark(context, '/') {
+		context.AddError(context.parsePos, "wrong SLASH after protocol-version for Via header")
 		return false
 	}
 

@@ -60,9 +60,13 @@ func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
 	if (context.parseSrc[context.parsePos] == '2') &&
 		(context.parseSrc[context.parsePos+1] == '.') &&
 		(context.parseSrc[context.parsePos+2] == '0') {
-		this.version = AbnfPtrSetValue(AbnfPtr(SIP_VERSION_2_0))
-		context.parsePos += 3
-		return true
+
+		if ((context.parsePos + 3) >= AbnfPos(len(context.parseSrc))) ||
+			!IsDigit(context.parseSrc[context.parsePos+3]) {
+			context.parsePos += 3
+			this.version = AbnfPtrSetValue(AbnfPtr(SIP_VERSION_2_0))
+			return true
+		}
 	}
 
 	majorStart := context.parsePos
@@ -77,7 +81,7 @@ func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
 
 	if context.parseSrc[newPos] != '.' {
 		context.parsePos = newPos
-		context.AddError(context.parsePos, "no '.' after major of SIP-Version")
+		context.AddError(context.parsePos, "no '.' after major for SIP-Version")
 		return false
 	}
 
@@ -92,6 +96,10 @@ func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
 	context.parsePos = newPos
 
 	this.version = AllocCString(context, context.parseSrc[majorStart:newPos])
+	if this.version == ABNF_PTR_NIL {
+		context.AddError(context.parsePos, "no mem for SIP-Version")
+		return false
+	}
 
 	return true
 }

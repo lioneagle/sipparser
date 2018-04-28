@@ -20,7 +20,7 @@ func TestSipHeaderViaParse(t *testing.T) {
 
 		{" Via: SIP/2.0/UDP 10.4.1.1:5070;branch=123", false, 0, ""},
 		{"Via2: SIP/2.0/UDP 10.4.1.1:5070;branch=123", false, 0, ""},
-		{"Via: SIP/2.0UDP 10.4.1.1:5070;branch=123", false, len("Via: SIP/2.0UDP "), ""},
+		{"Via: SIP/2.0UDP 10.4.1.1:5070;branch=123", false, len("Via: SIP/2.0"), ""},
 		{"Via: SIP/2.0/@ 10.4.1.1:5070;branch=123", false, len("Via: SIP/2.0/"), ""},
 		{"Via: SIP/2.0/UDP\r\n10.4.1.1:5070;branch=123", false, len("Via: SIP/2.0/UDP\r\n"), ""},
 		{"Via:", false, len("Via:"), ""},
