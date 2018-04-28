@@ -44,5 +44,8 @@ func printSize() {
 	fmt.Println("sizeof(SipHeaderContentDisposition)      =", unsafe.Sizeof(SipHeaderContentDisposition{}))
 	fmt.Println("sizeof(SipHeaderContentLength)           =", unsafe.Sizeof(SipHeaderContentLength{}))
 	fmt.Println("sizeof(SipMsg)                           =", unsafe.Sizeof(SipMsg{}))
+
+	fmt.Printf("ABNF_PTR_BIT                             = 0x%X\n", uint(ABNF_PTR_BIT))
+	fmt.Printf("ABNF_PTR_MASK                            = 0x%X\n", uint(ABNF_PTR_MASK))
 	fmt.Println("SIP_URI_KNOWN_PARAM_MAX_NUM              =", SIP_URI_KNOWN_PARAM_MAX_NUM)
 }

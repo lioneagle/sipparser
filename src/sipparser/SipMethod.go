@@ -1,6 +1,7 @@
 package sipparser
 
 import (
+	//"fmt"
 	"unsafe"
 )
 
@@ -22,8 +23,9 @@ var g_sipMethodName = []string{
 }
 
 type SipMethod struct {
-	method        byte
-	unknownMethod AbnfPtr
+	//method        byte
+	//unknownMethod AbnfPtr
+	method AbnfPtr
 }
 
 func SizeofSipMethod() int {
@@ -47,10 +49,10 @@ func (this *SipMethod) String(context *ParseContext) string {
 }
 
 func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
-	if this.method != ABNF_SIP_METHOD_UNKNOWN {
-		buf.WriteString(g_sipMethodName[this.method])
+	if !this.method.IsAbnfPtr() {
+		buf.WriteString(g_sipMethodName[this.method.GetValue()])
 	} else {
-		this.unknownMethod.WriteCString(context, buf)
+		this.method.WriteCString(context, buf)
 	}
 }
 
@@ -62,14 +64,17 @@ func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
  */
 func (this *SipMethod) Parse(context *ParseContext) (ok bool) {
 	var newPos AbnfPos
-	this.method, newPos = GetSipMethodIndex(context.parseSrc, context.parsePos)
+	method, newPos := GetSipMethodIndex(context.parseSrc, context.parsePos)
 
-	if this.method == ABNF_SIP_METHOD_UNKNOWN {
+	if method == ABNF_SIP_METHOD_UNKNOWN {
 		//this.unknownMethod, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
-		this.unknownMethod, ok = context.allocator.ParseAndAllocCStringFromPos(context, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
+		this.method, ok = context.allocator.ParseAndAllocCStringFromPos(context, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 		return ok
 	} else {
 		context.parsePos = newPos
+		//this.method = AbnfPtr(method)
+		//this.method = AbnfPtr(this.method.SetValue())
+		this.method = AbnfPtrSetValue(AbnfPtr(method))
 	}
 	return true
 }

@@ -10,9 +10,30 @@ import (
 	"github.com/lioneagle/goutil/src/chars"
 )
 
-type AbnfPtr uint16
+type AbnfPtr uint32
+
+const (
+	ABNF_PTR_BITS = unsafe.Sizeof(AbnfPtr(0)) * 8
+	ABNF_PTR_BIT  = AbnfPtr(1 << (ABNF_PTR_BITS - 1))
+	ABNF_PTR_MASK = AbnfPtr(^ABNF_PTR_BIT)
+)
 
 const ABNF_PTR_NIL = AbnfPtr(0)
+
+func (this AbnfPtr) IsAbnfPtr() bool {
+	return (this & ABNF_PTR_BIT) == 0
+}
+
+func (this AbnfPtr) GetValue() uint {
+	return uint(this & ABNF_PTR_MASK)
+}
+
+func AbnfPtrSetValue(value AbnfPtr) AbnfPtr {
+	return value | ABNF_PTR_BIT
+}
+func (this AbnfPtr) SetValue() uint {
+	return uint(this | ABNF_PTR_BIT)
+}
 
 func (this AbnfPtr) GetMemAddr(context *ParseContext) *byte {
 	return (*byte)(unsafe.Pointer(&context.allocator.mem[this]))
