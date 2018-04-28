@@ -30,6 +30,7 @@ const (
 	ABNF_SIP_HDR_REFERRED_BY         SipHeaderIndexType = 24
 	ABNF_SIP_HDR_SESSION_EXPIRES     SipHeaderIndexType = 25
 	ABNF_SIP_HDR_MIME_VERSION        SipHeaderIndexType = 26
+	ABNF_SIP_HDR_MAX_NUM             SipHeaderIndexType = iota
 )
 
 func GetSipHeaderIndex(src []byte, pos AbnfPos) (SipHeaderIndexType, AbnfPos) {

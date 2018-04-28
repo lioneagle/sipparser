@@ -3,7 +3,7 @@ package sipparser
 type SipPaseOneHeaderValue func(context *ParseContext) (parsed AbnfPtr, ok bool)
 type SipEncodeOneHeaderValue func(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer)
 
-type SipHeaderIndexType uint32
+type SipHeaderIndexType uint16
 
 type SipHeaderInfo struct {
 	index        SipHeaderIndexType
