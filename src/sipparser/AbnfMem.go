@@ -12,7 +12,7 @@ import (
 )
 
 const SLICE_HEADER_LEN = int32(unsafe.Sizeof(reflect.SliceHeader{}))
-const ABNF_MEM_ALIGN = uint32(8)
+const ABNF_MEM_ALIGN = uint32(1)
 const ABNF_MEM_LIGN_MASK = ^(ABNF_MEM_ALIGN - 1)
 const ABNF_MEM_LIGN_MASK2 = (ABNF_MEM_ALIGN - 1)
 const ABNF_MEM_PREFIX_LEN = 8
