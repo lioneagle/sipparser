@@ -71,7 +71,7 @@ func ParseEscapableEnableEmpty(context *ParseContext, src []byte, pos AbnfPos, c
 func AllocCString(context *ParseContext, buf []byte) AbnfPtr {
 	len1 := uint32(len(buf))
 
-	addr := context.allocator.Alloc(len1 + 3)
+	addr := context.allocator.Alloc(len1 + 2)
 	if addr == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL
 	}
@@ -80,7 +80,7 @@ func AllocCString(context *ParseContext, buf []byte) AbnfPtr {
 	}
 
 	binary.LittleEndian.PutUint16(context.allocator.mem[addr:], uint16(len1))
-	context.allocator.mem[addr+2+AbnfPtr(len1)] = 0
+	//context.allocator.mem[addr+2+AbnfPtr(len1)] = 0
 
 	/*dest := addr.GetAsByteSlice(context, int(len1+1))
 
@@ -117,12 +117,12 @@ func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum in
 
 	len1 := len(buf)
 
-	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum + 1 + 2))
+	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum + 2))
 	if addr == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL
 	}
 
-	dest := (addr + 2).GetAsByteSlice(context, len1-2*escapeNum+1)
+	dest := (addr + 2).GetAsByteSlice(context, len1-2*escapeNum)
 	j := 0
 	i := 0
 
@@ -151,7 +151,7 @@ func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum in
 
 	binary.LittleEndian.PutUint16(context.allocator.mem[addr:], uint16(j))
 
-	dest[j] = 0
+	//dest[j] = 0
 	return addr + 2
 }
 
@@ -162,7 +162,7 @@ func AllocCStringWithUnescapeNum2(context *ParseContext, buf []byte, escapeNum i
 
 	len1 := len(buf)
 
-	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum + 1))
+	addr := context.allocator.Alloc(uint32(len1 - 2*escapeNum))
 	if addr == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL
 	}
@@ -196,7 +196,7 @@ func AllocCStringWithUnescapeNum2(context *ParseContext, buf []byte, escapeNum i
 		dst++
 	}
 
-	*((*byte)(unsafe.Pointer(dst))) = 0
+	//*((*byte)(unsafe.Pointer(dst))) = 0
 	return addr
 }
 

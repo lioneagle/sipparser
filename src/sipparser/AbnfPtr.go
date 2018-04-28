@@ -154,7 +154,7 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 
 func (this AbnfPtr) WriteCString(context *ParseContext, buf *AbnfByteBuffer) {
 	data := this.GetCStringAsByteSlice(context)
-	buf.Write(data[:len(data)-1])
+	buf.Write(data)
 }
 
 func (this AbnfPtr) WriteCStringEscape(context *ParseContext, buf *AbnfByteBuffer, charsetIndex int, mask uint32) {
@@ -164,12 +164,10 @@ func (this AbnfPtr) WriteCStringEscape(context *ParseContext, buf *AbnfByteBuffe
 
 	charset := &g_charsets[charsetIndex]
 	p := this.GetUintptr(context)
+	end := p + uintptr(this.Strlen(context))
 
-	for {
+	for ; p < end; p++ {
 		v := *((*byte)(unsafe.Pointer(p)))
-		if v == 0 {
-			return
-		}
 
 		if (charset[v] & mask) != 0 {
 			buf.WriteByte(v)
@@ -178,8 +176,6 @@ func (this AbnfPtr) WriteCStringEscape(context *ParseContext, buf *AbnfByteBuffe
 			buf.WriteByte(chars.ToUpperHex(v >> 4))
 			buf.WriteByte(chars.ToUpperHex(v))
 		}
-
-		p++
 	}
 }
 
@@ -187,7 +183,7 @@ func (this AbnfPtr) GetCStringAsByteSlice(context *ParseContext) []byte {
 	if this == ABNF_PTR_NIL {
 		return nil
 	}
-	size := this.Strlen(context) + 1
+	size := this.Strlen(context)
 	header := reflect.SliceHeader{Data: this.GetUintptr(context), Len: size, Cap: size}
 	return *(*[]byte)(unsafe.Pointer(&header))
 }
