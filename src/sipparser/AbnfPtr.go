@@ -10,7 +10,7 @@ import (
 	"github.com/lioneagle/goutil/src/chars"
 )
 
-type AbnfPtr uint32
+type AbnfPtr uint16
 
 const (
 	ABNF_PTR_BITS = unsafe.Sizeof(AbnfPtr(0)) * 8

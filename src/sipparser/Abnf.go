@@ -20,7 +20,7 @@ func NewAbnfByteBuffer(buf []byte) *AbnfByteBuffer {
 
 var print_mem bool = false
 
-type AbnfPos = uint32
+type AbnfPos = uint
 
 type AbnfIsInCharset func(ch byte) bool
 

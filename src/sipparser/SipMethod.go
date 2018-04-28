@@ -63,7 +63,6 @@ func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
  * extension-method  =  token
  */
 func (this *SipMethod) Parse(context *ParseContext) (ok bool) {
-	var newPos AbnfPos
 	method, newPos := GetSipMethodIndex(context.parseSrc, context.parsePos)
 
 	if method == ABNF_SIP_METHOD_UNKNOWN {

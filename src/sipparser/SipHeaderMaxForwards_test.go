@@ -14,11 +14,11 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 		newPos int
 		encode string
 	}{
-		{"Max-Forwards: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
-		{"max-foRwardS: 1234", true, len("Max-Forwards: 1234"), "Max-Forwards: 1234"},
+		{"Max-Forwards: 123", true, len("Max-Forwards: 123"), "Max-Forwards: 123"},
+		{"max-foRwardS: 123", true, len("Max-Forwards: 123"), "Max-Forwards: 123"},
 
-		{" Max-Forwards: 1234", false, 0, ""},
-		{"Max-Forwards2: 1234", false, 0, ""},
+		{" Max-Forwards: 123", false, 0, ""},
+		{"Max-Forwards2: 123", false, 0, ""},
 		{"Max-Forwards: ", false, len("Max-Forwards: "), ""},
 		{"Max-Forwards: a123", false, len("Max-Forwards: "), ""},
 	}

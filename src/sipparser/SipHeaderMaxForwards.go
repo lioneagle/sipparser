@@ -6,7 +6,7 @@ import (
 )
 
 type SipHeaderMaxForwards struct {
-	size uint32
+	size byte
 }
 
 func SizeofSipHeaderMaxForwards() int {
@@ -77,7 +77,7 @@ func (this *SipHeaderMaxForwards) ParseValueWithoutInit(context *ParseContext) (
 		return false
 	}
 
-	this.size = uint32(digit)
+	this.size = byte(digit)
 	context.parsePos = newPos
 	return true
 }
