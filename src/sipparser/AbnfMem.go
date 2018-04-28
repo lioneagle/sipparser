@@ -2,7 +2,7 @@ package sipparser
 
 import (
 	"encoding/binary"
-	"fmt"
+	//"fmt"
 	"reflect"
 	"strconv"
 	"unsafe"
