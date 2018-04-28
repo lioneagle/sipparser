@@ -5,9 +5,12 @@ import (
 	"unsafe"
 )
 
+const (
+	SIP_VERSION_2_0 byte = 1
+)
+
 type SipVersion struct {
-	major AbnfPtr
-	minor AbnfPtr
+	version AbnfPtr
 }
 
 func SizeofSipVersion() int {
@@ -31,10 +34,12 @@ func (this *SipVersion) String(context *ParseContext) string {
 }
 
 func (this *SipVersion) Encode(context *ParseContext, buf *AbnfByteBuffer) {
-	buf.WriteString("SIP/")
-	this.major.WriteCString(context, buf)
-	buf.WriteByte('.')
-	this.minor.WriteCString(context, buf)
+	if !this.version.IsAbnfPtr() {
+		buf.WriteString("SIP/2.0")
+	} else {
+		buf.WriteString("SIP/")
+		this.version.WriteCString(context, buf)
+	}
 }
 
 /* RFC3261
@@ -52,24 +57,41 @@ func (this *SipVersion) Parse(context *ParseContext) (ok bool) {
 }
 
 func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
-	this.major, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
-	if !ok {
-		context.AddError(context.parsePos, "parse marjor of SIP-Version failed")
+	if (context.parseSrc[context.parsePos] == '2') &&
+		(context.parseSrc[context.parsePos+1] == '.') &&
+		(context.parseSrc[context.parsePos+2] == '0') {
+		this.version = AbnfPtrSetValue(AbnfPtr(SIP_VERSION_2_0))
+		context.parsePos += 3
+		return true
+	}
+
+	majorStart := context.parsePos
+	newPos := context.parsePos
+
+	ref := &AbnfRef{}
+	newPos = ref.Parse(context.parseSrc, newPos, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
+	if newPos <= majorStart {
+		context.AddError(context.parsePos, "no marjor for SIP-Version ")
 		return false
 	}
 
-	if context.parseSrc[context.parsePos] != '.' {
+	if context.parseSrc[newPos] != '.' {
+		context.parsePos = newPos
 		context.AddError(context.parsePos, "no '.' after major of SIP-Version")
 		return false
 	}
 
-	context.parsePos++
-
-	this.minor, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
-	if !ok {
-		context.AddError(context.parsePos, "parse minor of SIP-Version failed")
+	minorStart := newPos + 1
+	newPos = ref.Parse(context.parseSrc, newPos+1, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
+	if newPos <= minorStart {
+		context.parsePos = newPos
+		context.AddError(context.parsePos, "no minor for SIP-Version ")
 		return false
 	}
+
+	context.parsePos = newPos
+
+	this.version = AllocCString(context, context.parseSrc[majorStart:newPos])
 
 	return true
 }
