@@ -692,7 +692,7 @@ func BenchmarkMemcpy4(b *testing.B) {
 	}
 }
 
-func BenchmarkParseEscapable1(b *testing.B) {
+func BenchmarkParseEscapable1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
 	context := NewParseContext()
@@ -710,7 +710,25 @@ func BenchmarkParseEscapable1(b *testing.B) {
 	}
 }
 
-func BenchmarkParseEscapable2(b *testing.B) {
+func BenchmarkParseEscapable1_2(b *testing.B) {
+	b.StopTimer()
+	src := []byte("+012345678901230123456789")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024)
+	context.SetParseSrc(src)
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.allocator.FreeAll()
+		context.SetParsePos(0)
+		ParseEscapable(context, src, 0, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
+	}
+}
+
+func BenchmarkParseEscapable2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
 	context := NewParseContext()
