@@ -91,8 +91,8 @@ func TestFindRawHeaders(t *testing.T) {
 		headerIndex SipHeaderIndexType
 		ok          bool
 	}{
-		{"From: test\r\nTo: test\r\nCall-ID: test\r\n", ABNF_SIP_HDR_CALL_ID, true},
-		{"From: test\r\nTo: test\r\nCall-ID: test\r\n", ABNF_SIP_HDR_CSEQ, false},
+		{"From: test\r\nTo: test\r\nCall-ID: test\r\n", SIP_HDR_CALL_ID, true},
+		{"From: test\r\nTo: test\r\nCall-ID: test\r\n", SIP_HDR_CSEQ, false},
 	}
 
 	for i, v := range testdata {
@@ -133,6 +133,6 @@ func BenchmarkFindRawHeaders(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		FindRawHeaders(context, headers, ABNF_SIP_HDR_CALL_ID)
+		FindRawHeaders(context, headers, SIP_HDR_CALL_ID)
 	}
 }

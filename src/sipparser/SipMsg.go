@@ -9,82 +9,78 @@ import (
 )
 
 const (
-	SIP_COMMON_HEADER_START_LINE          = 0
-	SIP_COMMON_HEADER_VIA                 = 1
-	SIP_COMMON_HEADER_ROUTE               = 2
-	SIP_COMMON_HEADER_CONTACT             = 3
-	SIP_COMMON_HEADER_FROM                = 4
-	SIP_COMMON_HEADER_TO                  = 5
-	SIP_COMMON_HEADER_CALL_ID             = 6
-	SIP_COMMON_HEADER_CONTENT_LENGTH      = 7
-	SIP_COMMON_HEADER_CSEQ                = 8
-	SIP_COMMON_HEADER_RECORD_ROUTE        = 9
-	SIP_COMMON_HEADER_CONTENT_TYPE        = 10
-	SIP_COMMON_HEADER_MAX_FORWARDS        = 11
-	SIP_COMMON_HEADER_SUPPORTED           = 12
-	SIP_COMMON_HEADER_ALLOW               = 13
-	SIP_COMMON_HEADER_EVENT               = 14
-	SIP_COMMON_HEADER_CONTENT_DISPOSITION = 15
-	SIP_COMMON_HEADER_SESSION_EXPIRES     = 16
-	SIP_COMMON_HEADER_MIME_VERSION        = 17
-	SIP_COMMON_HEADER_REFER_TO            = 18
-	SIP_COMMON_HEADER_REFERRED_BY         = 19
-	//SIP_COMMON_HEADER_MAX_NUM             = iota
+	SIP_COMMON_HDR_START_LINE          = 0
+	SIP_COMMON_HDR_VIA                 = 1
+	SIP_COMMON_HDR_ROUTE               = 2
+	SIP_COMMON_HDR_CONTACT             = 3
+	SIP_COMMON_HDR_FROM                = 4
+	SIP_COMMON_HDR_TO                  = 5
+	SIP_COMMON_HDR_CALL_ID             = 6
+	SIP_COMMON_HDR_CONTENT_LENGTH      = 7
+	SIP_COMMON_HDR_CSEQ                = 8
+	SIP_COMMON_HDR_RECORD_ROUTE        = 9
+	SIP_COMMON_HDR_CONTENT_TYPE        = 10
+	SIP_COMMON_HDR_MAX_FORWARDS        = 11
+	SIP_COMMON_HDR_SUPPORTED           = 12
+	SIP_COMMON_HDR_ALLOW               = 13
+	SIP_COMMON_HDR_EVENT               = 14
+	SIP_COMMON_HDR_CONTENT_DISPOSITION = 15
+	SIP_COMMON_HDR_SESSION_EXPIRES     = 16
+	SIP_COMMON_HDR_MIME_VERSION        = 17
+	SIP_COMMON_HDR_REFER_TO            = 18
+	SIP_COMMON_HDR_REFERRED_BY         = 19
+	SIP_COMMON_HDR_MAX_NUM             = iota
 )
 
-const (
-	SIP_COMMON_HEADER_MAX_NUM = 20
-)
-
-var HeaderIndexToCommonIndex = [ABNF_SIP_HDR_MAX_NUM]int{
-	ABNF_SIP_HDR_VIA:                 1,
-	ABNF_SIP_HDR_ROUTE:               2,
-	ABNF_SIP_HDR_CONTACT:             3,
-	ABNF_SIP_HDR_FROM:                4,
-	ABNF_SIP_HDR_TO:                  5,
-	ABNF_SIP_HDR_CALL_ID:             6,
-	ABNF_SIP_HDR_CONTENT_LENGTH:      7,
-	ABNF_SIP_HDR_CSEQ:                8,
-	ABNF_SIP_HDR_RECORD_ROUTE:        9,
-	ABNF_SIP_HDR_CONTENT_TYPE:        10,
-	ABNF_SIP_HDR_MAX_FORWARDS:        11,
-	ABNF_SIP_HDR_SUPPORTED:           12,
-	ABNF_SIP_HDR_ALLOW:               13,
-	ABNF_SIP_HDR_EVENT:               14,
-	ABNF_SIP_HDR_CONTENT_DISPOSITION: 15,
+var HeaderIndexToCommonIndex = [SIP_HDR_MAX_NUM]int{
+	SIP_HDR_VIA:                 1,
+	SIP_HDR_ROUTE:               2,
+	SIP_HDR_CONTACT:             3,
+	SIP_HDR_FROM:                4,
+	SIP_HDR_TO:                  5,
+	SIP_HDR_CALL_ID:             6,
+	SIP_HDR_CONTENT_LENGTH:      7,
+	SIP_HDR_CSEQ:                8,
+	SIP_HDR_RECORD_ROUTE:        9,
+	SIP_HDR_CONTENT_TYPE:        10,
+	SIP_HDR_MAX_FORWARDS:        11,
+	SIP_HDR_SUPPORTED:           12,
+	SIP_HDR_ALLOW:               13,
+	SIP_HDR_EVENT:               14,
+	SIP_HDR_CONTENT_DISPOSITION: 15,
 }
 
-var CommonIndexToHeaderIndex = [SIP_COMMON_HEADER_MAX_NUM]SipHeaderIndexType{
-	0:  ABNF_SIP_HDR_VIA,
-	1:  ABNF_SIP_HDR_ROUTE,
-	2:  ABNF_SIP_HDR_CONTACT,
-	3:  ABNF_SIP_HDR_FROM,
-	4:  ABNF_SIP_HDR_TO,
-	5:  ABNF_SIP_HDR_CALL_ID,
-	6:  ABNF_SIP_HDR_CONTENT_LENGTH,
-	7:  ABNF_SIP_HDR_CSEQ,
-	8:  ABNF_SIP_HDR_RECORD_ROUTE,
-	9:  ABNF_SIP_HDR_CONTENT_TYPE,
-	10: ABNF_SIP_HDR_MAX_FORWARDS,
-	11: ABNF_SIP_HDR_SUPPORTED,
-	12: ABNF_SIP_HDR_ALLOW,
-	13: ABNF_SIP_HDR_EVENT,
-	14: ABNF_SIP_HDR_CONTENT_DISPOSITION,
+var CommonIndexToHeaderIndex = [SIP_COMMON_HDR_MAX_NUM]SipHeaderIndexType{
+	SIP_COMMON_HDR_VIA:                 SIP_HDR_VIA,
+	SIP_COMMON_HDR_ROUTE:               SIP_HDR_ROUTE,
+	SIP_COMMON_HDR_CONTACT:             SIP_HDR_CONTACT,
+	SIP_COMMON_HDR_FROM:                SIP_HDR_FROM,
+	SIP_COMMON_HDR_TO:                  SIP_HDR_TO,
+	SIP_COMMON_HDR_CALL_ID:             SIP_HDR_CALL_ID,
+	SIP_COMMON_HDR_CONTENT_LENGTH:      SIP_HDR_CONTENT_LENGTH,
+	SIP_COMMON_HDR_CSEQ:                SIP_HDR_CSEQ,
+	SIP_COMMON_HDR_RECORD_ROUTE:        SIP_HDR_RECORD_ROUTE,
+	SIP_COMMON_HDR_CONTENT_TYPE:        SIP_HDR_CONTENT_TYPE,
+	SIP_COMMON_HDR_MAX_FORWARDS:        SIP_HDR_MAX_FORWARDS,
+	SIP_COMMON_HDR_SUPPORTED:           SIP_HDR_SUPPORTED,
+	SIP_COMMON_HDR_ALLOW:               SIP_HDR_ALLOW,
+	SIP_COMMON_HDR_EVENT:               SIP_HDR_EVENT,
+	SIP_COMMON_HDR_CONTENT_DISPOSITION: SIP_HDR_CONTENT_DISPOSITION,
 }
 
 const (
 	SIP_COMMON_BODY_SESSION       = 0
 	SIP_COMMON_BODY_EARLY_SESSION = 1
+	SIP_COMMON_BODY_REG_INFO      = 2
 	SIP_COMMON_BODY_MAX_NUM       = iota
 )
 
 type SipMsg struct {
-	startLine      SipStartLine
-	knownHeaders   AbnfPtr
-	unknownHeaders AbnfPtr
-	bodies         AbnfPtr
-	commonHeaders  [SIP_COMMON_HEADER_MAX_NUM]AbnfPtr
-	commonBodies   [SIP_COMMON_BODY_MAX_NUM]AbnfPtr
+	startLine     SipStartLine
+	commonHeaders [SIP_COMMON_HDR_MAX_NUM]AbnfPtr
+	commonBodies  [SIP_COMMON_BODY_MAX_NUM]AbnfPtr
+	headers       AbnfPtr // uncommon headers
+	bodies        AbnfPtr // uncommon bodies
 }
 
 func SizeofSipMsg() int {

@@ -51,7 +51,7 @@ func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool
 			return false
 		}
 
-		if headerIndex != ABNF_SIP_HDR_UNKNOWN {
+		if headerIndex != SIP_HDR_UNKNOWN {
 			ok = parseKnownHeader(context, headerIndex, headerSetter)
 		} else {
 			ok = parseUnknownHeader(context, hname, headerSetter)
@@ -109,7 +109,7 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 
 	for headers != ABNF_PTR_NIL {
 		header := headers.GetSipHeader(context)
-		if header.id != ABNF_SIP_HDR_UNKNOWN {
+		if header.id != SIP_HDR_UNKNOWN {
 			buf.Write(g_SipHeaderInfos[header.id].name)
 			buf.WriteString(": ")
 		} else {
@@ -142,7 +142,7 @@ func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeade
 	var newPos AbnfPos
 
 	headerIndex, newPos = GetSipHeaderIndex(context.parseSrc, context.parsePos)
-	if headerIndex == ABNF_SIP_HDR_UNKNOWN {
+	if headerIndex == SIP_HDR_UNKNOWN {
 		hname, ok = context.allocator.ParseAndAllocCStringFromPos(context, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 	} else {
 		ok = true
@@ -197,14 +197,14 @@ func parseUnknownHeader(context *ParseContext, hname AbnfPtr, headerSetter SipHe
 	}
 
 	h := header.GetSipHeader(context)
-	h.id = ABNF_SIP_HDR_UNKNOWN
+	h.id = SIP_HDR_UNKNOWN
 	h.hname = hname
 	h.hvalue = parseRawHeaderValue(context)
 	if h.hvalue == ABNF_PTR_NIL {
 		return false
 	}
 
-	ok = headerSetter.SetHeaders(context, ABNF_SIP_HDR_UNKNOWN, header)
+	ok = headerSetter.SetHeaders(context, SIP_HDR_UNKNOWN, header)
 	if !ok {
 		return false
 	}
