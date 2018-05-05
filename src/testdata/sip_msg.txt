@@ -333,7 +333,7 @@ Call-ID: 12345678901234567890123456789012@10.189.154.164
 From: <tel:12345678901;phone-context=+86;noa=subscriber;srvattri=national>;tag=12345678
 To: <sip:12345678901;phone-context=xx.ims.mnc000.mcc123.3gppnetwork.org@ims.mnc000.mcc123.3gppnetwork.org;user=phone>;tag=12345678-1234-1234-1234-12345678912
 CSeq: 12345 UPDATE
-Contact: <sip:10.189.154.164:5060;Dpt=1234_123>;q=1;+q.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel";video;
+Contact: <sip:10.189.154.164:5060;Dpt=1234_123>;q=1;+q.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel";video
 Max-Forwards: 59
 Supported: timer
 P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided

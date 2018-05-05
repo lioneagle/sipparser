@@ -1,6 +1,7 @@
 package sipparser
 
 import (
+	"bytes"
 	//"fmt"
 	"unsafe"
 )
@@ -13,7 +14,7 @@ type KnownSipGenericParams interface {
 const (
 	SIP_GENERIC_VALUE_TYPE_TOKEN         = byte(0)
 	SIP_GENERIC_VALUE_TYPE_QUOTED_STRING = byte(1)
-	//SIP_GENERIC_VALUE_TYPE_HOST          = byte(2)
+	SIP_GENERIC_VALUE_TYPE_IPV6          = byte(2)
 )
 
 type SipGenericParam struct {
@@ -53,7 +54,7 @@ func (this *SipGenericParam) Encode(context *ParseContext, buf *AbnfByteBuffer) 
 func (this *SipGenericParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
 	if this.value != ABNF_PTR_NIL {
 		buf.WriteByte('=')
-		if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN {
+		if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN || this.valueType == SIP_GENERIC_VALUE_TYPE_IPV6 {
 			this.value.WriteCString(context, buf)
 		} else if this.valueType == SIP_GENERIC_VALUE_TYPE_QUOTED_STRING {
 			EncodeSipQuotedString(context, buf, this.value)
@@ -83,9 +84,15 @@ func (this *SipGenericParam) Parse(context *ParseContext) (ok bool) {
 		return true
 	}
 
-	ok = ParseSWSMark(context, '=')
+	var matchMark bool
+
+	matchMark, ok = ParseSWSMarkCanOmmit(context, '=')
 	if !ok {
 		return false
+	}
+
+	if !matchMark {
+		return true
 	}
 
 	return this.ParseValue(context)
@@ -112,9 +119,24 @@ func (this *SipGenericParam) ParseValue(context *ParseContext) (ok bool) {
 			this.valueType = SIP_GENERIC_VALUE_TYPE_QUOTED_STRING
 		}
 		return ok
+	} else if v == '[' {
+		p1 := bytes.IndexByte(context.parseSrc[context.parsePos:], ']')
+		if p1 == -1 {
+			context.AddError(context.parsePos, "no ']' for ipv6 for gen-value")
+			return false
+		}
+
+		this.value = AllocCString(context, context.parseSrc[context.parsePos:context.parsePos+AbnfPos(p1)+1])
+		if this.value == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "not mem for gen-value")
+			return false
+		}
+		context.parsePos += AbnfPos(p1) + 1
+		this.valueType = SIP_GENERIC_VALUE_TYPE_IPV6
+		return true
 	}
 
-	context.AddError(context.parsePos, "not token nor quoted-string for gen-value")
+	context.AddError(context.parsePos, "not token nor quoted-string nor ipv6 for gen-value")
 	return false
 }
 
