@@ -129,8 +129,9 @@ func (this *SipMsgBuf) Read(src []byte, pos int) (newPos int, ret int) {
 }
 
 type SipMsgBufs struct {
-	Size int
-	Data map[string]*SipMsgBuf
+	Size  int
+	Data  map[string]*SipMsgBuf
+	Names []string
 }
 
 func NewSipMsgBufs() *SipMsgBufs {
@@ -164,6 +165,7 @@ func (this *SipMsgBufs) ReadFromFile(filename string) bool {
 		}
 
 		this.Data[buf.Name] = buf
+		this.Names = append(this.Names, buf.Name)
 		this.Size++
 
 		if pos >= len1 {
@@ -172,6 +174,27 @@ func (this *SipMsgBufs) ReadFromFile(filename string) bool {
 	}
 
 	return true
+}
+
+func (this *SipMsgBufs) GetFilteredData(filter string) (ret []*SipMsgBuf) {
+	if len(filter) == 0 {
+		filter = "."
+	}
+
+	if filter != "." {
+		for _, v := range this.Names {
+			_, ok := ByteSliceIndexNoCase([]byte(v), 0, []byte(filter))
+			if ok {
+				ret = append(ret, this.Data[v])
+			}
+		}
+	} else {
+		for _, v := range this.Names {
+			ret = append(ret, this.Data[v])
+		}
+	}
+
+	return ret
 }
 
 var g_sip_msgs *SipMsgBufs = NewSipMsgBufs()
@@ -278,10 +301,7 @@ func BenchmarkSipMsgRawScan_2(b *testing.B) {
 func BenchmarkSipMsgsRawScan(b *testing.B) {
 	bufs := ReadSipMsgBufs()
 
-	testdata := []*SipMsgBuf{
-		bufs.Data["sip_flow_reg_register"],
-		bufs.Data["sip_flow_reg_register_100"],
-	}
+	testdata := bufs.GetFilteredData(".")
 
 	for _, v := range testdata {
 		v := v
@@ -310,4 +330,58 @@ func BenchmarkSipMsgsRawScan(b *testing.B) {
 			}
 		})
 	}
+}
+
+func BenchmarkFindSipHeader1(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(msg1)
+	name := []byte("Content-Type:")
+	buf := NewAbnfByteBuffer(nil)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.parsePos = 0
+		ok := FindSipHeader1(context, name, buf)
+		if !ok {
+			fmt.Println("BenchmarkFindSipHeader failed, err =", context.Errors.String())
+			fmt.Println("msg1 = ", string(msg1))
+			break
+		} //*/
+	}
+}
+
+func BenchmarkFindSipHeader2(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(msg1)
+	name := []byte("Content-Type")
+	shortname := []byte("c")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	//newPos := AbnfPos(0)
+	ok := false
+	for i := 0; i < b.N; i++ {
+		context.parsePos = 0
+		//newPos, ok = FindSipHeader2(context, name, shortname)
+		_, ok = FindSipHeader2(context, name, shortname)
+		if !ok {
+			fmt.Println("BenchmarkFindSipHeader failed, err =", context.Errors.String())
+			fmt.Println("msg1 = ", string(msg1))
+			break
+		} //*/
+	}
+
+	//fmt.Println("ok =", ok)
+	//fmt.Println("newPos =", newPos)
+	//fmt.Println("msg1[newPos:] =", string(msg1[newPos:]))
 }
