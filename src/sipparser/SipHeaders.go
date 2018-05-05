@@ -2,6 +2,7 @@ package sipparser
 
 import (
 	//"fmt"
+	"bytes"
 	"unsafe"
 )
 
@@ -264,14 +265,24 @@ func FindCrlfByRFC3261(context *ParseContext) (begin AbnfPos, ok bool) {
 
 	//for end < len1 {
 	for {
-		for ; (end < len1) && (src[end] != '\n'); end++ {
+		/*
+			for ; (end < len1) && (src[end] != '\n'); end++ {
+			}
+			if end >= len1 {
+				context.parsePos = end
+				return end, false
+			}
+			end++
+			//*/
+
+		//*
+		p1 := bytes.IndexByte(src[end:], '\n')
+		if p1 == -1 {
+			context.parsePos = len1
+			return len1, false
 		}
-		if end >= len1 {
-			/* no CRLF" */
-			context.parsePos = end
-			return end, false
-		}
-		end++
+		end += uint(p1) + 1
+		//*/
 
 		if end >= len1 {
 			break
