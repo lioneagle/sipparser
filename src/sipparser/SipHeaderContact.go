@@ -299,3 +299,18 @@ func EncodeSipContactValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteB
 	}
 	parsed.GetSipHeaderContact(context).EncodeValue(context, buf)
 }
+
+func AppendSipContactValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+	for addr := parsed; addr != ABNF_PTR_NIL; {
+		h := addr.GetSipHeaderContact(context)
+		if h.next == ABNF_PTR_NIL {
+			h.next = header
+			return
+		}
+		addr = h.next
+	}
+}
+
+func GetNextContactValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+	return parsed.GetSipHeaderContact(context).next
+}

@@ -328,12 +328,12 @@ func (this *SipHeaderVia) parseHeaderName(context *ParseContext) (ok bool) {
 }
 
 func ParseSipVia(context *ParseContext) (parsed AbnfPtr, ok bool) {
-	addr := NewSipHeaderTo(context)
+	addr := NewSipHeaderVia(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Via header")
 		return ABNF_PTR_NIL, false
 	}
-	ok = addr.GetSipHeaderTo(context).ParseValueWithoutInit(context)
+	ok = addr.GetSipHeaderVia(context).ParseValueWithoutInit(context)
 	return addr, ok
 }
 
@@ -341,5 +341,20 @@ func EncodeSipViaValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffe
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
-	parsed.GetSipHeaderTo(context).EncodeValue(context, buf)
+	parsed.GetSipHeaderVia(context).EncodeValue(context, buf)
+}
+
+func AppendSipViaValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+	for addr := parsed; addr != ABNF_PTR_NIL; {
+		h := addr.GetSipHeaderVia(context)
+		if h.next == ABNF_PTR_NIL {
+			h.next = header
+			return
+		}
+		addr = h.next
+	}
+}
+
+func GetNextViaValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+	return parsed.GetSipHeaderVia(context).next
 }

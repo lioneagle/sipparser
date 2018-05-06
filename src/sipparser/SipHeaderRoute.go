@@ -148,3 +148,18 @@ func EncodeSipRouteValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuf
 	}
 	parsed.GetSipHeaderRoute(context).EncodeValue(context, buf)
 }
+
+func AppendSipRouteValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+	for addr := parsed; addr != ABNF_PTR_NIL; {
+		h := addr.GetSipHeaderRoute(context)
+		if h.next == ABNF_PTR_NIL {
+			h.next = header
+			return
+		}
+		addr = h.next
+	}
+}
+
+func GetNextRouteValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+	return parsed.GetSipHeaderRoute(context).next
+}

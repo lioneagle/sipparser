@@ -40,14 +40,15 @@ func (this *SipStartLine) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	} else {
 		this.EncodeStatusLine(context, buf)
 	}
-	buf.WriteByte('\r')
-	buf.WriteByte('\n')
+	buf.WriteString("\r\n")
+	//buf.WriteByte('\r')
+	//buf.WriteByte('\n')
 }
 
 func (this *SipStartLine) EncodeRequestLine(context *ParseContext, buf *AbnfByteBuffer) {
 	this.method.Encode(context, buf)
 	buf.WriteByte(' ')
-	this.addr.Encode(context, buf)
+	this.addr.EncodeAddrSpec(context, buf)
 	buf.WriteByte(' ')
 	this.version.Encode(context, buf)
 }

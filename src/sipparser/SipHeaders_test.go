@@ -136,3 +136,29 @@ func BenchmarkFindRawHeaders(b *testing.B) {
 		FindRawHeaders(context, headers, SIP_HDR_CALL_ID)
 	}
 }
+
+func BenchmarkParseHeaderNameAndGetSipHeaderIndex(b *testing.B) {
+	b.StopTimer()
+	b.SetBytes(2)
+	b.ReportAllocs()
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+
+	var testdata [][]byte
+	for _, v := range g_SipHeaderInfos {
+		if v != nil {
+			name := []byte(fmt.Sprintf("%s: ", string(v.name)))
+			testdata = append(testdata, name)
+		}
+	}
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		for _, v := range testdata {
+			context.allocator.FreeAll()
+			context.SetParseSrc(v)
+			context.SetParsePos(0)
+			ParseHeaderName(context)
+		}
+	}
+}

@@ -129,6 +129,10 @@ func (this AbnfPtr) GetSipSentProtocol(context *ParseContext) *SipSentProtocol {
 	return (*SipSentProtocol)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipMsg(context *ParseContext) *SipMsg {
+	return (*SipMsg)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

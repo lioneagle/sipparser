@@ -9,76 +9,76 @@ import (
 )
 
 const (
-	SIP_COMMON_HDR_START_LINE          = 0
-	SIP_COMMON_HDR_VIA                 = 1
-	SIP_COMMON_HDR_ROUTE               = 2
-	SIP_COMMON_HDR_CONTACT             = 3
-	SIP_COMMON_HDR_FROM                = 4
-	SIP_COMMON_HDR_TO                  = 5
-	SIP_COMMON_HDR_CALL_ID             = 6
-	SIP_COMMON_HDR_CONTENT_LENGTH      = 7
-	SIP_COMMON_HDR_CSEQ                = 8
-	SIP_COMMON_HDR_RECORD_ROUTE        = 9
-	SIP_COMMON_HDR_CONTENT_TYPE        = 10
-	SIP_COMMON_HDR_MAX_FORWARDS        = 11
-	SIP_COMMON_HDR_SUPPORTED           = 12
-	SIP_COMMON_HDR_ALLOW               = 13
-	SIP_COMMON_HDR_EVENT               = 14
-	SIP_COMMON_HDR_CONTENT_DISPOSITION = 15
-	SIP_COMMON_HDR_SESSION_EXPIRES     = 16
-	SIP_COMMON_HDR_MIME_VERSION        = 17
-	SIP_COMMON_HDR_REFER_TO            = 18
-	SIP_COMMON_HDR_REFERRED_BY         = 19
-	SIP_COMMON_HDR_MAX_NUM             = iota
+	SIP_MSG_COMMON_HDR_START_LINE     = 0
+	SIP_MSG_COMMON_HDR_VIA            = 1
+	SIP_MSG_COMMON_HDR_ROUTE          = 2
+	SIP_MSG_COMMON_HDR_CONTACT        = 3
+	SIP_MSG_COMMON_HDR_FROM           = 4
+	SIP_MSG_COMMON_HDR_TO             = 5
+	SIP_MSG_COMMON_HDR_CALL_ID        = 6
+	SIP_MSG_COMMON_HDR_CONTENT_LENGTH = 7
+	SIP_MSG_COMMON_HDR_CSEQ           = 8
+	SIP_MSG_COMMON_HDR_RECORD_ROUTE   = 9
+	SIP_MSG_COMMON_HDR_CONTENT_TYPE   = 10
+	SIP_MSG_COMMON_HDR_MAX_FORWARDS   = 11
+	//SIP_MSG_COMMON_HDR_SUPPORTED           = 12
+	//SIP_MSG_COMMON_HDR_ALLOW               = 13
+	//SIP_MSG_COMMON_HDR_EVENT               = 14
+	//SIP_MSG_COMMON_HDR_CONTENT_DISPOSITION = 15
+	//SIP_MSG_COMMON_HDR_SESSION_EXPIRES     = 16
+	//SIP_MSG_COMMON_HDR_MIME_VERSION        = 17
+	//SIP_MSG_COMMON_HDR_REFER_TO            = 18
+	//SIP_MSG_COMMON_HDR_REFERRED_BY         = 19
+	SIP_MSG_COMMON_HDR_MAX_NUM = iota
 )
 
-var HeaderIndexToCommonIndex = [SIP_HDR_MAX_NUM]int{
-	SIP_HDR_VIA:                 1,
-	SIP_HDR_ROUTE:               2,
-	SIP_HDR_CONTACT:             3,
-	SIP_HDR_FROM:                4,
-	SIP_HDR_TO:                  5,
-	SIP_HDR_CALL_ID:             6,
-	SIP_HDR_CONTENT_LENGTH:      7,
-	SIP_HDR_CSEQ:                8,
-	SIP_HDR_RECORD_ROUTE:        9,
-	SIP_HDR_CONTENT_TYPE:        10,
-	SIP_HDR_MAX_FORWARDS:        11,
-	SIP_HDR_SUPPORTED:           12,
-	SIP_HDR_ALLOW:               13,
-	SIP_HDR_EVENT:               14,
-	SIP_HDR_CONTENT_DISPOSITION: 15,
+var g_sipHeaderIndexToCommonIndex = [SIP_HDR_MAX_NUM]int{
+	SIP_HDR_VIA:            1,
+	SIP_HDR_ROUTE:          2,
+	SIP_HDR_CONTACT:        3,
+	SIP_HDR_FROM:           4,
+	SIP_HDR_TO:             5,
+	SIP_HDR_CALL_ID:        6,
+	SIP_HDR_CONTENT_LENGTH: 7,
+	SIP_HDR_CSEQ:           8,
+	SIP_HDR_RECORD_ROUTE:   9,
+	SIP_HDR_CONTENT_TYPE:   10,
+	SIP_HDR_MAX_FORWARDS:   11,
+	//SIP_HDR_SUPPORTED:           12,
+	//SIP_HDR_ALLOW:               13,
+	//SIP_HDR_EVENT:               14,
+	//SIP_HDR_CONTENT_DISPOSITION: 15,
 }
 
-var CommonIndexToHeaderIndex = [SIP_COMMON_HDR_MAX_NUM]SipHeaderIndexType{
-	SIP_COMMON_HDR_VIA:                 SIP_HDR_VIA,
-	SIP_COMMON_HDR_ROUTE:               SIP_HDR_ROUTE,
-	SIP_COMMON_HDR_CONTACT:             SIP_HDR_CONTACT,
-	SIP_COMMON_HDR_FROM:                SIP_HDR_FROM,
-	SIP_COMMON_HDR_TO:                  SIP_HDR_TO,
-	SIP_COMMON_HDR_CALL_ID:             SIP_HDR_CALL_ID,
-	SIP_COMMON_HDR_CONTENT_LENGTH:      SIP_HDR_CONTENT_LENGTH,
-	SIP_COMMON_HDR_CSEQ:                SIP_HDR_CSEQ,
-	SIP_COMMON_HDR_RECORD_ROUTE:        SIP_HDR_RECORD_ROUTE,
-	SIP_COMMON_HDR_CONTENT_TYPE:        SIP_HDR_CONTENT_TYPE,
-	SIP_COMMON_HDR_MAX_FORWARDS:        SIP_HDR_MAX_FORWARDS,
-	SIP_COMMON_HDR_SUPPORTED:           SIP_HDR_SUPPORTED,
-	SIP_COMMON_HDR_ALLOW:               SIP_HDR_ALLOW,
-	SIP_COMMON_HDR_EVENT:               SIP_HDR_EVENT,
-	SIP_COMMON_HDR_CONTENT_DISPOSITION: SIP_HDR_CONTENT_DISPOSITION,
+var g_sipCommonIndexToHeaderIndex = [SIP_MSG_COMMON_HDR_MAX_NUM]SipHeaderIndexType{
+	SIP_MSG_COMMON_HDR_VIA:            SIP_HDR_VIA,
+	SIP_MSG_COMMON_HDR_ROUTE:          SIP_HDR_ROUTE,
+	SIP_MSG_COMMON_HDR_CONTACT:        SIP_HDR_CONTACT,
+	SIP_MSG_COMMON_HDR_FROM:           SIP_HDR_FROM,
+	SIP_MSG_COMMON_HDR_TO:             SIP_HDR_TO,
+	SIP_MSG_COMMON_HDR_CALL_ID:        SIP_HDR_CALL_ID,
+	SIP_MSG_COMMON_HDR_CONTENT_LENGTH: SIP_HDR_CONTENT_LENGTH,
+	SIP_MSG_COMMON_HDR_CSEQ:           SIP_HDR_CSEQ,
+	SIP_MSG_COMMON_HDR_RECORD_ROUTE:   SIP_HDR_RECORD_ROUTE,
+	SIP_MSG_COMMON_HDR_CONTENT_TYPE:   SIP_HDR_CONTENT_TYPE,
+	SIP_MSG_COMMON_HDR_MAX_FORWARDS:   SIP_HDR_MAX_FORWARDS,
+	//SIP_MSG_COMMON_HDR_SUPPORTED:           SIP_HDR_SUPPORTED,
+	//SIP_MSG_COMMON_HDR_ALLOW:               SIP_HDR_ALLOW,
+	//SIP_MSG_COMMON_HDR_EVENT:               SIP_HDR_EVENT,
+	//SIP_MSG_COMMON_HDR_CONTENT_DISPOSITION: SIP_HDR_CONTENT_DISPOSITION,
 }
 
 const (
-	SIP_COMMON_BODY_SESSION       = 0
-	SIP_COMMON_BODY_EARLY_SESSION = 1
-	SIP_COMMON_BODY_REG_INFO      = 2
-	SIP_COMMON_BODY_MAX_NUM       = iota
+	SIP_MSG_COMMON_BODY_SESSION       = 0
+	SIP_MSG_COMMON_BODY_EARLY_SESSION = 1
+	SIP_MSG_COMMON_BODY_REG_INFO      = 2
+	SIP_MSG_COMMON_BODY_MAX_NUM       = iota
 )
 
 type SipMsg struct {
 	startLine     SipStartLine
-	commonHeaders [SIP_COMMON_HDR_MAX_NUM]AbnfPtr
-	commonBodies  [SIP_COMMON_BODY_MAX_NUM]AbnfPtr
+	commonHeaders [SIP_MSG_COMMON_HDR_MAX_NUM]AbnfPtr
+	commonBodies  [SIP_MSG_COMMON_BODY_MAX_NUM]AbnfPtr
 	headers       AbnfPtr // uncommon headers
 	bodies        AbnfPtr // uncommon bodies
 }
@@ -97,6 +97,101 @@ func (this *SipMsg) memAddr() uintptr {
 
 func (this *SipMsg) Init() {
 	ZeroMem(this.memAddr(), SizeofSipMsg())
+}
+
+func (this *SipMsg) SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
+	commomHeaderIndex := g_sipHeaderIndexToCommonIndex[headerIndex]
+	if commomHeaderIndex != 0 && !context.ParseSipHeaderAsRaw {
+		if g_SipHeaderInfos[headerIndex].allowMulti {
+			if this.commonHeaders[commomHeaderIndex] == ABNF_PTR_NIL {
+				this.commonHeaders[commomHeaderIndex] = header
+			} else {
+				g_SipHeaderInfos[headerIndex].appendFunc(context, this.commonHeaders[commomHeaderIndex], header)
+			}
+		} else {
+			this.commonHeaders[commomHeaderIndex] = header
+		}
+	} else {
+		if this.headers == ABNF_PTR_NIL {
+			this.headers = header
+		} else {
+			if !appendUnknownSipHeader(context, this.headers, header) {
+				context.AddError(context.parsePos, "append uncommon header failed")
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (this *SipMsg) EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
+	len1 := len(this.commonHeaders)
+	for i := 1; i < len1; i++ {
+		v := this.commonHeaders[i]
+		if v == ABNF_PTR_NIL {
+			continue
+		}
+		info := g_SipHeaderInfos[g_sipCommonIndexToHeaderIndex[i]]
+		buf.Write(info.name)
+		buf.WriteString(": ")
+		info.encodeFunc(v, context, buf)
+		if info.allowMulti {
+			header := info.getNextFunc(context, v)
+			for header != ABNF_PTR_NIL {
+				buf.WriteString(", ")
+				info.encodeFunc(header, context, buf)
+				header = info.getNextFunc(context, header)
+			}
+		}
+		buf.WriteString("\r\n")
+	}
+
+	if this.headers != ABNF_PTR_NIL {
+		EncodeRawHeaders(context, this.headers, buf)
+	}
+}
+
+func (this *SipMsg) String(context *ParseContext) string {
+	var buf AbnfByteBuffer
+	this.Encode(context, &buf)
+	return buf.String()
+}
+
+func (this *SipMsg) Encode(context *ParseContext, buf *AbnfByteBuffer) (ok bool) {
+	this.startLine.Encode(context, buf)
+
+	this.EncodeHeaders(context, buf)
+
+	buf.WriteString("\r\n")
+
+	return true
+}
+
+func (this *SipMsg) Parse(context *ParseContext) (ok bool) {
+	len1 := AbnfPos(len(context.parseSrc))
+
+	this.Init()
+	ok = this.startLine.Parse(context)
+	if !ok {
+		context.AddError(context.parsePos, "parse start-line failed for sip msg")
+		return false
+	}
+
+	if context.parsePos >= len1 {
+		context.AddError(context.parsePos, "no headers for sip msg failed")
+		return false
+	}
+
+	ok = ParseHeaders(context, this)
+	if !ok {
+		context.AddError(context.parsePos, "parse headers failed for sip msg")
+		return false
+	}
+
+	//TODO: add parse bodies
+
+	return true
 }
 
 func SipMsgRawScan(context *ParseContext) (ok bool) {

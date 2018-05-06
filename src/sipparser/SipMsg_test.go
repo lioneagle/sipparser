@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	//"github.com/lioneagle/goutil/src/test"
 )
 
 const (
@@ -213,6 +215,76 @@ func ReadSipMsgBufs() *SipMsgBufs {
 	fmt.Printf("bufs[\"sip_flow_reg_message_200\"] = \n%s", string(p.Buf))
 }*/
 
+/*
+func TestSipMsgParseWithoutBody(t *testing.T) {
+
+	testdata := []struct {
+		src    string
+		ok     bool
+		newPos int
+		encode string
+	}{
+		{"INVITE sip:123@a.com SIP/2.0\r\nFrom: sip:abc@a.com;tag=1\r\nAllow: a, b\r\nContent-Length: 123\r\n\r\n", true, len("INVITE sip:123@a.com SIP/2.0\r\nFrom: sip:abc@a.com;tag=1\r\nAllow: a, b\r\nContent-Length: 123\r\n\r\n"), "INVITE sip:123@a.com SIP/2.0\r\nFrom: <sip:abc@a.com>;tag=1\r\nContent-Length:        123\r\nAllow: a, b\r\n\r\n"},
+		//{"INVITE sip:123@a.com SIP/2.0\r\nFrom: sip:abc@a.com;tag=1\r\nAllow: a, b\r\n\r\n", true, len("INVITE sip:123@a.com SIP/2.0\r\nFrom: sip:abc@a.com;tag=1\r\nAllow: a, b\r\n\r\n"), "INVITE sip:123@a.com SIP/2.0\r\nFrom: <sip:abc@a.com>;tag=1\r\nContent-Length:          0\r\nAllow: a, b\r\n\r\n"},
+		{"INVITE sip:123@a.com SIP/2.0\r\nVia: SIP/2.0/UDP 10.189.156.16:5061;branch=z9hG4bK123, SIP/2.0/UDP 10.189.156.16:5062;branch=z9hG4bK124\r\n , SIP/2.0/UDP 10.189.156.16:5064;branch=z9hG4bK126\r\nAllow: a, b\r\nVia: SIP/2.0/UDP 10.189.156.16:5063;branch=z9hG4bK125\r\nFrom: sip:abc@a.com;tag=1\r\n\r\n", true, len("INVITE sip:123@a.com SIP/2.0\r\nVia: SIP/2.0/UDP 10.189.156.16:5061;branch=z9hG4bK123, SIP/2.0/UDP 10.189.156.16:5062;branch=z9hG4bK124\r\n , SIP/2.0/UDP 10.189.156.16:5064;branch=z9hG4bK126\r\nAllow: a, b\r\nVia: SIP/2.0/UDP 10.189.156.16:5063;branch=z9hG4bK125\r\nFrom: sip:abc@a.com;tag=1\r\n\r\n"), "INVITE sip:123@a.com SIP/2.0\r\nVia: SIP/2.0/UDP 10.189.156.16:5061;branch=z9hG4bK123, SIP/2.0/UDP 10.189.156.16:5062;branch=z9hG4bK124, SIP/2.0/UDP 10.189.156.16:5064;branch=z9hG4bK126, SIP/2.0/UDP 10.189.156.16:5063;branch=z9hG4bK125\r\nFrom: <sip:abc@a.com>;tag=1\r\nAllow: a, b\r\n\r\n"},
+
+		{" INVITE sip:123@a.com SIP/2.0\r\n", false, 0, ""},
+		{"INVITE sip:123@a.com SIP/2.0\r\n", false, len("INVITE sip:123@a.com SIP/2.0\r\n"), ""},
+		{"INVITE sip:123@a.com SIP/2.0\r\nVia:", false, len("INVITE sip:123@a.com SIP/2.0\r\nVia:"), ""},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+			context.EncodeUriAsNameSpace = true
+
+			addr := NewSipMsg(context)
+			sipmsg := addr.GetSipMsg(context)
+			ok := sipmsg.Parse(context)
+
+			if v.ok {
+				test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			} else {
+				test.ASSERT_FALSE(t, ok, "")
+			}
+
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+
+			if !v.ok {
+				return
+			}
+
+			test.EXPECT_EQ(t, sipmsg.String(context), v.encode, "")
+		})
+	}
+}
+
+func TestSipMsg1RawParseAndEncode(t *testing.T) {
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(msg1)
+	context.ParseSipHeaderAsRaw = true
+
+	addr := NewSipMsg(context)
+	sipmsg := addr.GetSipMsg(context)
+
+	ok := sipmsg.Parse(context)
+	test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+
+	buf := NewAbnfByteBuffer(nil)
+	sipmsg.Encode(context, buf)
+
+	//fmt.Println("msg =", buf.String())
+}
+*/
 var msg string = "INVITE sip:6135000@24.15.255.4 SIP/2.0\r\n" +
 	"Content-Length: 226\r\n" +
 	"Via: SIP/2.0/UDP 24.15.255.101:5060\r\n" +
@@ -226,6 +298,120 @@ var msg string = "INVITE sip:6135000@24.15.255.4 SIP/2.0\r\n" +
 	"Contact: sip:6140000@24.15.255.101:5060\r\n" +
 	"Content-Type: application/sdp\r\n" +
 	"\r\n"
+
+func BenchmarkSipMsg1Parse(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 10)
+	context.SetParseSrc(msg1)
+	addr := NewSipMsg(context)
+	sipmsg := addr.GetSipMsg(context)
+	remain := context.allocator.Used()
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.parsePos = 0
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		ok := sipmsg.Parse(context)
+		if !ok {
+			fmt.Println("SipMsgRawScan3 failed, err =", context.Errors.String())
+			fmt.Println("msg1 = ", string(msg1))
+			break
+		} //*/
+	}
+
+	//fmt.Printf("msg = %s\n", sipmsg.String(context))
+	//fmt.Printf("allocator.AllocNum = %d\n", context.allocator.AllocNum())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
+}
+
+func BenchmarkSipMsg1RawParse(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 10)
+	context.SetParseSrc(msg1)
+	context.ParseSipHeaderAsRaw = true
+	addr := NewSipMsg(context)
+	sipmsg := addr.GetSipMsg(context)
+	remain := context.allocator.Used()
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		context.parsePos = 0
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		ok := sipmsg.Parse(context)
+		if !ok {
+			fmt.Println("SipMsgRawScan3 failed, err =", context.Errors.String())
+			fmt.Println("msg1 = ", string(msg1))
+			break
+		} //*/
+	}
+
+	//fmt.Printf("msg = %s\n", sipmsg.String(context))
+	//fmt.Printf("allocator.AllocNum = %d\n", context.allocator.AllocNum())
+	//fmt.Println("context.allocator.Used() =", context.allocator.Used()-remain)
+	//fmt.Println("remain =", remain)
+}
+
+func BenchmarkSipMsg1Encode(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(msg1)
+	addr := NewSipMsg(context)
+	sipmsg := addr.GetSipMsg(context)
+	sipmsg.Parse(context)
+	remain := context.allocator.Used()
+	buf := NewAbnfByteBuffer(nil)
+
+	b.SetBytes(2)
+	b.ReportAllocs()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		sipmsg.Encode(context, buf)
+	}
+	//fmt.Println("msg =", buf.String())
+}
+
+func BenchmarkSipMsg1RawEncode(b *testing.B) {
+	b.StopTimer()
+	msg1 := []byte(msg)
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(msg1)
+	context.ParseSipHeaderAsRaw = true
+	addr := NewSipMsg(context)
+	sipmsg := addr.GetSipMsg(context)
+	sipmsg.Parse(context)
+	remain := context.allocator.Used()
+	buf := NewAbnfByteBuffer(nil)
+
+	b.SetBytes(2)
+	b.ReportAllocs()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		context.allocator.ClearAllocNum()
+		context.allocator.FreePart(remain)
+		sipmsg.Encode(context, buf)
+	}
+	//fmt.Println("msg =", buf.String())
+}
 
 func BenchmarkSipMsgRawScan(b *testing.B) {
 	b.StopTimer()
@@ -298,10 +484,12 @@ func BenchmarkSipMsgRawScan_2(b *testing.B) {
 	//fmt.Println("newPos =", context.parsePos)
 }
 
+var sip_msgs_filter = "."
+
 func BenchmarkSipMsgsRawScan(b *testing.B) {
 	bufs := ReadSipMsgBufs()
 
-	testdata := bufs.GetFilteredData(".")
+	testdata := bufs.GetFilteredData(sip_msgs_filter)
 
 	for _, v := range testdata {
 		v := v
@@ -327,6 +515,162 @@ func BenchmarkSipMsgsRawScan(b *testing.B) {
 					fmt.Println("msg = \n", string(msg))
 					return
 				}
+			}
+		})
+	}
+}
+
+func BenchmarkSipMsgsParse(b *testing.B) {
+	bufs := ReadSipMsgBufs()
+
+	testdata := bufs.GetFilteredData(sip_msgs_filter)
+
+	for _, v := range testdata {
+		v := v
+
+		b.Run(v.Name, func(b *testing.B) {
+			//b.Parallel()
+
+			b.StopTimer()
+
+			msg := v.Buf
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(msg))
+			context.SetParsePos(0)
+
+			addr := NewSipMsg(context)
+			sipmsg := addr.GetSipMsg(context)
+			remain := context.allocator.Used()
+
+			b.StartTimer()
+
+			for i := 0; i < b.N; i++ {
+				context.parsePos = 0
+				context.allocator.ClearAllocNum()
+				context.allocator.FreePart(remain)
+				ok := sipmsg.Parse(context)
+				if !ok {
+					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Println("msg = \n", string(msg))
+					return
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkSipMsgsEncode(b *testing.B) {
+	bufs := ReadSipMsgBufs()
+
+	testdata := bufs.GetFilteredData(sip_msgs_filter)
+
+	for _, v := range testdata {
+		v := v
+
+		b.Run(v.Name, func(b *testing.B) {
+			//b.Parallel()
+
+			b.StopTimer()
+
+			msg := v.Buf
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(msg))
+			context.SetParsePos(0)
+
+			addr := NewSipMsg(context)
+			sipmsg := addr.GetSipMsg(context)
+			sipmsg.Parse(context)
+			remain := context.allocator.Used()
+			buf := NewAbnfByteBuffer(nil)
+
+			b.StartTimer()
+
+			for i := 0; i < b.N; i++ {
+				buf.Reset()
+				context.allocator.ClearAllocNum()
+				context.allocator.FreePart(remain)
+				sipmsg.Encode(context, buf)
+			}
+		})
+	}
+}
+
+func BenchmarkSipMsgsRawParse(b *testing.B) {
+	bufs := ReadSipMsgBufs()
+
+	testdata := bufs.GetFilteredData(sip_msgs_filter)
+
+	for _, v := range testdata {
+		v := v
+
+		b.Run(v.Name, func(b *testing.B) {
+			//b.Parallel()
+
+			b.StopTimer()
+
+			msg := v.Buf
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(msg))
+			context.SetParsePos(0)
+			context.ParseSipHeaderAsRaw = true
+
+			addr := NewSipMsg(context)
+			sipmsg := addr.GetSipMsg(context)
+			remain := context.allocator.Used()
+
+			b.StartTimer()
+
+			for i := 0; i < b.N; i++ {
+				context.parsePos = 0
+				context.allocator.ClearAllocNum()
+				context.allocator.FreePart(remain)
+				ok := sipmsg.Parse(context)
+				if !ok {
+					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Println("msg = \n", string(msg))
+					return
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkSipMsgsRawEncode(b *testing.B) {
+	bufs := ReadSipMsgBufs()
+
+	testdata := bufs.GetFilteredData(sip_msgs_filter)
+
+	for _, v := range testdata {
+		v := v
+
+		b.Run(v.Name, func(b *testing.B) {
+			//b.Parallel()
+
+			b.StopTimer()
+
+			msg := v.Buf
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 10)
+			context.SetParseSrc([]byte(msg))
+			context.SetParsePos(0)
+			context.ParseSipHeaderAsRaw = true
+
+			addr := NewSipMsg(context)
+			sipmsg := addr.GetSipMsg(context)
+			sipmsg.Parse(context)
+			remain := context.allocator.Used()
+			buf := NewAbnfByteBuffer(nil)
+
+			b.StartTimer()
+
+			for i := 0; i < b.N; i++ {
+				buf.Reset()
+				context.allocator.ClearAllocNum()
+				context.allocator.FreePart(remain)
+				sipmsg.Encode(context, buf)
 			}
 		})
 	}

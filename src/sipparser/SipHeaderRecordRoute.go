@@ -140,7 +140,7 @@ func (this *SipHeaderRecordRoute) parseHeaderName(context *ParseContext) (ok boo
 }
 
 func ParseSipRecordRoute(context *ParseContext) (parsed AbnfPtr, ok bool) {
-	addr := NewSipHeaderRoute(context)
+	addr := NewSipHeaderRecordRoute(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Record-Route header")
 		return ABNF_PTR_NIL, false
@@ -154,4 +154,19 @@ func EncodeSipRecordRouteValue(parsed AbnfPtr, context *ParseContext, buf *AbnfB
 		return
 	}
 	parsed.GetSipHeaderRecordRoute(context).EncodeValue(context, buf)
+}
+
+func AppendSipRecordRouteValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+	for addr := parsed; addr != ABNF_PTR_NIL; {
+		h := addr.GetSipHeaderRecordRoute(context)
+		if h.next == ABNF_PTR_NIL {
+			h.next = header
+			return
+		}
+		addr = h.next
+	}
+}
+
+func GetNextRecordRouteValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+	return parsed.GetSipHeaderRecordRoute(context).next
 }

@@ -1,14 +1,14 @@
 package sipparser
 
 import (
-	//"fmt"
 	"bytes"
+	//"fmt"
 	"unsafe"
 )
 
 type SipHeadersSetter interface {
 	SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool
-	EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer)
+	//EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer)
 }
 
 type SipHeader struct {
@@ -32,6 +32,22 @@ func (this *SipHeader) memAddr() uintptr {
 
 func (this *SipHeader) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeader())
+}
+
+func appendUnknownSipHeader(context *ParseContext, head AbnfPtr, newHeader AbnfPtr) (ok bool) {
+	count := 0
+	for addr := head; addr != ABNF_PTR_NIL; {
+		count++
+		header := addr.GetSipHeader(context)
+		if header.next == ABNF_PTR_NIL {
+			header.next = newHeader
+			return true
+		}
+
+		addr = header.next
+	}
+
+	return false
 }
 
 func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool) {
@@ -58,6 +74,7 @@ func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool
 		}
 
 		if !ok {
+
 			return false
 		}
 	}
@@ -103,14 +120,15 @@ func ParseRawHeaders(context *ParseContext) (headers AbnfPtr, ok bool) {
 
 func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffer) {
 	if headers == ABNF_PTR_NIL {
-		buf.WriteString("empty")
+		//buf.WriteString("empty")
 		return
 	}
+	infos := g_SipHeaderInfos
 
 	for headers != ABNF_PTR_NIL {
 		header := headers.GetSipHeader(context)
 		if header.id != SIP_HDR_UNKNOWN {
-			buf.Write(g_SipHeaderInfos[header.id].name)
+			buf.Write(infos[header.id].name)
 			buf.WriteString(": ")
 		} else {
 			header.hname.WriteCString(context, buf)
@@ -163,10 +181,46 @@ func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, hea
 	var header AbnfPtr
 
 	info := g_SipHeaderInfos[headerIndex]
-	if info.needParse && !context.ParseSipHeaderAsRaw {
+	if info != nil && info.needParse && !context.ParseSipHeaderAsRaw {
 		header, ok = info.parseFunc(context)
 		if !ok {
 			return false
+		}
+		if !info.allowMulti {
+			if !ParseCRLF(context) {
+				return false
+			}
+		} else {
+			len1 := AbnfPos(len(context.parseSrc))
+			for context.parsePos < len1 {
+				if !headerSetter.SetHeaders(context, headerIndex, header) {
+					return false
+				}
+
+				if IsOnlyCRLF(context.parseSrc, context.parsePos) {
+					context.parsePos += 2
+					return true
+				}
+
+				var macthMark bool
+
+				pos := context.parsePos
+				macthMark, ok = ParseSWSMarkCanOmmit(context, ',')
+				if !ok {
+					context.parsePos = pos
+					return ParseCRLF(context)
+				}
+
+				if !macthMark {
+					context.parsePos = pos
+					return ParseCRLF(context)
+				}
+
+				header, ok = info.parseFunc(context)
+				if !ok {
+					return false
+				}
+			}
 		}
 	} else {
 		header = NewSipHeader(context)
@@ -182,12 +236,7 @@ func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, hea
 		}
 	}
 
-	ok = headerSetter.SetHeaders(context, headerIndex, header)
-	if !ok {
-		return false
-	}
-
-	return ok
+	return headerSetter.SetHeaders(context, headerIndex, header)
 }
 
 func parseUnknownHeader(context *ParseContext, hname AbnfPtr, headerSetter SipHeadersSetter) (ok bool) {

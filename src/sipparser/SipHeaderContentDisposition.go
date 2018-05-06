@@ -223,7 +223,7 @@ func (this *SipHeaderContentDisposition) parseHeaderName(context *ParseContext) 
 }
 
 func ParseSipContentDisposition(context *ParseContext) (parsed AbnfPtr, ok bool) {
-	addr := NewSipHeaderContentType(context)
+	addr := NewSipHeaderContentDisposition(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Content-Disposition header")
 		return ABNF_PTR_NIL, false

@@ -53,7 +53,7 @@ func (this *SipAddr) String(context *ParseContext) string {
 }
 
 func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
-	if this.addrType == ABNF_SIP_NAME_ADDR {
+	if this.addrType == ABNF_SIP_NAME_ADDR || context.EncodeUriAsNameSpace {
 		if this.displayName != ABNF_PTR_NIL {
 			if this.displayNameIsQuotedString {
 				buf.WriteByte('"')
@@ -75,8 +75,19 @@ func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 		}
 	}
 
-	if this.addrType == ABNF_SIP_NAME_ADDR {
+	if this.addrType == ABNF_SIP_NAME_ADDR || context.EncodeUriAsNameSpace {
 		buf.WriteByte('>')
+	}
+}
+
+func (this *SipAddr) EncodeAddrSpec(context *ParseContext, buf *AbnfByteBuffer) {
+	if this.addr != ABNF_PTR_NIL {
+		switch this.uriType {
+		case ABNF_URI_SIP:
+			fallthrough
+		case ABNF_URI_SIPS:
+			this.addr.GetSipUri(context).Encode(context, buf)
+		}
 	}
 }
 

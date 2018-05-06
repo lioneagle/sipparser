@@ -61,17 +61,32 @@ func (this *SipHostPort) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 }
 
 func (this *SipHostPort) EncodeHost(context *ParseContext, buf *AbnfByteBuffer) {
-	if this.id == HOST_TYPE_UNKNOWN {
-		buf.WriteString("unknown host")
-	} else if this.IsIpv4() {
+	/*
+		if this.id == HOST_TYPE_IPV4 {
+			this.WriteIpv4AsString(context, buf)
+		} else if this.id == HOST_TYPE_IPV6 {
+			buf.WriteByte('[')
+			buf.WriteString(net.IP(this.data.GetAsByteSlice(context, 16)).String())
+			buf.WriteByte(']')
+		} else if this.id == HOST_TYPE_NAME {
+			this.data.WriteCString(context, buf)
+		} else {
+			buf.WriteString("unknown host")
+		}
+		//*/
+	//*
+	switch this.id {
+	case HOST_TYPE_IPV4:
 		this.WriteIpv4AsString(context, buf)
-	} else if this.IsIpv6() {
+	case HOST_TYPE_IPV6:
 		buf.WriteByte('[')
 		buf.WriteString(net.IP(this.data.GetAsByteSlice(context, 16)).String())
 		buf.WriteByte(']')
-	} else {
+	case HOST_TYPE_NAME:
 		this.data.WriteCString(context, buf)
-	}
+	default:
+		buf.WriteString("unknown host")
+	} //*/
 }
 
 func (this *SipHostPort) WriteIpv4AsString(context *ParseContext, buf *AbnfByteBuffer) {

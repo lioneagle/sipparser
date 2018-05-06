@@ -27,6 +27,8 @@ type ParseContext struct {
 	ParseSetSipContentTypeKnownParam        bool
 	ParseSetSipContentDispositionKnownParam bool
 	//ParseSipKeyHeader    bool
+
+	EncodeUriAsNameSpace bool
 }
 
 func NewParseContext() *ParseContext {

@@ -10,7 +10,7 @@ func init() {
 		v.index = SipHeaderIndexType(i)
 	}*/
 
-	printSize()
+	//printSize()
 
 }
 
