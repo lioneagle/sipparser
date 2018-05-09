@@ -1,7 +1,7 @@
 package sipparser
 
 import (
-	"fmt"
+	_ "fmt"
 	//"runtime"
 )
 
@@ -27,8 +27,7 @@ func (this *AbnfError) String() string {
 func (this *AbnfError) Write(buf *AbnfByteBuffer) {
 	//funcName := runtime.FuncForPC(this.pc).Name()
 	if this.pos < AbnfPos(len(this.src)) {
-		fmt.Println("here1")
-		num := AbnfPos(20)
+		num := AbnfPos(40)
 		if AbnfPos(len(this.src)) < (this.pos + num) {
 			num = AbnfPos(len(this.src)) - this.pos
 		}

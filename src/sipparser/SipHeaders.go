@@ -2,7 +2,7 @@ package sipparser
 
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"unsafe"
 )
 
@@ -126,7 +126,7 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 
 	for headers != ABNF_PTR_NIL {
 		header := headers.GetSipHeader(context)
-		if header.id != SIP_HDR_UNKNOWN {
+		if (header.id != SIP_HDR_UNKNOWN) && (infos[header.id] != nil) {
 			buf.Write(infos[header.id].name)
 		} else {
 			header.hname.WriteCString(context, buf)
@@ -172,8 +172,6 @@ func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeade
 
 	ok = ParseHcolon(context)
 	if !ok {
-		fmt.Println("---------------------------------")
-		fmt.Println("src =", string(context.parseSrc[context.parsePos:]))
 		context.AddError(context.parsePos, "parsed HCOLON failed when parsing aip header name")
 		return ABNF_PTR_NIL, headerIndex, false
 	}

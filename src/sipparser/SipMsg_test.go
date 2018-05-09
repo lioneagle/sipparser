@@ -3,6 +3,7 @@ package sipparser
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -214,6 +215,79 @@ func ReadSipMsgBufs() *SipMsgBufs {
 
 	fmt.Printf("bufs[\"sip_flow_reg_message_200\"] = \n%s", string(p.Buf))
 }*/
+
+func printSipMsgsParseMemUsed() {
+
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 10)
+	context.ParseSipHeaderAsRaw = false
+
+	type memUsed struct {
+		name    string
+		srcLen  int
+		memUsed int
+	}
+
+	var memUsedList []*memUsed
+
+	bufs := ReadSipMsgBufs()
+
+	testdata := bufs.GetFilteredData(".")
+
+	maxNameLen := 0
+
+	for _, v := range testdata {
+		msg := v.Buf
+		context.allocator.FreeAll()
+		addr := NewSipMsg(context)
+		sipmsg := addr.GetSipMsg(context)
+		context.SetParseSrc(msg)
+		context.SetParsePos(0)
+		ok := sipmsg.Parse(context)
+		if !ok {
+			fmt.Println("parse sip msg failed, err =", context.Errors.String())
+			fmt.Println("msg = ", string(msg))
+			return
+		}
+
+		mem := &memUsed{}
+		mem.name = v.Name
+		mem.srcLen = len(v.Buf)
+		mem.memUsed = int(context.allocator.Used())
+
+		if len(mem.name) > maxNameLen {
+			maxNameLen = len(mem.name)
+		}
+
+		memUsedList = append(memUsedList, mem)
+	}
+
+	//sort.Slice(memUsedList,func(i,j int){ return memUsedList[i].name < memUsedList[j].name})
+
+	fmt.Printf("name")
+	PrintIndent(os.Stdout, maxNameLen+4+len("MemUsed/"))
+	fmt.Printf("%-5s  %-5s  %-5s  %-5s", "src,", "mem,", "delta,", "percent\n")
+
+	totalSrcLen := 0
+	totalMemUsed := 0
+	for _, v := range memUsedList {
+		totalSrcLen += v.srcLen
+		totalMemUsed += v.memUsed
+		fmt.Printf("MemUsed/%s", v.name)
+		PrintIndent(os.Stdout, maxNameLen+4-len(v.name))
+		delta := v.memUsed - v.srcLen
+		fmt.Printf(":  %5d, %5d,  %5d,  %.2f%%\n", v.srcLen, v.memUsed, delta, 100*float64(delta)/float64(v.srcLen))
+	}
+	totalDelta := totalMemUsed - totalSrcLen
+	fmt.Printf("MemUsed/total")
+	PrintIndent(os.Stdout, maxNameLen+4-len("total"))
+	fmt.Printf(":  %5d, %5d,  %5d,  %.2f%%\n", totalSrcLen, totalMemUsed, totalDelta, 100*float64(totalDelta)/float64(totalSrcLen))
+
+}
+
+func PrintIndent(w io.Writer, indent int) {
+	fmt.Fprintf(w, fmt.Sprintf("%%%ds", indent), "")
+}
 
 func TestSipMsgParseWithoutBody(t *testing.T) {
 
@@ -658,7 +732,7 @@ func BenchmarkSipMsgRawScan_2(b *testing.B) {
 	//fmt.Println("newPos =", context.parsePos)
 }
 
-var sip_msgs_filter = "."
+var sip_msgs_filter = "flow_reg"
 
 func BenchmarkSipMsgsRawScan(b *testing.B) {
 	bufs := ReadSipMsgBufs()

@@ -61,7 +61,7 @@ func (this *ParseContext) GetParsePos() AbnfPos {
 
 func (this *ParseContext) AddError(pos AbnfPos, description string) {
 	fileName, pc, line := GetCallerInfoN(2)
-	this.Errors.Add(&AbnfError{pos: pos, description: description, fileName: fileName, pc: pc, line: line})
+	this.Errors.Add(&AbnfError{src: this.parseSrc, pos: pos, description: description, fileName: fileName, pc: pc, line: line})
 }
 
 func (this *ParseContext) SetAllocator(allocator *MemAllocator) {

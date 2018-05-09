@@ -12,6 +12,8 @@ func init() {
 
 	//printSize()
 
+	printSipMsgsParseMemUsed()
+
 }
 
 func printSize() {
