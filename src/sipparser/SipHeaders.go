@@ -2,11 +2,12 @@ package sipparser
 
 import (
 	"bytes"
-	//"fmt"
+	"fmt"
 	"unsafe"
 )
 
 type SipHeadersSetter interface {
+	NeedParse(context *ParseContext, headerIndex SipHeaderIndexType) bool
 	SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool
 	//EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer)
 }
@@ -35,18 +36,15 @@ func (this *SipHeader) Init() {
 }
 
 func appendUnknownSipHeader(context *ParseContext, head AbnfPtr, newHeader AbnfPtr) (ok bool) {
-	count := 0
 	for addr := head; addr != ABNF_PTR_NIL; {
-		count++
 		header := addr.GetSipHeader(context)
 		if header.next == ABNF_PTR_NIL {
 			header.next = newHeader
+
 			return true
 		}
-
 		addr = header.next
 	}
-
 	return false
 }
 
@@ -64,6 +62,7 @@ func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool
 
 		hname, headerIndex, ok := ParseHeaderName(context)
 		if !ok {
+			context.AddError(context.parsePos, "parsed header name failed")
 			return false
 		}
 
@@ -129,10 +128,10 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 		header := headers.GetSipHeader(context)
 		if header.id != SIP_HDR_UNKNOWN {
 			buf.Write(infos[header.id].name)
-			buf.WriteString(": ")
 		} else {
 			header.hname.WriteCString(context, buf)
 		}
+		buf.WriteString(": ")
 		if header.hvalue != ABNF_PTR_NIL {
 			header.hvalue.WriteCString(context, buf)
 		}
@@ -172,8 +171,14 @@ func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeade
 	}
 
 	ok = ParseHcolon(context)
+	if !ok {
+		fmt.Println("---------------------------------")
+		fmt.Println("src =", string(context.parseSrc[context.parsePos:]))
+		context.AddError(context.parsePos, "parsed HCOLON failed when parsing aip header name")
+		return ABNF_PTR_NIL, headerIndex, false
+	}
 
-	return ABNF_PTR_NIL, headerIndex, ok
+	return hname, headerIndex, ok
 
 }
 
@@ -181,7 +186,8 @@ func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, hea
 	var header AbnfPtr
 
 	info := g_SipHeaderInfos[headerIndex]
-	if info != nil && info.needParse && !context.ParseSipHeaderAsRaw {
+	needParse := headerSetter.NeedParse(context, headerIndex)
+	if needParse && info != nil && info.needParse {
 		header, ok = info.parseFunc(context)
 		if !ok {
 			return false

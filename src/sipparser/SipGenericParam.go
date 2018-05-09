@@ -140,6 +140,27 @@ func (this *SipGenericParam) ParseValue(context *ParseContext) (ok bool) {
 	return false
 }
 
+func (this *SipGenericParam) SetNameAsString(context *ParseContext, name string) bool {
+	addr := AllocCString(context, StringToByteSlice(name))
+	if addr == ABNF_PTR_NIL {
+		context.AddError(context.parsePos, "not mem for gen-name when set gen-name")
+		return false
+	}
+	this.name = addr
+	return true
+}
+
+func (this *SipGenericParam) SetValueQuotedString(context *ParseContext, value []byte) bool {
+	addr := AllocCString(context, value)
+	if addr == ABNF_PTR_NIL {
+		context.AddError(context.parsePos, "not mem for gen-value when set gen-value as quoted-string")
+		return false
+	}
+	this.value = addr
+	this.valueType = SIP_GENERIC_VALUE_TYPE_QUOTED_STRING
+	return true
+}
+
 /* RFC3261
  *
  * generic-param-list   =  *( SWS seperator SWS generic-param )

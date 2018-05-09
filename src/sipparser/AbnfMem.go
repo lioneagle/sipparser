@@ -188,6 +188,7 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 
 	if newPos < pos {
 		if (uint32(pos-newPos) + used) >= memEnd {
+			context.parsePos = newPos
 			context.AddError(newPos, "no mem")
 			return ABNF_PTR_NIL, false
 		}
@@ -201,6 +202,7 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 	}
 
 	if used >= memEnd {
+		context.parsePos = newPos
 		context.AddError(newPos, "no mem")
 		return ABNF_PTR_NIL, false
 	}
@@ -215,11 +217,13 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 	}
 
 	if newPos <= context.parsePos {
+		context.parsePos = newPos
 		context.AddError(newPos, "empty")
 		return ABNF_PTR_NIL, false
 	}
 
 	if used >= memEnd {
+		context.parsePos = newPos
 		context.AddError(newPos, "no mem")
 		return ABNF_PTR_NIL, false
 	}

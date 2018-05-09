@@ -32,7 +32,10 @@ type ParseContext struct {
 }
 
 func NewParseContext() *ParseContext {
-	return &ParseContext{}
+	ret := &ParseContext{}
+	ret.ParseSetSipContentTypeKnownParam = true
+	ret.EncodeUriAsNameSpace = true
+	return ret
 }
 
 func (this *ParseContext) SetParseSrc(src []byte) {

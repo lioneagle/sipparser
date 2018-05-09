@@ -16,7 +16,7 @@ const (
 )
 
 var g_SipContentDispositionKnownParamInfo = []SipContentDispositionKnownParamInfo{
-	{[]byte("handling\000"), SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY},
+	{[]byte("handling"), SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY},
 }
 
 type SipContentDispositionKnownParams struct {

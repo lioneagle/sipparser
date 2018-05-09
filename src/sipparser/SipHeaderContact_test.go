@@ -35,6 +35,7 @@ func TestSipHeaderContactParse(t *testing.T) {
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
+			context.EncodeUriAsNameSpace = false
 
 			addr := NewSipHeaderContact(context)
 			header := addr.GetSipHeaderContact(context)

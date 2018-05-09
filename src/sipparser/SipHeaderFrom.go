@@ -16,7 +16,7 @@ const (
 )
 
 var g_SipFromKnownParamInfo = []SipFromKnownParamInfo{
-	{[]byte("tag\000"), SIP_FROM_KNOWN_PARAM_TAG},
+	{[]byte("tag"), SIP_FROM_KNOWN_PARAM_TAG},
 }
 
 type SipFromKnownParams struct {

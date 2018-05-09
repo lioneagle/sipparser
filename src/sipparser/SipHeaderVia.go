@@ -20,11 +20,11 @@ const (
 )
 
 var g_SipViaKnownParamInfo = []SipToKnownParamInfo{
-	{[]byte("branch\000"), SIP_VIA_KNOWN_PARAM_BRANCH},
-	{[]byte("received\000"), SIP_VIA_KNOWN_PARAM_RECEIVED},
-	{[]byte("rport\000"), SIP_VIA_KNOWN_PARAM_RPORT},
-	{[]byte("ttl\000"), SIP_VIA_KNOWN_PARAM_TTL},
-	{[]byte("maddr\000"), SIP_VIA_KNOWN_PARAM_MADDR},
+	{[]byte("branch"), SIP_VIA_KNOWN_PARAM_BRANCH},
+	{[]byte("received"), SIP_VIA_KNOWN_PARAM_RECEIVED},
+	{[]byte("rport"), SIP_VIA_KNOWN_PARAM_RPORT},
+	{[]byte("ttl"), SIP_VIA_KNOWN_PARAM_TTL},
+	{[]byte("maddr"), SIP_VIA_KNOWN_PARAM_MADDR},
 }
 
 type SipViaKnownParams struct {

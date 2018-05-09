@@ -63,6 +63,17 @@ func (this AbnfPtr) CString(context *ParseContext) string {
 	return *(*string)(unsafe.Pointer(&header))
 }
 
+func (this AbnfPtr) HasPrefixNoCase(context *ParseContext, prefix string) bool {
+	len1 := this.Strlen(context)
+	len2 := len(prefix)
+	if len1 < len2 {
+		return false
+	}
+
+	prefix1 := StringToByteSlice(prefix)
+	return chars.EqualNoCase(context.allocator.mem[this:this+AbnfPtr(len2)], prefix1)
+}
+
 func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool {
 	if this == ABNF_PTR_NIL {
 		return false
@@ -153,6 +164,9 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 }
 
 func (this AbnfPtr) WriteCString(context *ParseContext, buf *AbnfByteBuffer) {
+	if this == ABNF_PTR_NIL {
+		return
+	}
 	data := this.GetCStringAsByteSlice(context)
 	buf.Write(data)
 }

@@ -16,7 +16,7 @@ const (
 )
 
 var g_SipContentTypeKnownParamInfo = []SipContentTypeKnownParamInfo{
-	{[]byte("boundary\000"), SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY},
+	{[]byte("boundary"), SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY},
 }
 
 type SipContentTypeKnownParams struct {
@@ -131,7 +131,7 @@ func (this *SipHeaderContentType) ParseValueWithoutInit(context *ParseContext) (
 		return false
 	}
 
-	if context.ParseSetSipFromKnownParam {
+	if context.ParseSetSipContentTypeKnownParam {
 		this.params, ok = ParseSipGenericParams(context, ';', this)
 	} else {
 		this.params, ok = ParseSipGenericParams(context, ';', nil)
@@ -179,12 +179,55 @@ func (this *SipHeaderContentType) SetKnownParams(context *ParseContext, name Abn
 				this.knownParams = NewSipContentTypeKnownParams(context)
 				knownParams = this.knownParams.GetSipContentTypeKnownParams(context)
 			}
-
 			knownParams.params[g_SipContentTypeKnownParamInfo[i].index] = param
 			return true
 		}
 	}
 	return false
+}
+
+func (this *SipHeaderContentType) GetKnownParam(context *ParseContext, paramIndex int) AbnfPtr {
+	if this.knownParams == ABNF_PTR_NIL || paramIndex >= SIP_CONTENT_TYPE_KNOWN_PARAM_MAX_NUM {
+		return ABNF_PTR_NIL
+	}
+
+	knownParams := this.knownParams.GetSipContentTypeKnownParams(context)
+	return knownParams.params[paramIndex]
+}
+
+func (this *SipHeaderContentType) SetBoundary(context *ParseContext, boundary []byte) (addr AbnfPtr) {
+	if this.knownParams == ABNF_PTR_NIL {
+		this.knownParams = NewSipContentTypeKnownParams(context)
+		if this.knownParams == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "no mem for known-params when set bounadry for Content-Type")
+			return ABNF_PTR_NIL
+		}
+	}
+
+	knownParams := this.knownParams.GetSipContentTypeKnownParams(context)
+	addr = knownParams.params[SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY]
+	if addr == ABNF_PTR_NIL {
+		addr = NewSipGenericParam(context)
+		if addr == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "no mem for generic-param when set bounadry for Content-Type")
+			return ABNF_PTR_NIL
+		}
+	}
+
+	param := addr.GetSipGenericParam(context)
+
+	if !param.SetNameAsString(context, "boundary") {
+		context.AddError(context.parsePos, "add boundary-name failed for Content-Type")
+		return ABNF_PTR_NIL
+	}
+
+	if !param.SetValueQuotedString(context, boundary) {
+		context.AddError(context.parsePos, "add boundary-name failed for Content-Type")
+		return ABNF_PTR_NIL
+	}
+
+	knownParams.params[SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY] = addr
+	return addr
 }
 
 func (this *SipHeaderContentType) parseHeaderName(context *ParseContext) (ok bool) {
