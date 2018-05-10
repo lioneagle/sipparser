@@ -74,6 +74,22 @@ func (this AbnfPtr) HasPrefixNoCase(context *ParseContext, prefix string) bool {
 	return chars.EqualNoCase(context.allocator.mem[this:this+AbnfPtr(len2)], prefix1)
 }
 
+func (this AbnfPtr) RemoveTelUriVisualSeperator(context *ParseContext) {
+	len1 := AbnfPtr(this.Strlen(context))
+	read := this
+	write := this
+	end := read + len1
+	data := context.allocator.mem
+	for read < end {
+		if !IsTelVisualSperator(data[read]) {
+			data[write] = data[read]
+			write++
+		}
+		read++
+	}
+	binary.LittleEndian.PutUint16(data[this-2:], uint16(write-this))
+}
+
 func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool {
 	if this == ABNF_PTR_NIL {
 		return false

@@ -197,7 +197,7 @@ func (this *SipUri) Parse(context *ParseContext) (ok bool) {
 }
 
 func (this *SipUri) ParseWithoutInit(context *ParseContext) (ok bool) {
-	ok = this.ParseScheme(context)
+	ok = this.parseScheme(context)
 	if !ok {
 		return false
 	}
@@ -210,8 +210,8 @@ func (this *SipUri) ParseAfterScheme(context *ParseContext) (ok bool) {
 }
 
 func (this *SipUri) ParseAfterSchemeWithoutInit(context *ParseContext) (ok bool) {
-	src := context.parseSrc
-	len1 := AbnfPos(len(src))
+	//src := context.parseSrc
+	len1 := AbnfPos(len(context.parseSrc))
 	ok = this.parseUserinfo(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse user-info failed")
@@ -440,7 +440,7 @@ func findUserinfo(src []byte, pos AbnfPos) bool {
 	return true
 }*/
 
-func (this *SipUri) ParseScheme(context *ParseContext) (ok bool) {
+func (this *SipUri) parseScheme(context *ParseContext) (ok bool) {
 	src1 := context.parseSrc[context.parsePos:]
 	if hasSipPrefixNoCase(src1) {
 		this.SetSipUri()
@@ -466,124 +466,3 @@ func hasSipsPrefixNoCase(src []byte) bool {
 	return len(src) >= 5 && ((src[0] | 0x20) == 's') && ((src[1] | 0x20) == 'i') && ((src[2] | 0x20) == 'p') &&
 		((src[3] | 0x20) == 's') && (src[4] == ':')
 }
-
-/*type SipUriParam struct {
-	name  AbnfPtr
-	value AbnfPtr
-	next  AbnfPtr
-}
-
-func SizeofSipUriParam() int {
-	return int(unsafe.Sizeof(SipUriParam{}))
-}
-
-func NewSipUriParam(context *ParseContext) AbnfPtr {
-	return context.allocator.AllocWithClear(uint32(SizeofSipUriParam()))
-}
-
-func (this *SipUriParam) Encode(context *ParseContext, buf *AbnfByteBuffer) {
-	if this.name != ABNF_PTR_NIL {
-		this.name.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_PNAME, ABNF_CHARSET_MASK_SIP_PNAME)
-
-		if this.value != ABNF_PTR_NIL {
-			buf.WriteByte('=')
-			this.value.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_PVALUE, ABNF_CHARSET_MASK_SIP_PVALUE)
-		}
-	}
-}
-
-func (this *SipUriParam) Parse(context *ParseContext) (ok bool) {
-	var name AbnfPtr
-	var value AbnfPtr
-
-	src := context.parseSrc
-	len1 := AbnfPos(len(src))
-	name, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_PNAME, ABNF_CHARSET_MASK_SIP_PNAME)
-	if !ok {
-		context.AddError(context.parsePos, "parse sip pname failed")
-		return false
-	}
-
-	this.name = name
-
-	if context.parsePos >= len1 {
-		return true
-	}
-
-	if src[context.parsePos] == '=' {
-		context.parsePos++
-		value, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_PVALUE, ABNF_CHARSET_MASK_SIP_PVALUE)
-		if !ok {
-			context.AddError(context.parsePos, "parse sip pvalue failed")
-			return false
-		}
-		this.value = value
-	}
-
-	return true
-}*/
-
-/*type SipUriHeader struct {
-	name  AbnfPtr
-	value AbnfPtr
-	next  AbnfPtr
-}
-
-func SizeofSipUriHeader() int {
-	return int(unsafe.Sizeof(SipUriHeader{}))
-}
-
-func NewSipUriHeader(context *ParseContext) AbnfPtr {
-	return context.allocator.AllocWithClear(uint32(SizeofSipUriHeader()))
-}
-
-func (this *SipUriHeader) Encode(context *ParseContext, buf *AbnfByteBuffer) {
-	if this.name != ABNF_PTR_NIL {
-		this.name.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_HNAME, ABNF_CHARSET_MASK_SIP_HNAME)
-
-		if this.value != ABNF_PTR_NIL {
-			buf.WriteByte('=')
-			this.value.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_HVALUE, ABNF_CHARSET_MASK_SIP_HVALUE)
-		}
-	}
-}
-
-func (this *SipUriHeader) Parse(context *ParseContext) (ok bool) {
-	var name AbnfPtr
-	var value AbnfPtr
-
-	src := context.parseSrc
-	len1 := AbnfPos(len(src))
-	name, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_HNAME, ABNF_CHARSET_MASK_SIP_HNAME)
-	if !ok {
-		context.AddError(context.parsePos, "parse sip pname failed")
-		return false
-	}
-
-	this.name = name
-
-	if context.parsePos >= len1 {
-		context.AddError(context.parsePos, "reach end after hname")
-		return false
-	}
-
-	if src[context.parsePos] != '=' {
-		context.AddError(context.parsePos, "no '=' after hname")
-		return false
-	}
-
-	context.parsePos++
-
-	if context.parsePos >= len1 {
-		return true
-	}
-
-	value, ok = context.allocator.ParseAndAllocCStringEscapableEnableEmpty(context, ABNF_CHARSET_SIP_HVALUE, ABNF_CHARSET_MASK_SIP_HVALUE)
-	if !ok {
-		context.AddError(context.parsePos, "parse sip pvalue failed")
-		return false
-	}
-	this.value = value
-
-	return true
-}*/

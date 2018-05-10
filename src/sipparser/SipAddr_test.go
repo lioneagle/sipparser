@@ -81,7 +81,7 @@ func TestSipAddrParseAddrSpec(t *testing.T) {
 	}{
 		{"sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa", true, len("sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa"), "sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa"},
 		{"sips:123:tsdd@[1080::8:800:200c:417a]:5061", true, len("sips:123:tsdd@[1080::8:800:200c:417a]:5061"), "sips:123:tsdd@[1080::8:800:200c:417a]:5061"},
-		//{"tel:861234;phone-context=+123", true, len("tel:861234;phone-context=+123"), "tel:861234;phone-context=+123"},
+		{"tel:861234;phone-context=+123", true, len("tel:861234;phone-context=+123"), "tel:861234;phone-context=+123"},
 
 		//{"httpx://861234/phone-context=+123", false, len("httpx:"), ""},
 	}
@@ -90,7 +90,7 @@ func TestSipAddrParseAddrSpec(t *testing.T) {
 		v := v
 
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
 
 			context := NewParseContext()
 			context.allocator = NewMemAllocator(1024)
@@ -130,13 +130,13 @@ func TestSipAddrParseNameAddr(t *testing.T) {
 		{"<sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa>", true, len("<sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa>"), "<sip:123@abc.com;ttl=10;user=phone;a;b;c;d;e?xx=yy&x1=aa>"},
 		{"\"abc\"<sips:123:tsdd@[1080::8:800:200c:417a]:5061>", true, len("\"abc\"<sips:123:tsdd@[1080::8:800:200c:417a]:5061>"), "\"abc\"<sips:123:tsdd@[1080::8:800:200c:417a]:5061>"},
 		{"abc def ee<sip:861234;phone-context=+123>", true, len("abc def ee<sip:861234;phone-context=+123>"), "abc def ee<sip:861234;phone-context=+123>"},
-		//{"abc def ee<tel:861234;phone-context=+123>", true, len("abc def ee<tel:861234;phone-context=+123>"), "abc def ee<tel:861234;phone-context=+123>"},
+		{"abc def ee<tel:861234;phone-context=+123>", true, len("abc def ee<tel:861234;phone-context=+123>"), "abc def ee<tel:861234;phone-context=+123>"},
 
 		{"\"", false, len("\""), ""},
-		//{"\r\n<tel:123>", false, len(""), ""},
-		//{"a b@ c<tel:123>", false, len("a b"), ""},
-		//{"<tel:", false, len("<tel:"), ""},
-		//{"<tel:123", false, len("<tel:123"), ""},
+		{"\r\n<tel:123>", false, len(""), ""},
+		{"a b@ c<tel:123>", false, len("a b"), ""},
+		{"<tel:", false, len("<tel:"), ""},
+		{"<tel:123", false, len("<tel:123"), ""},
 	}
 
 	for i, v := range testdata {

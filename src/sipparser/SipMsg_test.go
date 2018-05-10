@@ -216,7 +216,7 @@ func ReadSipMsgBufs() *SipMsgBufs {
 	fmt.Printf("bufs[\"sip_flow_reg_message_200\"] = \n%s", string(p.Buf))
 }*/
 
-func printSipMsgsParseMemUsed() {
+func TestPrintSipMsgsParseMemUsed(t *testing.T) {
 
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 10)
@@ -232,6 +232,7 @@ func printSipMsgsParseMemUsed() {
 
 	bufs := ReadSipMsgBufs()
 
+	//testdata := bufs.GetFilteredData("flow_reg")
 	testdata := bufs.GetFilteredData(".")
 
 	maxNameLen := 0
@@ -732,7 +733,8 @@ func BenchmarkSipMsgRawScan_2(b *testing.B) {
 	//fmt.Println("newPos =", context.parsePos)
 }
 
-var sip_msgs_filter = "flow_reg"
+//var sip_msgs_filter = "flow_reg"
+var sip_msgs_filter = "."
 
 func BenchmarkSipMsgsRawScan(b *testing.B) {
 	bufs := ReadSipMsgBufs()

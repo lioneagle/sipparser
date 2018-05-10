@@ -72,6 +72,8 @@ func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 			fallthrough
 		case ABNF_URI_SIPS:
 			this.addr.GetSipUri(context).Encode(context, buf)
+		case ABNF_URI_TEL:
+			this.addr.GetTelUri(context).Encode(context, buf)
 		}
 	}
 
@@ -219,7 +221,20 @@ func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpe
 			return uri.ParseAfterSchemeWithoutInit(context)
 		}
 		return uri.ParseAfterSchemeWithoutParam(context)
+
+	case ABNF_URI_TEL:
+		this.addr = NewTelUri(context)
+		if this.addr == ABNF_PTR_NIL {
+			context.AddError(context.parsePos, "no mem for new tel uri")
+			return false
+		}
+		uri := this.addr.GetTelUri(context)
+		if parseAddrSpecParam {
+			return uri.ParseAfterSchemeWithoutInit(context)
+		}
+		return uri.ParseAfterSchemeWithoutParam(context)
 	}
+
 	return false
 }
 

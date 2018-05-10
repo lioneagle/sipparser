@@ -176,6 +176,64 @@ func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetInd
 	return addr, true
 }
 
+func (this *MemAllocator) ParseAndAllocTelNumberRemoveVisualSeperator(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+	charset := &g_charsets[charsetIndex]
+	newPos := context.parsePos
+	src := context.parseSrc
+	len1 := AbnfPos(len(src))
+
+	memEnd := uint32(cap(this.mem))
+	used := this.used + 2
+	addr = AbnfPtr(this.used + 2)
+
+	if used >= memEnd {
+		context.AddError(newPos, "no mem")
+		return ABNF_PTR_NIL, false
+	}
+
+	if newPos < len1 && src[newPos] == '+' {
+		this.mem[used] = src[newPos]
+		used++
+		newPos++
+		context.parsePos++
+	}
+
+	num := 0
+	for ; newPos < len1; newPos++ {
+		v := src[newPos]
+		if ((charset[v]) & mask) == 0 {
+			break
+		}
+		if !IsTelVisualSperator(v) {
+			this.mem[used] = v
+			used++
+			num++
+		}
+	}
+
+	if num == 0 {
+		context.parsePos = newPos
+		context.AddError(newPos, "tel uri number empty")
+		return ABNF_PTR_NIL, false
+	}
+
+	if used >= memEnd {
+		context.parsePos = newPos
+		context.AddError(newPos, "no mem for tel uri number")
+		return ABNF_PTR_NIL, false
+	}
+
+	//this.mem[used] = 0
+	//used++
+	this.stat.allocNum++
+	this.stat.allocNumOk++
+	this.stat.allocReqBytes = used - this.used - 2
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(used-this.used-2))
+	this.used = RoundToAlign(used, ABNF_MEM_ALIGN)
+	context.parsePos = newPos
+	return addr, true
+}
+
 func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos

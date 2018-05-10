@@ -26,6 +26,7 @@ type ParseContext struct {
 	ParseSetSipViaKnownParam                bool
 	ParseSetSipContentTypeKnownParam        bool
 	ParseSetSipContentDispositionKnownParam bool
+	ParseSetTelUriKnownParam                bool
 	//ParseSipKeyHeader    bool
 
 	EncodeUriAsNameSpace bool

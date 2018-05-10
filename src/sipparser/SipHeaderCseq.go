@@ -107,20 +107,17 @@ func (this *SipHeaderCseq) parseHeaderName(context *ParseContext) (ok bool) {
 		return false
 	}
 
-	if src[pos]|0x20 == 'c' {
-		pos++
+	if (pos + 4) >= len1 {
+		return false
+	}
 
-		if (pos + 3) >= len1 {
-			return false
-		}
-
-		if ((src[pos] | 0x20) == 's') &&
-			((src[pos+1] | 0x20) == 'e') &&
-			((src[pos+2] | 0x20) == 'q') {
-			if src[pos+3] == ':' || IsWspChar(src[pos+3]) {
-				context.parsePos = pos + 3
-				return true
-			}
+	if ((src[pos] | 0x20) == 'c') &&
+		((src[pos+1] | 0x20) == 's') &&
+		((src[pos+2] | 0x20) == 'e') &&
+		((src[pos+3] | 0x20) == 'q') {
+		if src[pos+4] == ':' || IsWspChar(src[pos+4]) {
+			context.parsePos = pos + 4
+			return true
 		}
 	}
 
