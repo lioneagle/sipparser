@@ -755,6 +755,10 @@ func BenchmarkSipMsgsRawScan(b *testing.B) {
 			context.SetParseSrc([]byte(msg))
 			context.SetParsePos(0)
 
+			b.SetBytes(2)
+			b.ReportAllocs()
+			b.StartTimer()
+
 			b.StartTimer()
 
 			for i := 0; i < b.N; i++ {
@@ -792,6 +796,10 @@ func BenchmarkSipMsgsParse(b *testing.B) {
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)
 			remain := context.allocator.Used()
+
+			b.SetBytes(2)
+			b.ReportAllocs()
+			b.StartTimer()
 
 			b.StartTimer()
 
@@ -835,6 +843,10 @@ func BenchmarkSipMsgsEncode(b *testing.B) {
 			remain := context.allocator.Used()
 			buf := NewAbnfByteBuffer(nil)
 
+			b.SetBytes(2)
+			b.ReportAllocs()
+			b.StartTimer()
+
 			b.StartTimer()
 
 			for i := 0; i < b.N; i++ {
@@ -870,6 +882,10 @@ func BenchmarkSipMsgsRawParse(b *testing.B) {
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)
 			remain := context.allocator.Used()
+
+			b.SetBytes(2)
+			b.ReportAllocs()
+			b.StartTimer()
 
 			b.StartTimer()
 
@@ -913,6 +929,10 @@ func BenchmarkSipMsgsRawEncode(b *testing.B) {
 			sipmsg.Parse(context)
 			remain := context.allocator.Used()
 			buf := NewAbnfByteBuffer(nil)
+
+			b.SetBytes(2)
+			b.ReportAllocs()
+			b.StartTimer()
 
 			b.StartTimer()
 
