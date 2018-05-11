@@ -86,18 +86,14 @@ func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
 	}
 
 	minorStart := newPos + 1
-	newPos = ref.Parse(context.parseSrc, newPos+1, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
-	if newPos <= minorStart {
-		context.parsePos = newPos
-		context.AddError(context.parsePos, "no minor for SIP-Version ")
+	this.version, ok = context.allocator.ParseAndAllocCStringFromPos(context, minorStart, ABNF_CHARSET_DIGIT, ABNF_CHARSET_MASK_DIGIT)
+	if !ok {
+		context.AddError(context.parsePos, "parse minor failed for SIP-Version ")
 		return false
 	}
 
-	context.parsePos = newPos
-
-	this.version = AllocCString(context, context.parseSrc[majorStart:newPos])
-	if this.version == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for SIP-Version")
+	if context.parsePos <= minorStart {
+		context.AddError(context.parsePos, "no minor for SIP-Version ")
 		return false
 	}
 

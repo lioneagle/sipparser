@@ -105,7 +105,7 @@ Content-Length: 0
 
 
 ============================================
-name = "sip_flow_sub_subsribe"
+name = "sip_flow_sub_subscribe"
 
 SUBSCRIBE sip:sip:123012345678901@xx.ims.mnc000.mcc123.3gppnetwork.org SIP/2.0
 Via: SIP/2.0/UDP 10.189.152.104:5060;branch=z9hG4bK-*9*12345678901-zRoaM-
@@ -127,7 +127,7 @@ Content-Length: 0
 
 
 ============================================
-name = "sip_flow_sub_subsribe_200"
+name = "sip_flow_sub_subscribe_200"
 
 SIP/2.0 200 OK
 Via: SIP/2.0/UDP 10.189.152.104:5060;branch=z9hG4bK-*9*80efbc12524d4630b04b
