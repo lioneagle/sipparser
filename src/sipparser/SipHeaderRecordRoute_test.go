@@ -17,7 +17,7 @@ func TestSipHeaderRecordRouteParse(t *testing.T) {
 		{"Record-Route: <sip:abc@a.com>;tag=1", true, len("Record-Route: <sip:abc@a.com>;tag=1"), "Record-Route: <sip:abc@a.com>;tag=1"},
 		{"REcord-roUte: <sip:abc@a.com;user=ip>;tag=1", true, len("Record-Route: <sip:abc@a.com;user=ip>;tag=1"), "Record-Route: <sip:abc@a.com;user=ip>;tag=1"},
 		{"Record-Route: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Record-Route: abc<sip:abc@a.com;user=ip>;tag=1"), "Record-Route: abc<sip:abc@a.com;user=ip>;tag=1"},
-		//{"Record-Route: <tel:+12358;tag=123>", true, len("Route: <tel:+12358;tag=123>"), "Record-Route: <tel:+12358;tag=123>"},
+		{"Record-Route: <tel:+12358;tag=123>", true, len("Record-Route: <tel:+12358;tag=123>"), "Record-Route: <tel:+12358;tag=123>"},
 
 		{" Record-Route: <sip:abc@a.com>;tag=1", false, 0, "0"},
 		{"Record-Route: sip:abc@a.com;tag=1", false, len("Record-Route: sip"), "0"},

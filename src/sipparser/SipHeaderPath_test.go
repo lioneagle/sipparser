@@ -7,22 +7,22 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestSipHeaderRouteParse(t *testing.T) {
+func TestSipHeaderPathParse(t *testing.T) {
 	testdata := []struct {
 		src    string
 		ok     bool
 		newPos int
 		encode string
 	}{
-		{"Route: <sip:abc@a.com>;tag=1", true, len("Route: <sip:abc@a.com>;tag=1"), "Route: <sip:abc@a.com>;tag=1"},
-		{"routE: <sip:abc@a.com;user=ip>;tag=1", true, len("Route: <sip:abc@a.com;user=ip>;tag=1"), "Route: <sip:abc@a.com;user=ip>;tag=1"},
-		{"Route: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Route: abc<sip:abc@a.com;user=ip>;tag=1"), "Route: abc<sip:abc@a.com;user=ip>;tag=1"},
-		{"Route: <tel:+12358;tag=123>", true, len("Route: <tel:+12358;tag=123>"), "Route: <tel:+12358;tag=123>"},
+		{"Path: <sip:abc@a.com>;tag=1", true, len("Path: <sip:abc@a.com>;tag=1"), "Path: <sip:abc@a.com>;tag=1"},
+		{"pAtH: <sip:abc@a.com;user=ip>;tag=1", true, len("pAtH: <sip:abc@a.com;user=ip>;tag=1"), "Path: <sip:abc@a.com;user=ip>;tag=1"},
+		{"Path: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Path: abc<sip:abc@a.com;user=ip>;tag=1"), "Path: abc<sip:abc@a.com;user=ip>;tag=1"},
+		{"Path: <tel:+12358;tag=123>", true, len("Path: <tel:+12358;tag=123>"), "Path: <tel:+12358;tag=123>"},
 
-		{" Route: <sip:abc@a.com>;tag=1", false, 0, "0"},
-		{"Route: sip:abc@a.com;tag=1", false, len("Route: sip"), "0"},
-		{"Route1: <sip:abc@a.com>;tag=1", false, 0, ""},
-		{"Route: ", false, len("Route: "), ""},
+		{" Path: <sip:abc@a.com>;tag=1", false, 0, "0"},
+		{"Path: sip:abc@a.com;tag=1", false, len("Path: sip"), "0"},
+		{"Path1: <sip:abc@a.com>;tag=1", false, 0, ""},
+		{"Path: ", false, len("Path: "), ""},
 	}
 
 	for i, v := range testdata {
@@ -36,8 +36,8 @@ func TestSipHeaderRouteParse(t *testing.T) {
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 
-			addr := NewSipHeaderRoute(context)
-			header := addr.GetSipHeaderRoute(context)
+			addr := NewSipHeaderPath(context)
+			header := addr.GetSipHeaderPath(context)
 
 			ok := header.Parse(context)
 			if v.ok {
@@ -57,14 +57,14 @@ func TestSipHeaderRouteParse(t *testing.T) {
 	}
 }
 
-func BenchmarkSipHeaderRouteParse(b *testing.B) {
+func BenchmarkSipHeaderPathParse(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Route: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
+	v := []byte("Path: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderRoute(context)
-	header := addr.GetSipHeaderRoute(context)
+	addr := NewSipHeaderPath(context)
+	header := addr.GetSipHeaderPath(context)
 	remain := context.allocator.Used()
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -82,14 +82,14 @@ func BenchmarkSipHeaderRouteParse(b *testing.B) {
 	//fmt.Println("remain =", remain)
 }
 
-func BenchmarkSipHeaderRouteEncode(b *testing.B) {
+func BenchmarkSipHeaderPathEncode(b *testing.B) {
 	b.StopTimer()
-	v := []byte("Route: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
+	v := []byte("Path: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
-	addr := NewSipHeaderRoute(context)
-	header := addr.GetSipHeaderRoute(context)
+	addr := NewSipHeaderPath(context)
+	header := addr.GetSipHeaderPath(context)
 	header.Parse(context)
 	remain := context.allocator.Used()
 	//buf := bytes.NewBuffer(make([]byte, 1024*1024))
