@@ -57,6 +57,50 @@ func TestSipHeaderToParse(t *testing.T) {
 	}
 }
 
+func TestSipHeaderToParse2(t *testing.T) {
+	testdata := []struct {
+		src    string
+		ok     bool
+		newPos int
+		encode string
+	}{
+		{"To: sip:abc@a.com;xxx;tag=1", true, len("To: sip:abc@a.com;xxx;tag=1"), "To: <sip:abc@a.com>;tag=1;xxx"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+			context.EncodeUriAsNameSpace = true
+			context.ParseSetSipToKnownParam = true
+
+			addr := NewSipHeaderTo(context)
+			header := addr.GetSipHeaderTo(context)
+
+			ok := header.Parse(context)
+			if v.ok {
+				test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			} else {
+				test.ASSERT_FALSE(t, ok, "")
+			}
+
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+
+			if !v.ok {
+				return
+			}
+
+			test.EXPECT_EQ(t, header.String(context), v.encode, "")
+		})
+	}
+}
+
 func BenchmarkSipHeaderToParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("To: <sip:6135000@24.15.255.4>")

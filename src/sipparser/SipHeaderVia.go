@@ -267,14 +267,14 @@ func (this *SipHeaderVia) EncodeKnownParams(context *ParseContext, buf *AbnfByte
 }
 
 func (this *SipHeaderVia) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
-	if !context.ParseSetSipToKnownParam {
+	if !context.ParseSetSipViaKnownParam {
 		return false
 	}
 
 	var knownParams *SipViaKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipViaKnownParams(context)
+		knownParams = this.knownParams.GetSipViaKnownParams(context)
 	}
 
 	len1 := len(g_SipViaKnownParamInfo)

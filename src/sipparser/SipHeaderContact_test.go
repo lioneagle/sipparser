@@ -17,8 +17,8 @@ func TestSipHeaderContactParse(t *testing.T) {
 		{"Contact: *", true, len("Contact: *"), "Contact: *"},
 		{"Contact: sip:abc@a.com;tag=1", true, len("Contact: sip:abc@a.com;tag=1"), "Contact: sip:abc@a.com;tag=1"},
 		{"m: <sip:abc@a.com;user=ip>;tag=1", true, len("m: <sip:abc@a.com;user=ip>;tag=1"), "Contact: <sip:abc@a.com;user=ip>;tag=1"},
-		{"cOntact: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Contact: abc<sip:abc@a.com;user=ip>;tag=1"), "Contact: abc<sip:abc@a.com;user=ip>;tag=1"},
-		//{"Contact: tel:+12358;tag=123", true, len("Contact: tel:+12358;tag=123"), "Contact: <tel:+12358>;tag=123"},
+		{"cOntact: abc<sip:abc@a.com;user=ip>;q=1;expires=3600", true, len("Contact: abc<sip:abc@a.com;user=ip>;q=1;expires=3600"), "Contact: abc<sip:abc@a.com;user=ip>;q=1;expires=3600"},
+		{"Contact: tel:+12358;tag=123", true, len("Contact: tel:+12358;tag=123"), "Contact: tel:+12358;tag=123"},
 
 		{" Contact: <sip:abc@a.com>;tag=1", false, 0, "0"},
 		{"Contact1: <sip:abc@a.com>;tag=1", false, 0, ""},
@@ -36,6 +36,50 @@ func TestSipHeaderContactParse(t *testing.T) {
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
 			context.EncodeUriAsNameSpace = false
+
+			addr := NewSipHeaderContact(context)
+			header := addr.GetSipHeaderContact(context)
+
+			ok := header.Parse(context)
+			if v.ok {
+				test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			} else {
+				test.ASSERT_FALSE(t, ok, "")
+			}
+
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+
+			if !v.ok {
+				return
+			}
+
+			test.EXPECT_EQ(t, header.String(context), v.encode, "")
+		})
+	}
+}
+
+func TestSipHeaderContactParse2(t *testing.T) {
+	testdata := []struct {
+		src    string
+		ok     bool
+		newPos int
+		encode string
+	}{
+		{"cOntact: abc<sip:abc@a.com;user=ip>;q=1;expires=3600", true, len("Contact: abc<sip:abc@a.com;user=ip>;q=1;expires=3600"), "Contact: abc<sip:abc@a.com;user=ip>;expires=3600;q=1"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+			context.EncodeUriAsNameSpace = false
+			context.ParseSetSipContactKnownParam = true
 
 			addr := NewSipHeaderContact(context)
 			header := addr.GetSipHeaderContact(context)

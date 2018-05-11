@@ -169,7 +169,7 @@ func (this *SipHeaderContentType) SetKnownParams(context *ParseContext, name Abn
 	var knownParams *SipContentTypeKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipContentTypeKnownParams(context)
+		knownParams = this.knownParams.GetSipContentTypeKnownParams(context)
 	}
 
 	len1 := len(g_SipContentTypeKnownParamInfo)

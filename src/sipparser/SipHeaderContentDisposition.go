@@ -16,7 +16,7 @@ const (
 )
 
 var g_SipContentDispositionKnownParamInfo = []SipContentDispositionKnownParamInfo{
-	{[]byte("handling"), SIP_CONTENT_TYPE_KNOWN_PARAM_BOUNDARY},
+	{[]byte("handling"), SIP_CONTENT_DISPOSITION_KNOWN_PARAM_HANDLING},
 }
 
 type SipContentDispositionKnownParams struct {
@@ -114,7 +114,7 @@ func (this *SipHeaderContentDisposition) ParseValueWithoutInit(context *ParseCon
 		return false
 	}
 
-	if context.ParseSetSipFromKnownParam {
+	if context.ParseSetSipContentDispositionKnownParam {
 		this.params, ok = ParseSipGenericParams(context, ';', this)
 	} else {
 		this.params, ok = ParseSipGenericParams(context, ';', nil)
@@ -152,7 +152,7 @@ func (this *SipHeaderContentDisposition) SetKnownParams(context *ParseContext, n
 	var knownParams *SipContentDispositionKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipContentDispositionKnownParams(context)
+		knownParams = this.knownParams.GetSipContentDispositionKnownParams(context)
 	}
 
 	len1 := len(g_SipContentDispositionKnownParamInfo)

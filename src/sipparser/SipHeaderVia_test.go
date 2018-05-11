@@ -58,6 +58,49 @@ func TestSipHeaderViaParse(t *testing.T) {
 	}
 }
 
+func TestSipHeaderViaParse2(t *testing.T) {
+	testdata := []struct {
+		src    string
+		ok     bool
+		newPos int
+		encode string
+	}{
+		{"Via: SIP/2.0/UDP 10.4.1.1:5070;xxx;ttl=1;branch=123", true, len("Via: SIP/2.0/UDP 10.4.1.1:5070;xxx;ttl=1;branch=123"), "Via: SIP/2.0/UDP 10.4.1.1:5070;branch=123;ttl=1;xxx"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+			context.ParseSetSipViaKnownParam = true
+
+			addr := NewSipHeaderVia(context)
+			header := addr.GetSipHeaderVia(context)
+
+			ok := header.Parse(context)
+			if v.ok {
+				test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			} else {
+				test.ASSERT_FALSE(t, ok, "")
+			}
+
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+
+			if !v.ok {
+				return
+			}
+
+			test.EXPECT_EQ(t, header.String(context), v.encode, "")
+		})
+	}
+}
+
 func BenchmarkSipHeaderViaParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Via: SIP/2.0/UDP 24.15.255.101:5060;branch=072c09e5.0")

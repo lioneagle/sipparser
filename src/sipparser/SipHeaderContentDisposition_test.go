@@ -55,6 +55,49 @@ func TestSipHeaderContentDispositionParse(t *testing.T) {
 	}
 }
 
+func TestSipHeaderContentDispositionParse2(t *testing.T) {
+	testdata := []struct {
+		src    string
+		ok     bool
+		newPos int
+		encode string
+	}{
+		{"Content-Disposition: session;abc;handling=optional", true, len("Content-Disposition: session;abc;handling=optional"), "Content-Disposition: session;handling=optional;abc"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			context := NewParseContext()
+			context.allocator = NewMemAllocator(1024 * 2)
+			context.SetParseSrc([]byte(v.src))
+			context.SetParsePos(0)
+			context.ParseSetSipContentDispositionKnownParam = true
+
+			addr := NewSipHeaderContentDisposition(context)
+			header := addr.GetSipHeaderContentDisposition(context)
+
+			ok := header.Parse(context)
+			if v.ok {
+				test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
+			} else {
+				test.ASSERT_FALSE(t, ok, "")
+			}
+
+			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
+
+			if !v.ok {
+				return
+			}
+
+			test.EXPECT_EQ(t, header.String(context), v.encode, "")
+		})
+	}
+}
+
 func BenchmarkSipHeaderContentDispositionParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Content-Disposition: early-session;handling=optional")

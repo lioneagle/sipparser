@@ -1,7 +1,7 @@
 package sipparser
 
 import (
-	//"fmt"
+	"fmt"
 	"unsafe"
 )
 
@@ -17,8 +17,8 @@ const (
 )
 
 var g_SipContactKnownParamInfo = []SipContactKnownParamInfo{
-	{[]byte("expires\000"), SIP_CONTACT_KNOWN_PARAM_EXPIRES},
-	{[]byte("q\000"), SIP_CONTACT_KNOWN_PARAM_Q},
+	{[]byte("expires"), SIP_CONTACT_KNOWN_PARAM_EXPIRES},
+	{[]byte("q"), SIP_CONTACT_KNOWN_PARAM_Q},
 }
 
 type SipContactKnownParams struct {
@@ -208,6 +208,7 @@ func (this *SipHeaderContact) EncodeKnownParams(context *ParseContext, buf *Abnf
 
 	for i := 0; i < SIP_CONTACT_KNOWN_PARAM_MAX_NUM; i++ {
 		param := knownParams.params[i]
+		fmt.Println("i =", i, "param =", param)
 		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
 			buf.Write(g_SipContactKnownParamInfo[i].name)
@@ -224,7 +225,8 @@ func (this *SipHeaderContact) SetKnownParams(context *ParseContext, name AbnfPtr
 	var knownParams *SipContactKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipContactKnownParams(context)
+		knownParams = this.knownParams.GetSipContactKnownParams(context)
+
 	}
 
 	len1 := len(g_SipContactKnownParamInfo)

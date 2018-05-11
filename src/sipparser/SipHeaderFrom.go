@@ -146,7 +146,7 @@ func (this *SipHeaderFrom) SetKnownParams(context *ParseContext, name AbnfPtr, p
 	var knownParams *SipFromKnownParams
 
 	if this.knownParams != ABNF_PTR_NIL {
-		knownParams = this.params.GetSipFromKnownParams(context)
+		knownParams = this.knownParams.GetSipFromKnownParams(context)
 	}
 
 	len1 := len(g_SipFromKnownParamInfo)
