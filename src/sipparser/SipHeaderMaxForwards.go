@@ -87,32 +87,25 @@ func (this *SipHeaderMaxForwards) parseHeaderName(context *ParseContext) (ok boo
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
 
-	if pos >= len1 {
+	if (pos + 12) >= len1 {
 		return false
 	}
 
-	if src[pos]|0x20 == 'm' {
-		pos++
-
-		if (pos + 11) >= len1 {
-			return false
-		}
-
-		if ((src[pos] | 0x20) == 'a') &&
-			((src[pos+1] | 0x20) == 'x') &&
-			(src[pos+2] == '-') &&
-			((src[pos+3] | 0x20) == 'f') &&
-			((src[pos+4] | 0x20) == 'o') &&
-			((src[pos+5] | 0x20) == 'r') &&
-			((src[pos+6] | 0x20) == 'w') &&
-			((src[pos+7] | 0x20) == 'a') &&
-			((src[pos+8] | 0x20) == 'r') &&
-			((src[pos+9] | 0x20) == 'd') &&
-			((src[pos+10] | 0x20) == 's') {
-			if src[pos+11] == ':' || IsWspChar(src[pos+11]) {
-				context.parsePos = pos + 11
-				return true
-			}
+	if ((src[pos] | 0x20) == 'm') &&
+		((src[pos+1] | 0x20) == 'a') &&
+		((src[pos+2] | 0x20) == 'x') &&
+		(src[pos+3] == '-') &&
+		((src[pos+4] | 0x20) == 'f') &&
+		((src[pos+5] | 0x20) == 'o') &&
+		((src[pos+6] | 0x20) == 'r') &&
+		((src[pos+7] | 0x20) == 'w') &&
+		((src[pos+8] | 0x20) == 'a') &&
+		((src[pos+9] | 0x20) == 'r') &&
+		((src[pos+10] | 0x20) == 'd') &&
+		((src[pos+11] | 0x20) == 's') {
+		if src[pos+12] == ':' || IsWspChar(src[pos+12]) {
+			context.parsePos = pos + 12
+			return true
 		}
 	}
 

@@ -87,10 +87,6 @@ func (this *SipHeaderExpires) parseHeaderName(context *ParseContext) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
 
-	if pos >= len1 {
-		return false
-	}
-
 	if (pos + 7) >= len1 {
 		return false
 	}

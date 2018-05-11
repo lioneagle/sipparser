@@ -153,6 +153,10 @@ func (this AbnfPtr) GetSipHeaderPath(context *ParseContext) *SipHeaderPath {
 	return (*SipHeaderPath)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderServiceRoute(context *ParseContext) *SipHeaderServiceRoute {
+	return (*SipHeaderServiceRoute)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

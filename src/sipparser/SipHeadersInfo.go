@@ -56,4 +56,5 @@ var g_SipHeaderInfos = [SIP_HDR_MAX_NUM]*SipHeaderInfo{
 	SIP_HDR_EXPIRES:             &SipHeaderInfo{name: []byte("Expires"), needParse: true, parseFunc: ParseSipExpires, encodeFunc: EncodeSipExpiresValue},
 	SIP_HDR_USER_AGENT:          &SipHeaderInfo{name: []byte("User-Agent")},
 	SIP_HDR_PATH:                &SipHeaderInfo{name: []byte("Path"), allowMulti: true, needParse: true, parseFunc: ParseSipPath, encodeFunc: EncodeSipPathValue, appendFunc: AppendSipPathValue, getNextFunc: GetNextPathValue},
+	SIP_HDR_SERVICE_ROUTE:       &SipHeaderInfo{name: []byte("Service-Route"), allowMulti: true, needParse: true, parseFunc: ParseSipServiceRoute, encodeFunc: EncodeSipServiceRouteValue, appendFunc: AppendSipServiceRouteValue, getNextFunc: GetNextServiceRouteValue},
 }

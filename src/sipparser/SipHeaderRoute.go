@@ -107,25 +107,18 @@ func (this *SipHeaderRoute) parseHeaderName(context *ParseContext) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
 
-	if pos >= len1 {
+	if (pos + 5) >= len1 {
 		return false
 	}
 
-	if src[pos]|0x20 == 'r' {
-		pos++
-
-		if (pos + 4) >= len1 {
-			return false
-		}
-
-		if ((src[pos] | 0x20) == 'o') &&
-			((src[pos+1] | 0x20) == 'u') &&
-			((src[pos+2] | 0x20) == 't') &&
-			((src[pos+3] | 0x20) == 'e') {
-			if src[pos+4] == ':' || IsWspChar(src[pos+4]) {
-				context.parsePos = pos + 4
-				return true
-			}
+	if ((src[pos] | 0x20) == 'r') &&
+		((src[pos+1] | 0x20) == 'o') &&
+		((src[pos+2] | 0x20) == 'u') &&
+		((src[pos+3] | 0x20) == 't') &&
+		((src[pos+4] | 0x20) == 'e') {
+		if src[pos+5] == ':' || IsWspChar(src[pos+5]) {
+			context.parsePos = pos + 5
+			return true
 		}
 	}
 

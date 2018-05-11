@@ -42,7 +42,7 @@ func (this *SipHeaderPath) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
 
-/* RFC3261
+/* RFC3327
  *
  * Path       = "Path" HCOLON path-value *( COMMA path-value )
  * path-value = name-addr *( SEMI rr-param )
@@ -106,10 +106,6 @@ func (this *SipHeaderPath) parseHeaderName(context *ParseContext) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
-
-	if pos >= len1 {
-		return false
-	}
 
 	if (pos + 4) >= len1 {
 		return false
