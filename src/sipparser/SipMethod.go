@@ -6,20 +6,20 @@ import (
 )
 
 var g_sipMethodName = []string{
-	ABNF_SIP_METHOD_UNKNOWN:   "UKNOWN",
-	ABNF_SIP_METHOD_INVITE:    "INVITE",
-	ABNF_SIP_METHOD_PRACK:     "PRACK",
-	ABNF_SIP_METHOD_UPDATE:    "UPDATE",
-	ABNF_SIP_METHOD_INFO:      "INFO",
-	ABNF_SIP_METHOD_ACK:       "ACK",
-	ABNF_SIP_METHOD_BYE:       "BYE",
-	ABNF_SIP_METHOD_REGISTER:  "REGISTER",
-	ABNF_SIP_METHOD_SUBSCRIBE: "SUBSCRIBE",
-	ABNF_SIP_METHOD_NOTIFY:    "NOTIFY",
-	ABNF_SIP_METHOD_REFER:     "REFER",
-	ABNF_SIP_METHOD_OPTIONS:   "OPTIONS",
-	ABNF_SIP_METHOD_MESSAGE:   "MESSAGE",
-	ABNF_SIP_METHOD_PUBLISH:   "PUBLISH",
+	SIP_METHOD_UNKNOWN:   "UKNOWN",
+	SIP_METHOD_INVITE:    "INVITE",
+	SIP_METHOD_PRACK:     "PRACK",
+	SIP_METHOD_UPDATE:    "UPDATE",
+	SIP_METHOD_INFO:      "INFO",
+	SIP_METHOD_ACK:       "ACK",
+	SIP_METHOD_BYE:       "BYE",
+	SIP_METHOD_REGISTER:  "REGISTER",
+	SIP_METHOD_SUBSCRIBE: "SUBSCRIBE",
+	SIP_METHOD_NOTIFY:    "NOTIFY",
+	SIP_METHOD_REFER:     "REFER",
+	SIP_METHOD_OPTIONS:   "OPTIONS",
+	SIP_METHOD_MESSAGE:   "MESSAGE",
+	SIP_METHOD_PUBLISH:   "PUBLISH",
 }
 
 type SipMethod struct {
@@ -65,7 +65,7 @@ func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 func (this *SipMethod) Parse(context *ParseContext) (ok bool) {
 	method, newPos := GetSipMethodIndex(context.parseSrc, context.parsePos)
 
-	if method == ABNF_SIP_METHOD_UNKNOWN {
+	if method == SIP_METHOD_UNKNOWN {
 		//this.unknownMethod, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 		this.method, ok = context.allocator.ParseAndAllocCStringFromPos(context, newPos, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 		return ok

@@ -15,21 +15,21 @@ func TestSipMethodParse(t *testing.T) {
 		method byte
 		encode string
 	}{
-		{"INVITE: sip:abc@a.com", true, len("INVITE"), ABNF_SIP_METHOD_INVITE, "INVITE"},
-		{"PRACK: sip:abc@a.com", true, len("PRACK"), ABNF_SIP_METHOD_PRACK, "PRACK"},
-		{"UPDATE: sip:abc@a.com", true, len("UPDATE"), ABNF_SIP_METHOD_UPDATE, "UPDATE"},
-		{"INFO: sip:abc@a.com", true, len("INFO"), ABNF_SIP_METHOD_INFO, "INFO"},
-		{"ACK: sip:abc@a.com", true, len("ACK"), ABNF_SIP_METHOD_ACK, "ACK"},
-		{"BYE: sip:abc@a.com", true, len("BYE"), ABNF_SIP_METHOD_BYE, "BYE"},
-		{"REGISTER: sip:abc@a.com", true, len("REGISTER"), ABNF_SIP_METHOD_REGISTER, "REGISTER"},
-		{"SUBSCRIBE: sip:abc@a.com", true, len("SUBSCRIBE"), ABNF_SIP_METHOD_SUBSCRIBE, "SUBSCRIBE"},
-		{"NOTIFY: sip:abc@a.com", true, len("NOTIFY"), ABNF_SIP_METHOD_NOTIFY, "NOTIFY"},
-		{"REFER: sip:abc@a.com", true, len("REFER"), ABNF_SIP_METHOD_REFER, "REFER"},
-		{"OPTIONS: sip:abc@a.com", true, len("OPTIONS"), ABNF_SIP_METHOD_OPTIONS, "OPTIONS"},
-		{"MESSAGE: sip:abc@a.com", true, len("MESSAGE"), ABNF_SIP_METHOD_MESSAGE, "MESSAGE"},
-		{"PUBLISH: sip:abc@a.com", true, len("PUBLISH"), ABNF_SIP_METHOD_PUBLISH, "PUBLISH"},
-		{"INVITE1: sip:abc@a.com", true, len("INVITE1"), ABNF_SIP_METHOD_UNKNOWN, "INVITE1"},
-		{"iNVITE: sip:abc@a.com", true, len("iNVITE"), ABNF_SIP_METHOD_UNKNOWN, "iNVITE"},
+		{"INVITE: sip:abc@a.com", true, len("INVITE"), SIP_METHOD_INVITE, "INVITE"},
+		{"PRACK: sip:abc@a.com", true, len("PRACK"), SIP_METHOD_PRACK, "PRACK"},
+		{"UPDATE: sip:abc@a.com", true, len("UPDATE"), SIP_METHOD_UPDATE, "UPDATE"},
+		{"INFO: sip:abc@a.com", true, len("INFO"), SIP_METHOD_INFO, "INFO"},
+		{"ACK: sip:abc@a.com", true, len("ACK"), SIP_METHOD_ACK, "ACK"},
+		{"BYE: sip:abc@a.com", true, len("BYE"), SIP_METHOD_BYE, "BYE"},
+		{"REGISTER: sip:abc@a.com", true, len("REGISTER"), SIP_METHOD_REGISTER, "REGISTER"},
+		{"SUBSCRIBE: sip:abc@a.com", true, len("SUBSCRIBE"), SIP_METHOD_SUBSCRIBE, "SUBSCRIBE"},
+		{"NOTIFY: sip:abc@a.com", true, len("NOTIFY"), SIP_METHOD_NOTIFY, "NOTIFY"},
+		{"REFER: sip:abc@a.com", true, len("REFER"), SIP_METHOD_REFER, "REFER"},
+		{"OPTIONS: sip:abc@a.com", true, len("OPTIONS"), SIP_METHOD_OPTIONS, "OPTIONS"},
+		{"MESSAGE: sip:abc@a.com", true, len("MESSAGE"), SIP_METHOD_MESSAGE, "MESSAGE"},
+		{"PUBLISH: sip:abc@a.com", true, len("PUBLISH"), SIP_METHOD_PUBLISH, "PUBLISH"},
+		{"INVITE1: sip:abc@a.com", true, len("INVITE1"), SIP_METHOD_UNKNOWN, "INVITE1"},
+		{"iNVITE: sip:abc@a.com", true, len("iNVITE"), SIP_METHOD_UNKNOWN, "iNVITE"},
 	}
 
 	for i, v := range testdata {
