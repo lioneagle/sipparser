@@ -145,6 +145,10 @@ func (this AbnfPtr) GetTelUri(context *ParseContext) *TelUri {
 	return (*TelUri)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderExpires(context *ParseContext) *SipHeaderExpires {
+	return (*SipHeaderExpires)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }

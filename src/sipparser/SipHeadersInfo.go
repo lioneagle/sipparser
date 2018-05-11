@@ -53,4 +53,5 @@ var g_SipHeaderInfos = [SIP_HDR_MAX_NUM]*SipHeaderInfo{
 	SIP_HDR_REFERRED_BY:         &SipHeaderInfo{name: []byte("Referred-By"), hasShortName: true, shortName: []byte("b")},
 	SIP_HDR_SESSION_EXPIRES:     &SipHeaderInfo{name: []byte("Session-Expires"), hasShortName: true, shortName: []byte("x")},
 	SIP_HDR_MIME_VERSION:        &SipHeaderInfo{name: []byte("MIME-Version")},
+	SIP_HDR_EXPIRES:             &SipHeaderInfo{name: []byte("Expires"), needParse: true, parseFunc: ParseSipExpires, encodeFunc: EncodeSipExpiresValue},
 }
