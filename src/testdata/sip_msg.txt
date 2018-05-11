@@ -10,7 +10,7 @@ CSeq: 1 REGISTER
 Expires: 3600
 Max-Forwards: 69
 Contact: <sip:123012345678901@[2409:8805:84e3:3603::1]:1388>;useraddr=[2409:8805:84e3:3603::1];userport=1060;+sip.instance="<urn:gsma:imei:12345678-123456-0>";+g.3gpp.smsip;+g.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel";video;expires=3600
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
 Supported: sec-agree,path
 Require: path
 Path: <sip:abcd_9_2_2@xxatcf12yyy.xx.ims.mnc000.mcc123.3gppnetwork.org:5060;lr>
@@ -61,7 +61,7 @@ CSeq: 2 REGISTER
 Expires: 3600
 Max-Forwards: 69
 Contact: <sip:123012345678901@[2409:8805:84e3:3603::1]:1388>;useraddr=[2409:8805:84e3:3603::1];userport=1060;+sip.instance="<urn:gsma:imei:12345678-123456-0>";+g.3gpp.smsip;+g.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel";video;expires=3600
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
 Supported: sec-agree,path
 Require: path
 Path: <sip:abcd_9_2_2@xxatcf12yyy.xx.ims.mnc000.mcc123.3gppnetwork.org:5060;lr>
@@ -119,7 +119,7 @@ Max-Forwards: 69
 Contact: <sip:123012345678901@10.189.152.104:5060>
 Record-Route: <sip:abcd_9_0_09000004@10.189.152.104:5060;lr>
 Route: <sip:orig@xxcscf12yyyy.xx.test1mobile.com;lr;Dpt=1234_12345678;ca=123456;TRC=ffffffff-ffffffff>
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc.1234.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060
 P-Asserted-Identity: <sip:+1212345678901@xx.ims.mnc000.mcc123.3gppnetwork.org>
 P-Charging-Vector: icid-value=0123456789-12345678-12-12345678-123
 Accept: application/reginfo+xml
@@ -303,7 +303,7 @@ From: <tel:12345678901;phone-context=+86;noa=subscriber;srvattri=national>;tag=1
 To: <sip:12345678901;phone-context=xx.ims.mnc000.mcc123.3gppnetwork.org@ims.mnc000.mcc123.3gppnetwork.org;user=phone>;tag=12345678-1234-1234-1234-12345678912
 CSeq: 12345 PRACK
 Max-Forwards: 59
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
 P-Charging-Vector: icid-value="12345678901234567890123456789012.1234567890.12345678.123";orig-ioi=xx.test1mobile.com
 RAck: 12345 12345 INVITE
 Content-Length: 0
@@ -336,7 +336,7 @@ CSeq: 12345 UPDATE
 Contact: <sip:10.189.154.164:5060;Dpt=1234_123>;q=1;+q.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel";video
 Max-Forwards: 59
 Supported: timer
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
 P-Charging-Vector: icid-value="12345678901234567890123456789012.1234567890.12345678.123";orig-ioi=xx.test1mobile.com
 P-Early-Media: gated
 Content-Length: 643
@@ -431,7 +431,7 @@ From: <tel:12345678901;phone-context=+86;noa=subscriber;srvattri=national>;tag=1
 To: <sip:12345678901;phone-context=xx.ims.mnc000.mcc123.3gppnetwork.org@ims.mnc000.mcc123.3gppnetwork.org;user=phone>;tag=12345678-1234-1234-1234-12345678912
 CSeq: 12345 PRACK
 Max-Forwards: 59
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
 P-Charging-Vector: icid-value="12345678901234567890123456789012.1234567890.12345678.123";orig-ioi=xx.test1mobile.com
 RAck: 12345 12345 INVITE
 Content-Length: 0
@@ -479,7 +479,7 @@ From: <tel:12345678901;phone-context=+86;noa=subscriber;srvattri=national>;tag=1
 To: <sip:12345678901;phone-context=xx.ims.mnc000.mcc123.3gppnetwork.org@ims.mnc000.mcc123.3gppnetwork.org;user=phone>;tag=12345678-1234-1234-1234-12345678912
 CSeq: 12345 ACK
 Max-Forwards: 59
-P-AccessNetwork-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
+P-Access-Network-Info: 3GPP-E-UTRAN;utran-cell-id-3gpp=1230123456789123;sbc-domain=sbc4.xx.test1mobile.com;ue-ip=[2409:8805:84e3:3603::1];ue-port=1060;network-provided
 P-Charging-Vector: icid-value="12345678901234567890123456789012.1234567890.12345678.123";orig-ioi=xx.test1mobile.com
 Content-Length: 0
 
@@ -520,7 +520,7 @@ From: <sip:123456789012.sccas.xx.ims.mnc000.mcc123.3gppnetwork.org>;tag=12345678
 To: <sip:abcd_9_2_2_123012345678901@12345678901.xx.ims.mnc000.mcc123.3gppnetwork.org>
 CSeq: 1 MESSAGE
 P-Asserted-Identity: <sip:123456789012.sccas.xx.ims.mnc000.mcc123.3gppnetwork.org>
-P-AccessNetwork-Info: 3PTC
+P-Access-Network-Info: 3PTC
 P-Charging-Vector: icid-value=1234567-123456789012345678901;icid-generated-at=xx.ims.mnc000.mcc123.3gppnetwork.org
 Max-Forwards: 70
 Content-Length: 338
