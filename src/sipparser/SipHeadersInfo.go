@@ -58,4 +58,5 @@ var g_SipHeaderInfos = [SIP_HDR_MAX_NUM]*SipHeaderInfo{
 	SIP_HDR_PATH:                &SipHeaderInfo{name: []byte("Path"), allowMulti: true, needParse: true, parseFunc: ParseSipPath, encodeFunc: EncodeSipPathValue, appendFunc: AppendSipPathValue, getNextFunc: GetNextPathValue},
 	SIP_HDR_SERVICE_ROUTE:       &SipHeaderInfo{name: []byte("Service-Route"), allowMulti: true, needParse: true, parseFunc: ParseSipServiceRoute, encodeFunc: EncodeSipServiceRouteValue, appendFunc: AppendSipServiceRouteValue, getNextFunc: GetNextServiceRouteValue},
 	SIP_HDR_RSEQ:                &SipHeaderInfo{name: []byte("RSeq"), needParse: true, parseFunc: ParseSipRseq, encodeFunc: EncodeSipRseqValue},
+	SIP_HDR_RACK:                &SipHeaderInfo{name: []byte("RAck"), needParse: true, parseFunc: ParseSipRack, encodeFunc: EncodeSipRackValue},
 }

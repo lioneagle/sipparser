@@ -30,6 +30,7 @@ const (
 	SIP_MSG_COMMON_HDR_PATH                = 14
 	SIP_MSG_COMMON_HDR_SERVICE_ROUTE       = 15
 	SIP_MSG_COMMON_HDR_RSEQ                = 16
+	SIP_MSG_COMMON_HDR_RACK                = 17
 	//SIP_MSG_COMMON_HDR_SESSION_EXPIRES     = 17
 	//SIP_MSG_COMMON_HDR_MIME_VERSION        = 18
 	//SIP_MSG_COMMON_HDR_REFER_TO            = 19
@@ -57,6 +58,7 @@ var g_SipMsgHeaderIndexToCommonIndex = [SIP_HDR_MAX_NUM]int{
 	SIP_HDR_PATH:                SIP_MSG_COMMON_HDR_PATH,
 	SIP_HDR_SERVICE_ROUTE:       SIP_MSG_COMMON_HDR_SERVICE_ROUTE,
 	SIP_HDR_RSEQ:                SIP_MSG_COMMON_HDR_RSEQ,
+	SIP_HDR_RACK:                SIP_MSG_COMMON_HDR_RACK,
 }
 
 var g_SipMsgCommonIndexToHeaderIndex = [SIP_MSG_COMMON_HDR_MAX_NUM]SipHeaderIndexType{
@@ -79,6 +81,7 @@ var g_SipMsgCommonIndexToHeaderIndex = [SIP_MSG_COMMON_HDR_MAX_NUM]SipHeaderInde
 	SIP_MSG_COMMON_HDR_PATH:                SIP_HDR_PATH,
 	SIP_MSG_COMMON_HDR_SERVICE_ROUTE:       SIP_HDR_SERVICE_ROUTE,
 	SIP_MSG_COMMON_HDR_RSEQ:                SIP_HDR_RSEQ,
+	SIP_MSG_COMMON_HDR_RACK:                SIP_HDR_RACK,
 }
 
 const (

@@ -1,7 +1,7 @@
 package sipparser
 
 import (
-	"fmt"
+	//"fmt"
 	"unsafe"
 )
 
@@ -208,7 +208,6 @@ func (this *SipHeaderContact) EncodeKnownParams(context *ParseContext, buf *Abnf
 
 	for i := 0; i < SIP_CONTACT_KNOWN_PARAM_MAX_NUM; i++ {
 		param := knownParams.params[i]
-		fmt.Println("i =", i, "param =", param)
 		if param != ABNF_PTR_NIL {
 			buf.WriteByte(';')
 			buf.Write(g_SipContactKnownParamInfo[i].name)

@@ -161,6 +161,10 @@ func (this AbnfPtr) GetSipHeaderRseq(context *ParseContext) *SipHeaderRseq {
 	return (*SipHeaderRseq)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
+func (this AbnfPtr) GetSipHeaderRack(context *ParseContext) *SipHeaderRack {
+	return (*SipHeaderRack)(unsafe.Pointer(&context.allocator.mem[this]))
+}
+
 /*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
 	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
 }
