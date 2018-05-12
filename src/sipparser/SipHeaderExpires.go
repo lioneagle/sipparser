@@ -51,13 +51,13 @@ func (this *SipHeaderExpires) Parse(context *ParseContext) (ok bool) {
 func (this *SipHeaderExpires) ParseWithoutInit(context *ParseContext) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
-		context.AddError(context.parsePos, "parse header-name failed for CSeq header")
+		context.AddError(context.parsePos, "parse header-name failed for Expires header")
 		return false
 	}
 
 	ok = ParseHcolon(context)
 	if !ok {
-		context.AddError(context.parsePos, "parse HCOLON failed for CSeq header")
+		context.AddError(context.parsePos, "parse HCOLON failed for Expires header")
 		return false
 	}
 
@@ -73,7 +73,7 @@ func (this *SipHeaderExpires) ParseValueWithoutInit(context *ParseContext) (ok b
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
-		context.AddError(newPos, "parse num failed for CSeq header")
+		context.AddError(newPos, "parse num failed for Expires header")
 		return false
 	}
 
@@ -110,7 +110,7 @@ func (this *SipHeaderExpires) parseHeaderName(context *ParseContext) (ok bool) {
 func ParseSipExpires(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderExpires(context)
 	if addr == ABNF_PTR_NIL {
-		context.AddError(context.parsePos, "no mem for Content-Length header")
+		context.AddError(context.parsePos, "no mem for Expires header")
 		return ABNF_PTR_NIL, false
 	}
 	ok = addr.GetSipHeaderExpires(context).ParseValueWithoutInit(context)

@@ -21,11 +21,19 @@ func NewUriHeader(context *ParseContext) AbnfPtr {
 
 func (this *UriHeader) Encode(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
 	if this.name != ABNF_PTR_NIL {
-		this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
+		if !context.EncodeUriNoEscape {
+			this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
+		} else {
+			this.name.WriteCString(context, buf)
+		}
 
 		if this.value != ABNF_PTR_NIL {
 			buf.WriteByte('=')
-			this.value.WriteCStringEscape(context, buf, charsets.valueCharsetIndex, charsets.valueMask)
+			if !context.EncodeUriNoEscape {
+				this.value.WriteCStringEscape(context, buf, charsets.valueCharsetIndex, charsets.valueMask)
+			} else {
+				this.value.WriteCString(context, buf)
+			}
 		}
 	}
 }

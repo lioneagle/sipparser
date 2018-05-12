@@ -115,7 +115,7 @@ func (this *TelUri) SetKnownParams(context *ParseContext, name AbnfPtr, param Ab
 		return true
 	}
 
-	if !context.ParseSetSipUriKnownParam {
+	if !context.ParseSetTelUriKnownParam {
 		return false
 	}
 

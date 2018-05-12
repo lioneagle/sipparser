@@ -735,6 +735,7 @@ func BenchmarkSipMsgRawScan_2(b *testing.B) {
 
 //var sip_msgs_filter = "flow_reg"
 var sip_msgs_filter = "."
+var encodeSipUriNoEscape = true
 
 func BenchmarkSipMsgsRawScan(b *testing.B) {
 	bufs := ReadSipMsgBufs()
@@ -792,6 +793,7 @@ func BenchmarkSipMsgsParse(b *testing.B) {
 			context.allocator = NewMemAllocator(1024 * 10)
 			context.SetParseSrc([]byte(msg))
 			context.SetParsePos(0)
+			context.EncodeUriNoEscape = encodeSipUriNoEscape
 
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)
@@ -836,6 +838,7 @@ func BenchmarkSipMsgsEncode(b *testing.B) {
 			context.allocator = NewMemAllocator(1024 * 10)
 			context.SetParseSrc([]byte(msg))
 			context.SetParsePos(0)
+			context.EncodeUriNoEscape = encodeSipUriNoEscape
 
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)
@@ -878,6 +881,7 @@ func BenchmarkSipMsgsRawParse(b *testing.B) {
 			context.SetParseSrc([]byte(msg))
 			context.SetParsePos(0)
 			context.ParseSipHeaderAsRaw = true
+			context.EncodeUriNoEscape = encodeSipUriNoEscape
 
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)
@@ -923,6 +927,7 @@ func BenchmarkSipMsgsRawEncode(b *testing.B) {
 			context.SetParseSrc([]byte(msg))
 			context.SetParsePos(0)
 			context.ParseSipHeaderAsRaw = true
+			context.EncodeUriNoEscape = encodeSipUriNoEscape
 
 			addr := NewSipMsg(context)
 			sipmsg := addr.GetSipMsg(context)

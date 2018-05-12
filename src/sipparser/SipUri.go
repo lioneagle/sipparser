@@ -99,10 +99,18 @@ func (this *SipUri) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	this.encodeScheme(buf)
 
 	if this.user != ABNF_PTR_NIL {
-		this.user.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
+		if !context.EncodeUriNoEscape {
+			this.user.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
+		} else {
+			this.user.WriteCString(context, buf)
+		}
 		if this.password != ABNF_PTR_NIL {
 			buf.WriteByte(':')
-			this.password.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_PASSWORD, ABNF_CHARSET_MASK_SIP_PASSWORD)
+			if !context.EncodeUriNoEscape {
+				this.password.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_PASSWORD, ABNF_CHARSET_MASK_SIP_PASSWORD)
+			} else {
+				this.password.WriteCString(context, buf)
+			}
 		}
 		buf.WriteByte('@')
 	}

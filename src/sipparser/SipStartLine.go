@@ -58,7 +58,11 @@ func (this *SipStartLine) EncodeStatusLine(context *ParseContext, buf *AbnfByteB
 	buf.WriteByte(' ')
 	EncodeUInt(buf, uint64(this.statusCode))
 	buf.WriteByte(' ')
-	this.reasonPhrase.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_REASON_PHRASE, ABNF_CHARSET_MASK_SIP_REASON_PHRASE)
+	if !context.EncodeReasonPhraseNoEscape {
+		this.reasonPhrase.WriteCStringEscape(context, buf, ABNF_CHARSET_SIP_REASON_PHRASE, ABNF_CHARSET_MASK_SIP_REASON_PHRASE)
+	} else {
+		this.reasonPhrase.WriteCString(context, buf)
+	}
 }
 
 /* RFC3261 Section 25.1, page 222

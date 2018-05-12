@@ -31,7 +31,9 @@ type ParseContext struct {
 	ParseSetSipServiceRouteKnownParam       bool
 	//ParseSipKeyHeader    bool
 
-	EncodeUriAsNameSpace bool
+	EncodeUriAsNameSpace       bool
+	EncodeUriNoEscape          bool
+	EncodeReasonPhraseNoEscape bool
 }
 
 func NewParseContext() *ParseContext {
