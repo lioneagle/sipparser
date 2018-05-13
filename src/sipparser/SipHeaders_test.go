@@ -111,13 +111,13 @@ func TestFindRawHeaders(t *testing.T) {
 			test.ASSERT_NE(t, headers, ABNF_PTR_NIL, "")
 			test.ASSERT_TRUE(t, ok, "")
 
-			_, ok = FindRawHeaders(context, headers, v.headerIndex)
+			_, ok = FindRawHeaderByIndex(context, headers, v.headerIndex)
 			test.EXPECT_EQ(t, ok, v.ok, "")
 		})
 	}
 }
 
-func BenchmarkFindRawHeaders(b *testing.B) {
+func BenchmarkFindRawHeaderByIndex(b *testing.B) {
 	b.StopTimer()
 	v := []byte("From1: test\r\nFrom2: test\r\nFrom3: test\r\nFrom4: test\r\nFrom5: test\r\nFrom6: test\r\nTo: test\r\nCall-ID: test\r\n")
 	context := NewParseContext()
@@ -133,7 +133,7 @@ func BenchmarkFindRawHeaders(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		FindRawHeaders(context, headers, SIP_HDR_CALL_ID)
+		FindRawHeaderByIndex(context, headers, SIP_HDR_CALL_ID)
 	}
 }
 

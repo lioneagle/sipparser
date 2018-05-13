@@ -140,7 +140,7 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 	}
 }
 
-func FindRawHeaders(context *ParseContext, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
+func FindRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
 	if headers == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL, false
 	}
