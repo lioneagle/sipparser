@@ -140,7 +140,7 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 	}
 }
 
-func FindRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
+func FindKnownRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
 	if headers == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL, false
 	}
@@ -148,6 +148,21 @@ func FindRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerIndex Si
 	for headers != ABNF_PTR_NIL {
 		h := headers.GetSipHeader(context)
 		if h.id == headerIndex {
+			return headers, true
+		}
+		headers = h.next
+	}
+	return ABNF_PTR_NIL, false
+}
+
+func FindUnknownRawHeaderByName(context *ParseContext, headers AbnfPtr, headerName []byte) (header AbnfPtr, ok bool) {
+	if headers == ABNF_PTR_NIL {
+		return ABNF_PTR_NIL, false
+	}
+
+	for headers != ABNF_PTR_NIL {
+		h := headers.GetSipHeader(context)
+		if h.hname.CStringEqualNoCase(context, headerName) {
 			return headers, true
 		}
 		headers = h.next

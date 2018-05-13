@@ -111,13 +111,13 @@ func TestFindRawHeaders(t *testing.T) {
 			test.ASSERT_NE(t, headers, ABNF_PTR_NIL, "")
 			test.ASSERT_TRUE(t, ok, "")
 
-			_, ok = FindRawHeaderByIndex(context, headers, v.headerIndex)
+			_, ok = FindKnownRawHeaderByIndex(context, headers, v.headerIndex)
 			test.EXPECT_EQ(t, ok, v.ok, "")
 		})
 	}
 }
 
-func BenchmarkFindRawHeaderByIndex(b *testing.B) {
+func BenchmarkFindKnownRawHeaderByIndex(b *testing.B) {
 	b.StopTimer()
 	v := []byte("From1: test\r\nFrom2: test\r\nFrom3: test\r\nFrom4: test\r\nFrom5: test\r\nFrom6: test\r\nTo: test\r\nCall-ID: test\r\n")
 	context := NewParseContext()
@@ -133,7 +133,28 @@ func BenchmarkFindRawHeaderByIndex(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		FindRawHeaderByIndex(context, headers, SIP_HDR_CALL_ID)
+		FindKnownRawHeaderByIndex(context, headers, SIP_HDR_CALL_ID)
+	}
+}
+
+func BenchmarkFindUnknownRawHeaderByName(b *testing.B) {
+	b.StopTimer()
+	v := []byte("From1: test\r\nFrom2: test\r\nFrom3: test\r\nFrom4: test\r\nFrom5: test\r\nFrom6: test\r\nTo: test\r\nCall-ID1: test\r\n")
+	context := NewParseContext()
+	context.allocator = NewMemAllocator(1024 * 30)
+	context.SetParseSrc(v)
+	headers, ok := ParseRawHeaders(context)
+	if !ok {
+		fmt.Println("parse raw header failed")
+		return
+	}
+	name := []byte("Call-ID1")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		FindUnknownRawHeaderByName(context, headers, name)
 	}
 }
 

@@ -19,8 +19,8 @@ func TestSipHeaderPathParse(t *testing.T) {
 		{"Path: abc<sip:abc@a.com;user=ip>;tag=1", true, len("Path: abc<sip:abc@a.com;user=ip>;tag=1"), "Path: abc<sip:abc@a.com;user=ip>;tag=1"},
 		{"Path: <tel:+12358;tag=123>", true, len("Path: <tel:+12358;tag=123>"), "Path: <tel:+12358;tag=123>"},
 
-		{" Path: <sip:abc@a.com>;tag=1", false, 0, "0"},
-		{"Path: sip:abc@a.com;tag=1", false, len("Path: sip"), "0"},
+		{" Path: <sip:abc@a.com>;tag=1", false, 0, ""},
+		{"Path: sip:abc@a.com;tag=1", false, len("Path: sip"), ""},
 		{"Path1: <sip:abc@a.com>;tag=1", false, 0, ""},
 		{"Path: ", false, len("Path: "), ""},
 	}

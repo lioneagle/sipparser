@@ -53,12 +53,12 @@ func (this AbnfPtr) GetSipToKnownParams(context *ParseContext) *SipToKnownParams
 	return (*SipToKnownParams)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderCallId(context *ParseContext) *SipHeaderCallId {
-	return (*SipHeaderCallId)(unsafe.Pointer(&context.allocator.mem[this]))
+func (this AbnfPtr) GetSipHeaderCallID(context *ParseContext) *SipHeaderCallID {
+	return (*SipHeaderCallID)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderCseq(context *ParseContext) *SipHeaderCseq {
-	return (*SipHeaderCseq)(unsafe.Pointer(&context.allocator.mem[this]))
+func (this AbnfPtr) GetSipHeaderCSeq(context *ParseContext) *SipHeaderCSeq {
+	return (*SipHeaderCSeq)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
 func (this AbnfPtr) GetSipMethod(context *ParseContext) *SipMethod {
@@ -157,48 +157,17 @@ func (this AbnfPtr) GetSipHeaderServiceRoute(context *ParseContext) *SipHeaderSe
 	return (*SipHeaderServiceRoute)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderRseq(context *ParseContext) *SipHeaderRseq {
-	return (*SipHeaderRseq)(unsafe.Pointer(&context.allocator.mem[this]))
+func (this AbnfPtr) GetSipHeaderRSeq(context *ParseContext) *SipHeaderRSeq {
+	return (*SipHeaderRSeq)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetSipHeaderRack(context *ParseContext) *SipHeaderRack {
-	return (*SipHeaderRack)(unsafe.Pointer(&context.allocator.mem[this]))
+func (this AbnfPtr) GetSipHeaderRAck(context *ParseContext) *SipHeaderRAck {
+	return (*SipHeaderRAck)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-/*func (this AbnfPtr) GetSipSingleHeader(context *ParseContext) *SipSingleHeader {
-	return (*SipSingleHeader)(unsafe.Pointer(&context.allocator.mem[this]))
+func (this AbnfPtr) GetSipHeaderPAssertedIdentity(context *ParseContext) *SipHeaderPAssertedIdentity {
+	return (*SipHeaderPAssertedIdentity)(unsafe.Pointer(&context.allocator.mem[this]))
 }
-func (this AbnfPtr) GetSipSingleHeaders(context *ParseContext) *SipSingleHeaders {
-	return (*SipSingleHeaders)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-func (this AbnfPtr) GetSipMultiHeader(context *ParseContext) *SipMultiHeader {
-	return (*SipMultiHeader)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-func (this AbnfPtr) GetSipMultiHeaders(context *ParseContext) *SipMultiHeaders {
-	return (*SipMultiHeaders)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-
-
-func (this AbnfPtr) GetTelUriContext(context *ParseContext) *TelUriContext {
-	return (*TelUriContext)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-
-func (this AbnfPtr) GetTelUri(context *ParseContext) *TelUri {
-	return (*TelUri)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-
-func (this AbnfPtr) GetSipMsgBody(context *ParseContext) *SipMsgBody {
-	return (*SipMsgBody)(unsafe.Pointer(&context.allocator.mem[this]))
-}
-
-func (this AbnfPtr) GetSipMsgBodies(context *ParseContext) *SipMsgBodies {
-	return (*SipMsgBodies)(unsafe.Pointer(&context.allocator.mem[this]))
-}*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
