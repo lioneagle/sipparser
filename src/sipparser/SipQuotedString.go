@@ -4,7 +4,7 @@ import (
 	_ "unsafe"
 )
 
-func EncodeSipQuotedString(context *ParseContext, buf *AbnfByteBuffer, quotedString AbnfPtr) {
+func EncodeSipQuotedString(context *Context, buf *AbnfByteBuffer, quotedString AbnfPtr) {
 	buf.WriteByte('"')
 	quotedString.WriteCString(context, buf)
 	buf.WriteByte('"')

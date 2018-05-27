@@ -16,7 +16,7 @@ func SizeofSipHeaderServiceRoute() int {
 	return int(unsafe.Sizeof(SipHeaderServiceRoute{}))
 }
 
-func NewSipHeaderServiceRoute(context *ParseContext) AbnfPtr {
+func NewSipHeaderServiceRoute(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderServiceRoute()))
 }
 
@@ -28,16 +28,16 @@ func (this *SipHeaderServiceRoute) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderServiceRoute())
 }
 
-func (this *SipHeaderServiceRoute) String(context *ParseContext) string {
+func (this *SipHeaderServiceRoute) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderServiceRoute) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderServiceRoute) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Service-Route: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderServiceRoute) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderServiceRoute) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.addr.Encode(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
@@ -48,12 +48,12 @@ func (this *SipHeaderServiceRoute) EncodeValue(context *ParseContext, buf *AbnfB
  * sr-value      = name-addr *( SEMI rr-param )
  * rr-param      =  generic-param
  */
-func (this *SipHeaderServiceRoute) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderServiceRoute) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderServiceRoute) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderServiceRoute) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Service-Route header")
@@ -69,12 +69,12 @@ func (this *SipHeaderServiceRoute) ParseWithoutInit(context *ParseContext) (ok b
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderServiceRoute) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderServiceRoute) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderServiceRoute) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderServiceRoute) ParseValueWithoutInit(context *Context) (ok bool) {
 	ok = this.addr.ParseNameAddrWithoutInit(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for Service-Route header")
@@ -94,15 +94,15 @@ func (this *SipHeaderServiceRoute) ParseValueWithoutInit(context *ParseContext) 
 	return true
 }
 
-func (this *SipHeaderServiceRoute) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderServiceRoute) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	return
 }
 
-func (this *SipHeaderServiceRoute) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderServiceRoute) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	return false
 }
 
-func (this *SipHeaderServiceRoute) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderServiceRoute) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -137,7 +137,7 @@ func (this *SipHeaderServiceRoute) parseHeaderName(context *ParseContext) (ok bo
 	return false
 }
 
-func ParseSipServiceRoute(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipServiceRoute(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderRecordRoute(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Service-Route header")
@@ -147,14 +147,14 @@ func ParseSipServiceRoute(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipServiceRouteValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipServiceRouteValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
 	parsed.GetSipHeaderServiceRoute(context).EncodeValue(context, buf)
 }
 
-func AppendSipServiceRouteValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+func AppendSipServiceRouteValue(context *Context, parsed AbnfPtr, header AbnfPtr) {
 	for addr := parsed; addr != ABNF_PTR_NIL; {
 		h := addr.GetSipHeaderServiceRoute(context)
 		if h.next == ABNF_PTR_NIL {
@@ -165,6 +165,6 @@ func AppendSipServiceRouteValue(context *ParseContext, parsed AbnfPtr, header Ab
 	}
 }
 
-func GetNextServiceRouteValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+func GetNextServiceRouteValue(context *Context, parsed AbnfPtr) AbnfPtr {
 	return parsed.GetSipHeaderServiceRoute(context).next
 }

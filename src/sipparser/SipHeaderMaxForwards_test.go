@@ -29,7 +29,7 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -58,7 +58,7 @@ func TestSipHeaderMaxForwardsParse(t *testing.T) {
 func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Max-Forwards: 70")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderMaxForwards(context)
@@ -83,7 +83,7 @@ func BenchmarkSipHeaderMaxForwardsParse(b *testing.B) {
 func BenchmarkSipHeaderMaxForwardsEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Max-Forwards: 70")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderMaxForwards(context)

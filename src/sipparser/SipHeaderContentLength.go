@@ -14,7 +14,7 @@ func SizeofSipHeaderContentLength() int {
 	return int(unsafe.Sizeof(SipHeaderContentLength{}))
 }
 
-func NewSipHeaderContentLength(context *ParseContext) AbnfPtr {
+func NewSipHeaderContentLength(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderContentLength()))
 }
 
@@ -26,16 +26,16 @@ func (this *SipHeaderContentLength) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderContentLength())
 }
 
-func (this *SipHeaderContentLength) String(context *ParseContext) string {
+func (this *SipHeaderContentLength) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderContentLength) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentLength) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Content-Length: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderContentLength) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentLength) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	//EncodeUInt(buf, uint64(this.size))
 	EncodeUIntWithWidth(buf, uint64(this.size), 10)
 	this.encodeEnd = uint32(len(buf.Bytes()))
@@ -45,12 +45,12 @@ func (this *SipHeaderContentLength) EncodeValue(context *ParseContext, buf *Abnf
  *
  * Content-Length  =  ( "Content-Length" / "l" ) HCOLON 1*DIGIT
  */
-func (this *SipHeaderContentLength) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentLength) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderContentLength) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentLength) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for CSeq header")
@@ -66,12 +66,12 @@ func (this *SipHeaderContentLength) ParseWithoutInit(context *ParseContext) (ok 
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentLength) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentLength) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentLength) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentLength) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -84,7 +84,7 @@ func (this *SipHeaderContentLength) ParseValueWithoutInit(context *ParseContext)
 	return true
 }
 
-func (this *SipHeaderContentLength) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentLength) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -132,7 +132,7 @@ func (this *SipHeaderContentLength) parseHeaderName(context *ParseContext) (ok b
 	return false
 }
 
-func ParseSipContentLength(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipContentLength(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderContentLength(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Content-Length header")
@@ -142,7 +142,7 @@ func ParseSipContentLength(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipContentLengthValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipContentLengthValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

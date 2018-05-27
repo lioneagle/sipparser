@@ -10,7 +10,7 @@ import (
 )
 
 func TestSipHostPortUnknownString(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 2)
 
 	addr := NewSipHostPort(context)
@@ -21,7 +21,7 @@ func TestSipHostPortUnknownString(t *testing.T) {
 }
 
 func TestSipHostPortIpv4String(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 2)
 
 	addr := NewSipHostPort(context)
@@ -38,7 +38,7 @@ func TestSipHostPortIpv4String(t *testing.T) {
 }
 
 func TestSipHostPortIpv6String(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 2)
 
 	addr := NewSipHostPort(context)
@@ -55,7 +55,7 @@ func TestSipHostPortIpv6String(t *testing.T) {
 }
 
 func TestSipHostPortHostnameString(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 
 	addr := NewSipHostPort(context)
@@ -99,7 +99,7 @@ func TestSipHostPortParseHostOk(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			//t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -135,7 +135,7 @@ func TestSipHostPortParseHostNOk(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -175,7 +175,7 @@ func TestSipHostPortParseOk(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -217,7 +217,7 @@ func TestSipHostPortParseNOk(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			//t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -276,7 +276,7 @@ func TestSipHostPortWriteIpv4AsString(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 
 			addr := NewSipHostPort(context)
@@ -374,7 +374,7 @@ func BenchmarkWriteIpv4UseFmt(b *testing.B) {
 
 func BenchmarkWriteIpv4AsString(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	ip := []byte{255, 255, 255, 255}
 	host := &SipHostPort{id: HOST_TYPE_IPV4}
@@ -392,7 +392,7 @@ func BenchmarkWriteIpv4AsString(b *testing.B) {
 
 func BenchmarkSipHostPortParseIpv4(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	host := &SipHostPort{}
 	src := []byte("255.255.255.255")

@@ -180,7 +180,7 @@ func TestMemParseAndAllocCStringEscapable(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024)
 			context.SetParseSrc([]byte(v.src))
 			addr, ok := context.allocator.ParseAndAllocCStringEscapable(context, v.charsetIndex, v.mask)
@@ -224,7 +224,7 @@ func TestMemParseAndAllocSipQuotedStringParseOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -259,7 +259,7 @@ func TestMemParseAndAllocSipQuotedStringNOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -320,7 +320,7 @@ func BenchmarkMemAllocWithClear(b *testing.B) {
 func BenchmarkParseAndAllocCStringEscapable1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -338,7 +338,7 @@ func BenchmarkParseAndAllocCStringEscapable1(b *testing.B) {
 func BenchmarkParseAndAllocSipQuotedString(b *testing.B) {
 	b.StopTimer()
 	src := []byte("\"0123456789\"")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 

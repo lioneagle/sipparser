@@ -35,7 +35,7 @@ func TestSipUriParseOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -218,7 +218,7 @@ func TestSipUriParseNOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 4)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -256,7 +256,7 @@ func TestSipUriEncode(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 10)
 
 			addr := NewSipUri(context)
@@ -294,7 +294,7 @@ func TestSipUriEncode2(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 10)
 			context.ParseSetSipUriKnownParam = true
 
@@ -333,7 +333,7 @@ func TestSipUriEncode3(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 10)
 			context.ParseSetSipUriKnownParam = true
 			context.EncodeUriNoEscape = true
@@ -423,7 +423,7 @@ func BenchmarkSipUriParse1(b *testing.B) {
 	//v := []byte("sip:abc@biloxi.com;transport=tcp")
 	//v := []byte("sip:abc@biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 
 	remain := context.allocator.Used()
@@ -453,7 +453,7 @@ func BenchmarkSipUriParse2(b *testing.B) {
 	//v := []byte("sip:abc@biloxi.com;transport=tcp")
 	//v := []byte("sip:abc@biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.ParseSetSipUriKnownParam = true
 	remain := context.allocator.Used()
@@ -511,7 +511,7 @@ func BenchmarkSipUriString1(b *testing.B) {
 	//v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
 	//v := []byte("sip:abc@biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -537,7 +537,7 @@ func BenchmarkSipUriEncode1(b *testing.B) {
 	b.StopTimer()
 	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -567,7 +567,7 @@ func BenchmarkSipUriEncode2(b *testing.B) {
 	b.StopTimer()
 	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -599,7 +599,7 @@ func BenchmarkSipUriEncode3(b *testing.B) {
 	b.StopTimer()
 	//v := []byte("sip:biloxi.com;transport=tcp;method=REGISTER?to=sip:bob%40biloxi.com")
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -631,7 +631,7 @@ func BenchmarkSipUriEncode3(b *testing.B) {
 func BenchmarkGetUriParamByName(b *testing.B) {
 	b.StopTimer()
 	v := []byte("transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -659,7 +659,7 @@ func BenchmarkGetUriParamByName(b *testing.B) {
 func BenchmarkSipUriWith4UnknownParamsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.ParseSetSipUriKnownParam = false
 	remain := context.allocator.Used()
@@ -685,7 +685,7 @@ func BenchmarkSipUriWith4UnknownParamsParse(b *testing.B) {
 func BenchmarkSipUriWith4KnownParamsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.ParseSetSipUriKnownParam = true
 	remain := context.allocator.Used()
@@ -711,7 +711,7 @@ func BenchmarkSipUriWith4KnownParamsParse(b *testing.B) {
 func BenchmarkSipUriWith4UnknownParamsEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -742,7 +742,7 @@ func BenchmarkSipUriWith4UnknownParamsEncode(b *testing.B) {
 func BenchmarkSipUriWith4KnownParamsEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)
@@ -773,7 +773,7 @@ func BenchmarkSipUriWith4KnownParamsEncode(b *testing.B) {
 func BenchmarkGetUriParamByIndex(b *testing.B) {
 	b.StopTimer()
 	v := []byte("sip:abc@biloxi.com;transport=tcp;method=REGISTER;lr;user=phone")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.SetParsePos(0)

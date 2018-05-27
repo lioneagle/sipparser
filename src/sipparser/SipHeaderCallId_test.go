@@ -30,7 +30,7 @@ func TestSipHeaderCallIDParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -59,7 +59,7 @@ func TestSipHeaderCallIDParse(t *testing.T) {
 func BenchmarkSipHeaderCallIDParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Call-ID: 0009b7da-0352000f-30a69b83-0e7b53d6@24.15.255.101")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderCallID(context)
@@ -84,7 +84,7 @@ func BenchmarkSipHeaderCallIDParse(b *testing.B) {
 func BenchmarkSipHeaderCallIDEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Call-ID: 0009b7da-0352000f-30a69b83-0e7b53d6@24.15.255.101")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderCallID(context)

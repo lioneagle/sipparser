@@ -29,7 +29,7 @@ func TestSipHeaderExpiresParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -58,7 +58,7 @@ func TestSipHeaderExpiresParse(t *testing.T) {
 func BenchmarkSipHeaderExpiresParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Expires: 2226")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderExpires(context)
@@ -83,7 +83,7 @@ func BenchmarkSipHeaderExpiresParse(b *testing.B) {
 func BenchmarkSipHeaderExpiresEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Expires: 2226")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderExpires(context)

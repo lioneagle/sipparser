@@ -30,7 +30,7 @@ func TestSipHeaderFromParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -73,7 +73,7 @@ func TestSipHeaderFromParse2(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -106,7 +106,7 @@ func BenchmarkSipHeaderFromParse(b *testing.B) {
 	//v := []byte("From: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	//v := []byte("From: \"User ID\" <sip:6140000@24.15.255.4>;tag=dab70900252036d7134be-4ec05abe")
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderFrom(context)
@@ -133,7 +133,7 @@ func BenchmarkSipHeaderFromEncode(b *testing.B) {
 	//v := []byte("From: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
 	//v := []byte("From:<sip:abc@biloxi.com>;tag=dab70900252036d7134be-4ec05abe")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderFrom(context)
@@ -160,7 +160,7 @@ func BenchmarkSipHeaderFromEncode(b *testing.B) {
 func BenchmarkSipHeaderFromString(b *testing.B) {
 	b.StopTimer()
 	v := []byte("From: \"User ID\" <sip:abc@biloxi.com;transport=tcp;method=REGISTER>;tag=dab70900252036d7134be-4ec05abe")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderFrom(context)

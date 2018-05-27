@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-type ParseContext struct {
+type Context struct {
 	Errors                                  AbnfErrors
 	EncodeHeaderShorName                    bool
 	allocator                               *MemAllocator
@@ -38,15 +38,15 @@ type ParseContext struct {
 	SipHeaders SipHeaderInfos
 }
 
-func NewParseContext() *ParseContext {
-	ret := &ParseContext{}
+func NewContext() *Context {
+	ret := &Context{}
 	ret.ParseSetSipContentTypeKnownParam = true
 	ret.EncodeUriAsNameSpace = true
 	ret.SipHeaders = g_SipHeaderInfos
 	return ret
 }
 
-func (this *ParseContext) SetParseSrc(src []byte) {
+func (this *Context) SetParseSrc(src []byte) {
 	this.Errors.src = src
 	this.parseSrc = src
 	this.srcLen = AbnfPos(len(src))
@@ -59,35 +59,35 @@ func (this *ParseContext) SetParseSrc(src []byte) {
 	}
 }
 
-func (this *ParseContext) SetParsePos(pos AbnfPos) {
+func (this *Context) SetParsePos(pos AbnfPos) {
 	this.parsePos = pos
 }
 
-func (this *ParseContext) GetParsePos() AbnfPos {
+func (this *Context) GetParsePos() AbnfPos {
 	return this.parsePos
 }
 
-func (this *ParseContext) AddError(pos AbnfPos, description string) {
+func (this *Context) AddError(pos AbnfPos, description string) {
 	fileName, pc, line := GetCallerInfoN(2)
 	this.Errors.Add(&AbnfError{src: this.parseSrc, pos: pos, description: description, fileName: fileName, pc: pc, line: line})
 }
 
-func (this *ParseContext) SetAllocator(allocator *MemAllocator) {
+func (this *Context) SetAllocator(allocator *MemAllocator) {
 	this.allocator = allocator
 }
 
-func (this *ParseContext) ClearAllocNum() {
+func (this *Context) ClearAllocNum() {
 	this.allocator.ClearAllocNum()
 }
 
-func (this *ParseContext) GetAllocNum() uint32 {
+func (this *Context) GetAllocNum() uint32 {
 	return this.allocator.AllocNum()
 }
 
-func (this *ParseContext) FreePart(remain uint32) {
+func (this *Context) FreePart(remain uint32) {
 	this.allocator.FreePart(remain)
 }
 
-func (this *ParseContext) Used() uint32 {
+func (this *Context) Used() uint32 {
 	return this.allocator.Used()
 }

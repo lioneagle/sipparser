@@ -6,8 +6,8 @@ import (
 )
 
 type KnownUriParams interface {
-	SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool
-	EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer)
+	SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool
+	EncodeKnownParams(context *Context, buf *AbnfByteBuffer)
 }
 
 type UriParam struct {
@@ -27,11 +27,11 @@ func SizeofUriParam() int {
 	return int(unsafe.Sizeof(UriParam{}))
 }
 
-func NewUriParam(context *ParseContext) AbnfPtr {
+func NewUriParam(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofUriParam()))
 }
 
-func (this *UriParam) Encode(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
+func (this *UriParam) Encode(context *Context, buf *AbnfByteBuffer, charsets *CharsetInfo) {
 	if this.name != ABNF_PTR_NIL {
 		if !context.EncodeUriNoEscape {
 			this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
@@ -43,7 +43,7 @@ func (this *UriParam) Encode(context *ParseContext, buf *AbnfByteBuffer, charset
 	}
 }
 
-func (this *UriParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
+func (this *UriParam) EncodeValue(context *Context, buf *AbnfByteBuffer, charsets *CharsetInfo) {
 	if this.value != ABNF_PTR_NIL {
 		buf.WriteByte('=')
 		if !context.EncodeUriNoEscape {
@@ -74,7 +74,7 @@ func (this *UriParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer, ch
  * paramchar         =  param-unreserved / unreserved / escaped
  * param-unreserved  =  "[" / "]" / "/" / ":" / "&" / "+" / "$"
  */
-func (this *UriParam) Parse(context *ParseContext, charsets *CharsetInfo) (ok bool) {
+func (this *UriParam) Parse(context *Context, charsets *CharsetInfo) (ok bool) {
 	var name AbnfPtr
 	var value AbnfPtr
 
@@ -105,7 +105,7 @@ func (this *UriParam) Parse(context *ParseContext, charsets *CharsetInfo) (ok bo
 	return true
 }
 
-func ParseUriParams(context *ParseContext, charsets *CharsetInfo) (params AbnfPtr, ok bool) {
+func ParseUriParams(context *Context, charsets *CharsetInfo) (params AbnfPtr, ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
 		context.AddError(context.parsePos, "reach end after ';' for uri params")
@@ -146,7 +146,7 @@ func ParseUriParams(context *ParseContext, charsets *CharsetInfo) (params AbnfPt
 	return params, true
 }
 
-func ParseUriParamsEx(context *ParseContext, charsets *CharsetInfo, knownParams KnownUriParams) (params AbnfPtr, ok bool) {
+func ParseUriParamsEx(context *Context, charsets *CharsetInfo, knownParams KnownUriParams) (params AbnfPtr, ok bool) {
 
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
@@ -190,7 +190,7 @@ func ParseUriParamsEx(context *ParseContext, charsets *CharsetInfo, knownParams 
 	return params, true
 }
 
-func EncodeUriParams(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr, charsets *CharsetInfo) {
+func EncodeUriParams(context *Context, buf *AbnfByteBuffer, params AbnfPtr, charsets *CharsetInfo) {
 	if params != ABNF_PTR_NIL {
 		param := params.GetUriParam(context)
 
@@ -205,7 +205,7 @@ func EncodeUriParams(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr,
 	}
 }
 
-func EncodeUriParamsEx(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr, charsets *CharsetInfo, knownParams KnownUriParams) {
+func EncodeUriParamsEx(context *Context, buf *AbnfByteBuffer, params AbnfPtr, charsets *CharsetInfo, knownParams KnownUriParams) {
 	if knownParams != nil {
 		knownParams.EncodeKnownParams(context, buf)
 	}
@@ -223,7 +223,7 @@ func EncodeUriParamsEx(context *ParseContext, buf *AbnfByteBuffer, params AbnfPt
 	}
 }
 
-func GetUriParamByName(context *ParseContext, params AbnfPtr, name []byte) *UriParam {
+func GetUriParamByName(context *Context, params AbnfPtr, name []byte) *UriParam {
 	for params != ABNF_PTR_NIL {
 		param := params.GetUriParam(context)
 		if param.name.CStringEqualNoCase(context, name) {

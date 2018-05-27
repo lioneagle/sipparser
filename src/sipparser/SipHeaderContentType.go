@@ -27,7 +27,7 @@ func SizeofSipContentTypeKnownParams() int {
 	return int(unsafe.Sizeof(SipContentTypeKnownParams{}))
 }
 
-func NewSipContentTypeKnownParams(context *ParseContext) AbnfPtr {
+func NewSipContentTypeKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipContentTypeKnownParams()))
 }
 
@@ -42,7 +42,7 @@ func SizeofSipHeaderContentType() int {
 	return int(unsafe.Sizeof(SipHeaderContentType{}))
 }
 
-func NewSipHeaderContentType(context *ParseContext) AbnfPtr {
+func NewSipHeaderContentType(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderContentType()))
 }
 
@@ -54,16 +54,16 @@ func (this *SipHeaderContentType) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderContentType())
 }
 
-func (this *SipHeaderContentType) String(context *ParseContext) string {
+func (this *SipHeaderContentType) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderContentType) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentType) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Content-Type: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderContentType) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentType) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.mainType.WriteCString(context, buf)
 	buf.WriteByte('/')
 	this.subType.WriteCString(context, buf)
@@ -87,12 +87,12 @@ func (this *SipHeaderContentType) EncodeValue(context *ParseContext, buf *AbnfBy
  * m-attribute      =  token
  * m-value          =  token / quoted-string
  */
-func (this *SipHeaderContentType) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentType) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderContentType) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentType) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Content-Type header")
@@ -108,12 +108,12 @@ func (this *SipHeaderContentType) ParseWithoutInit(context *ParseContext) (ok bo
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentType) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentType) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentType) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentType) ParseValueWithoutInit(context *Context) (ok bool) {
 	this.mainType, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 	if !ok {
 		context.AddError(context.parsePos, "parse m-type failed for Content-Type header")
@@ -144,7 +144,7 @@ func (this *SipHeaderContentType) ParseValueWithoutInit(context *ParseContext) (
 	return true
 }
 
-func (this *SipHeaderContentType) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentType) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -161,7 +161,7 @@ func (this *SipHeaderContentType) EncodeKnownParams(context *ParseContext, buf *
 	}
 }
 
-func (this *SipHeaderContentType) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderContentType) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipContentTypeKnownParam {
 		return false
 	}
@@ -186,7 +186,7 @@ func (this *SipHeaderContentType) SetKnownParams(context *ParseContext, name Abn
 	return false
 }
 
-func (this *SipHeaderContentType) GetKnownParam(context *ParseContext, paramIndex int) AbnfPtr {
+func (this *SipHeaderContentType) GetKnownParam(context *Context, paramIndex int) AbnfPtr {
 	if this.knownParams == ABNF_PTR_NIL || paramIndex >= SIP_CONTENT_TYPE_KNOWN_PARAM_MAX_NUM {
 		return ABNF_PTR_NIL
 	}
@@ -195,7 +195,7 @@ func (this *SipHeaderContentType) GetKnownParam(context *ParseContext, paramInde
 	return knownParams.params[paramIndex]
 }
 
-func (this *SipHeaderContentType) SetBoundary(context *ParseContext, boundary []byte) (addr AbnfPtr) {
+func (this *SipHeaderContentType) SetBoundary(context *Context, boundary []byte) (addr AbnfPtr) {
 	if this.knownParams == ABNF_PTR_NIL {
 		this.knownParams = NewSipContentTypeKnownParams(context)
 		if this.knownParams == ABNF_PTR_NIL {
@@ -230,7 +230,7 @@ func (this *SipHeaderContentType) SetBoundary(context *ParseContext, boundary []
 	return addr
 }
 
-func (this *SipHeaderContentType) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentType) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -283,7 +283,7 @@ func (this *SipHeaderContentType) parseHeaderName(context *ParseContext) (ok boo
 	return false
 }
 
-func ParseSipContentType(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipContentType(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderContentType(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Content-Type header")
@@ -293,7 +293,7 @@ func ParseSipContentType(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipContentTypeValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipContentTypeValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

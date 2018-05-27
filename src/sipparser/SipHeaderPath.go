@@ -16,7 +16,7 @@ func SizeofSipHeaderPath() int {
 	return int(unsafe.Sizeof(SipHeaderPath{}))
 }
 
-func NewSipHeaderPath(context *ParseContext) AbnfPtr {
+func NewSipHeaderPath(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderPath()))
 }
 
@@ -28,16 +28,16 @@ func (this *SipHeaderPath) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderPath())
 }
 
-func (this *SipHeaderPath) String(context *ParseContext) string {
+func (this *SipHeaderPath) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderPath) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderPath) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Path: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderPath) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderPath) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.addr.Encode(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
@@ -48,12 +48,12 @@ func (this *SipHeaderPath) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
  * path-value = name-addr *( SEMI rr-param )
  * rr-param   =  generic-param
  */
-func (this *SipHeaderPath) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderPath) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderPath) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderPath) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Path header")
@@ -69,12 +69,12 @@ func (this *SipHeaderPath) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderPath) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderPath) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderPath) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderPath) ParseValueWithoutInit(context *Context) (ok bool) {
 	ok = this.addr.ParseNameAddrWithoutInit(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for Path header")
@@ -94,15 +94,15 @@ func (this *SipHeaderPath) ParseValueWithoutInit(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipHeaderPath) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderPath) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	return
 }
 
-func (this *SipHeaderPath) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderPath) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	return false
 }
 
-func (this *SipHeaderPath) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderPath) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -124,7 +124,7 @@ func (this *SipHeaderPath) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipPath(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipPath(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderPath(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Path header")
@@ -134,14 +134,14 @@ func ParseSipPath(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipPathValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipPathValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
 	parsed.GetSipHeaderPath(context).EncodeValue(context, buf)
 }
 
-func AppendSipPathValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+func AppendSipPathValue(context *Context, parsed AbnfPtr, header AbnfPtr) {
 	for addr := parsed; addr != ABNF_PTR_NIL; {
 		h := addr.GetSipHeaderPath(context)
 		if h.next == ABNF_PTR_NIL {
@@ -152,6 +152,6 @@ func AppendSipPathValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
 	}
 }
 
-func GetNextPathValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+func GetNextPathValue(context *Context, parsed AbnfPtr) AbnfPtr {
 	return parsed.GetSipHeaderPath(context).next
 }

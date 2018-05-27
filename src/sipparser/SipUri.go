@@ -54,7 +54,7 @@ func SizeofSipUriKnownParams() int {
 	return int(unsafe.Sizeof(SipUriKnownParams{}))
 }
 
-func NewSipUriKnownParams(context *ParseContext) AbnfPtr {
+func NewSipUriKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipUriKnownParams()))
 }
 
@@ -74,7 +74,7 @@ func SizeofSipUri() int {
 	return int(unsafe.Sizeof(SipUri{}))
 }
 
-func NewSipUri(context *ParseContext) AbnfPtr {
+func NewSipUri(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipUri()))
 }
 
@@ -91,11 +91,11 @@ func (this *SipUri) SetSipsUri()     { this.isSecure = true }
 func (this *SipUri) IsSipUri() bool  { return !this.isSecure }
 func (this *SipUri) IsSipsUri() bool { return this.isSecure }
 
-func (this *SipUri) String(context *ParseContext) string {
+func (this *SipUri) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipUri) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipUri) Encode(context *Context, buf *AbnfByteBuffer) {
 	this.encodeScheme(buf)
 
 	if this.user != ABNF_PTR_NIL {
@@ -145,7 +145,7 @@ func (this *SipUri) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *SipUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipUri) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -162,7 +162,7 @@ func (this *SipUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer
 	}
 }
 
-func (this *SipUri) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipUri) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipUriKnownParam {
 		return false
 	}
@@ -199,12 +199,12 @@ func (this *SipUri) encodeScheme(buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *SipUri) Parse(context *ParseContext) (ok bool) {
+func (this *SipUri) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipUri) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipUri) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseScheme(context)
 	if !ok {
 		return false
@@ -213,11 +213,11 @@ func (this *SipUri) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseAfterSchemeWithoutInit(context)
 }
 
-func (this *SipUri) ParseAfterScheme(context *ParseContext) (ok bool) {
+func (this *SipUri) ParseAfterScheme(context *Context) (ok bool) {
 	return this.ParseAfterSchemeWithoutInit(context)
 }
 
-func (this *SipUri) ParseAfterSchemeWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipUri) ParseAfterSchemeWithoutInit(context *Context) (ok bool) {
 	//src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	ok = this.parseUserinfo(context)
@@ -264,7 +264,7 @@ func (this *SipUri) ParseAfterSchemeWithoutInit(context *ParseContext) (ok bool)
 	return true
 }
 
-func (this *SipUri) ParseAfterSchemeWithoutParam(context *ParseContext) (ok bool) {
+func (this *SipUri) ParseAfterSchemeWithoutParam(context *Context) (ok bool) {
 	//newPos = pos
 	//this.Init()
 
@@ -281,7 +281,7 @@ func (this *SipUri) ParseAfterSchemeWithoutParam(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipUri) parseUserinfo(context *ParseContext) (ok bool) {
+func (this *SipUri) parseUserinfo(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	hasUserinfo := findUserinfo(context.parseSrc, context.parsePos)
 	if hasUserinfo {
@@ -322,7 +322,7 @@ func (this *SipUri) parseUserinfo(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipUri) parsePassword(context *ParseContext) (ok bool) {
+func (this *SipUri) parsePassword(context *Context) (ok bool) {
 	src := context.parseSrc
 
 	if src[context.parsePos] == ':' {
@@ -448,7 +448,7 @@ func findUserinfo(src []byte, pos AbnfPos) bool {
 	return true
 }*/
 
-func (this *SipUri) parseScheme(context *ParseContext) (ok bool) {
+func (this *SipUri) parseScheme(context *Context) (ok bool) {
 	src1 := context.parseSrc[context.parsePos:]
 	if hasSipPrefixNoCase(src1) {
 		this.SetSipUri()

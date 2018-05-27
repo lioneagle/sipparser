@@ -34,7 +34,7 @@ func TestFindCrlfRFC3261(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -67,7 +67,7 @@ func TestParseRawHeadersOk(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -101,7 +101,7 @@ func TestFindRawHeaders(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			//t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -120,7 +120,7 @@ func TestFindRawHeaders(t *testing.T) {
 func BenchmarkFindKnownRawHeaderByIndex(b *testing.B) {
 	b.StopTimer()
 	v := []byte("From1: test\r\nFrom2: test\r\nFrom3: test\r\nFrom4: test\r\nFrom5: test\r\nFrom6: test\r\nTo: test\r\nCall-ID: test\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	headers, ok := ParseRawHeaders(context)
@@ -140,7 +140,7 @@ func BenchmarkFindKnownRawHeaderByIndex(b *testing.B) {
 func BenchmarkFindUnknownRawHeaderByName(b *testing.B) {
 	b.StopTimer()
 	v := []byte("From1: test\r\nFrom2: test\r\nFrom3: test\r\nFrom4: test\r\nFrom5: test\r\nFrom6: test\r\nTo: test\r\nCall-ID1: test\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	headers, ok := ParseRawHeaders(context)
@@ -162,7 +162,7 @@ func BenchmarkParseHeaderNameAndGetSipHeaderIndex(b *testing.B) {
 	b.StopTimer()
 	b.SetBytes(2)
 	b.ReportAllocs()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 
 	var testdata [][]byte

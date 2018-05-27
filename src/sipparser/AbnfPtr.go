@@ -35,15 +35,15 @@ func (this AbnfPtr) SetValue() uint {
 	return uint(this | ABNF_PTR_BIT)
 }
 
-func (this AbnfPtr) GetMemAddr(context *ParseContext) *byte {
+func (this AbnfPtr) GetMemAddr(context *Context) *byte {
 	return (*byte)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
-func (this AbnfPtr) GetMemPointer(context *ParseContext) unsafe.Pointer {
+func (this AbnfPtr) GetMemPointer(context *Context) unsafe.Pointer {
 	return unsafe.Pointer(&context.allocator.mem[this])
 }
 
-func (this AbnfPtr) GetUintptr(context *ParseContext) uintptr {
+func (this AbnfPtr) GetUintptr(context *Context) uintptr {
 	return (uintptr)(unsafe.Pointer(&context.allocator.mem[this]))
 }
 
@@ -54,7 +54,7 @@ func (this AbnfPtr) String() string {
 	return strconv.FormatUint(uint64(this), 10)
 }
 
-func (this AbnfPtr) CString(context *ParseContext) string {
+func (this AbnfPtr) CString(context *Context) string {
 	if this == ABNF_PTR_NIL {
 		return ""
 	}
@@ -63,7 +63,7 @@ func (this AbnfPtr) CString(context *ParseContext) string {
 	return *(*string)(unsafe.Pointer(&header))
 }
 
-func (this AbnfPtr) HasPrefixNoCase(context *ParseContext, prefix string) bool {
+func (this AbnfPtr) HasPrefixNoCase(context *Context, prefix string) bool {
 	len1 := this.Strlen(context)
 	len2 := len(prefix)
 	if len1 < len2 {
@@ -74,7 +74,7 @@ func (this AbnfPtr) HasPrefixNoCase(context *ParseContext, prefix string) bool {
 	return chars.EqualNoCase(context.allocator.mem[this:this+AbnfPtr(len2)], prefix1)
 }
 
-func (this AbnfPtr) RemoveTelUriVisualSeperator(context *ParseContext) {
+func (this AbnfPtr) RemoveTelUriVisualSeperator(context *Context) {
 	len1 := AbnfPtr(this.Strlen(context))
 	read := this
 	write := this
@@ -90,7 +90,7 @@ func (this AbnfPtr) RemoveTelUriVisualSeperator(context *ParseContext) {
 	binary.LittleEndian.PutUint16(data[this-2:], uint16(write-this))
 }
 
-func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool {
+func (this AbnfPtr) CStringEqualNoCase(context *Context, name []byte) bool {
 	if this == ABNF_PTR_NIL {
 		return false
 	}
@@ -179,7 +179,7 @@ func (this AbnfPtr) CStringEqualNoCase(context *ParseContext, name []byte) bool 
 	//return false
 }
 
-func (this AbnfPtr) WriteCString(context *ParseContext, buf *AbnfByteBuffer) {
+func (this AbnfPtr) WriteCString(context *Context, buf *AbnfByteBuffer) {
 	if this == ABNF_PTR_NIL {
 		return
 	}
@@ -187,7 +187,7 @@ func (this AbnfPtr) WriteCString(context *ParseContext, buf *AbnfByteBuffer) {
 	buf.Write(data)
 }
 
-func (this AbnfPtr) WriteCStringEscape(context *ParseContext, buf *AbnfByteBuffer, charsetIndex int, mask uint32) {
+func (this AbnfPtr) WriteCStringEscape(context *Context, buf *AbnfByteBuffer, charsetIndex int, mask uint32) {
 	if this == ABNF_PTR_NIL {
 		return
 	}
@@ -209,7 +209,7 @@ func (this AbnfPtr) WriteCStringEscape(context *ParseContext, buf *AbnfByteBuffe
 	}
 }
 
-func (this AbnfPtr) GetCStringAsByteSlice(context *ParseContext) []byte {
+func (this AbnfPtr) GetCStringAsByteSlice(context *Context) []byte {
 	if this == ABNF_PTR_NIL {
 		return nil
 	}
@@ -218,7 +218,7 @@ func (this AbnfPtr) GetCStringAsByteSlice(context *ParseContext) []byte {
 	return *(*[]byte)(unsafe.Pointer(&header))
 }
 
-func (this AbnfPtr) GetAsByteSlice(context *ParseContext, size int) []byte {
+func (this AbnfPtr) GetAsByteSlice(context *Context, size int) []byte {
 	if this == ABNF_PTR_NIL {
 		return nil
 	}
@@ -229,7 +229,7 @@ func (this AbnfPtr) GetAsByteSlice(context *ParseContext, size int) []byte {
 	//return context.allocator.mem[int(this) : int(this)+size]
 }
 
-func (this AbnfPtr) CopyFrom(context *ParseContext, src AbnfPtr, size int) {
+func (this AbnfPtr) CopyFrom(context *Context, src AbnfPtr, size int) {
 	if this == ABNF_PTR_NIL || src == ABNF_PTR_NIL {
 		return
 	}
@@ -241,7 +241,7 @@ func (this AbnfPtr) CopyFrom(context *ParseContext, src AbnfPtr, size int) {
 	copy(context.allocator.mem[int(this):int(this)+size], context.allocator.mem[int(src):int(src)+size])
 }
 
-func (this AbnfPtr) Strlen2(context *ParseContext) int {
+func (this AbnfPtr) Strlen2(context *Context) int {
 	if this == ABNF_PTR_NIL {
 		return 0
 	}
@@ -259,7 +259,7 @@ const (
 	lomagic uint64 = 0x0101010101010101
 )
 
-func (this AbnfPtr) Strlen(context *ParseContext) int {
+func (this AbnfPtr) Strlen(context *Context) int {
 	if this == ABNF_PTR_NIL {
 		return 0
 	}

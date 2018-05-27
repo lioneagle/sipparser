@@ -15,11 +15,11 @@ func SizeofUriHeader() int {
 	return int(unsafe.Sizeof(UriHeader{}))
 }
 
-func NewUriHeader(context *ParseContext) AbnfPtr {
+func NewUriHeader(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofUriHeader()))
 }
 
-func (this *UriHeader) Encode(context *ParseContext, buf *AbnfByteBuffer, charsets *CharsetInfo) {
+func (this *UriHeader) Encode(context *Context, buf *AbnfByteBuffer, charsets *CharsetInfo) {
 	if this.name != ABNF_PTR_NIL {
 		if !context.EncodeUriNoEscape {
 			this.name.WriteCStringEscape(context, buf, charsets.nameCharsetIndex, charsets.nameMask)
@@ -38,7 +38,7 @@ func (this *UriHeader) Encode(context *ParseContext, buf *AbnfByteBuffer, charse
 	}
 }
 
-func (this *UriHeader) Parse(context *ParseContext, charsets *CharsetInfo) (ok bool) {
+func (this *UriHeader) Parse(context *Context, charsets *CharsetInfo) (ok bool) {
 	var name AbnfPtr
 	var value AbnfPtr
 
@@ -78,7 +78,7 @@ func (this *UriHeader) Parse(context *ParseContext, charsets *CharsetInfo) (ok b
 	return true
 }
 
-func ParseUriHeaders(context *ParseContext, charsets *CharsetInfo) (headers AbnfPtr, ok bool) {
+func ParseUriHeaders(context *Context, charsets *CharsetInfo) (headers AbnfPtr, ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
 		context.AddError(context.parsePos, "reach end after ';' for uri headers")
@@ -119,7 +119,7 @@ func ParseUriHeaders(context *ParseContext, charsets *CharsetInfo) (headers Abnf
 	return headers, true
 }
 
-func EncodeUriHeaders(context *ParseContext, buf *AbnfByteBuffer, headers AbnfPtr, charsets *CharsetInfo) {
+func EncodeUriHeaders(context *Context, buf *AbnfByteBuffer, headers AbnfPtr, charsets *CharsetInfo) {
 	header := headers.GetUriHeader(context)
 
 	for {

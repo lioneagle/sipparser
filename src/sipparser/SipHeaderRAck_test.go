@@ -30,7 +30,7 @@ func TestSipHeaderRAckParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -59,7 +59,7 @@ func TestSipHeaderRAckParse(t *testing.T) {
 func BenchmarkSipHeaderRAckParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("RAck: 101 123 INVITE")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderRAck(context)
@@ -84,7 +84,7 @@ func BenchmarkSipHeaderRAckParse(b *testing.B) {
 func BenchmarkSipHeaderRAckEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("RAck: 101 123 INVITE")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderRAck(context)

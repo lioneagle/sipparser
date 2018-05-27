@@ -10,7 +10,7 @@ import (
 	"github.com/lioneagle/goutil/src/chars"
 )
 
-func ParseEscapable2(context *ParseContext, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
+func ParseEscapable2(context *Context, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
 	ref := &AbnfRef{}
 	escapeNum, newPos, ok := ref.ParseEscapable(src, pos, charsetIndex, mask)
 	if !ok {
@@ -31,7 +31,7 @@ func ParseEscapable2(context *ParseContext, src []byte, pos AbnfPos, charsetInde
 	return addr, newPos, true
 }
 
-func ParseEscapable(context *ParseContext, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
+func ParseEscapable(context *Context, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
 	context.SetParsePos(pos)
 	addr, ok = context.allocator.ParseAndAllocCStringEscapable(context, charsetIndex, mask)
 	newPos = context.parsePos
@@ -42,7 +42,7 @@ func ParseEscapable(context *ParseContext, src []byte, pos AbnfPos, charsetIndex
 	return addr, newPos, ok
 }
 
-func ParseEscapableEnableEmpty2(context *ParseContext, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
+func ParseEscapableEnableEmpty2(context *Context, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
 	ref := &AbnfRef{}
 	escapeNum, newPos, ok := ref.ParseEscapable(src, pos, charsetIndex, mask)
 	if !ok {
@@ -58,7 +58,7 @@ func ParseEscapableEnableEmpty2(context *ParseContext, src []byte, pos AbnfPos, 
 	return addr, newPos, true
 }
 
-func ParseEscapableEnableEmpty(context *ParseContext, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
+func ParseEscapableEnableEmpty(context *Context, src []byte, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, newPos AbnfPos, ok bool) {
 	context.SetParsePos(pos)
 	addr, ok = context.allocator.ParseAndAllocCStringEscapableEnableEmpty(context, charsetIndex, mask)
 	newPos = context.parsePos
@@ -69,7 +69,7 @@ func ParseEscapableEnableEmpty(context *ParseContext, src []byte, pos AbnfPos, c
 	return addr, newPos, ok
 }
 
-func AllocCString(context *ParseContext, buf []byte) AbnfPtr {
+func AllocCString(context *Context, buf []byte) AbnfPtr {
 	len1 := uint32(len(buf))
 
 	addr := context.allocator.Alloc(len1 + 2)
@@ -111,7 +111,7 @@ func AllocCString(context *ParseContext, buf []byte) AbnfPtr {
 }
 */
 
-func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum int) AbnfPtr {
+func AllocCStringWithUnescapeNum(context *Context, buf []byte, escapeNum int) AbnfPtr {
 	if escapeNum <= 0 {
 		return AllocCString(context, buf)
 	}
@@ -156,7 +156,7 @@ func AllocCStringWithUnescapeNum(context *ParseContext, buf []byte, escapeNum in
 	return addr + 2
 }
 
-func AllocCStringWithUnescapeNum2(context *ParseContext, buf []byte, escapeNum int) AbnfPtr {
+func AllocCStringWithUnescapeNum2(context *Context, buf []byte, escapeNum int) AbnfPtr {
 	if escapeNum <= 0 {
 		return AllocCString(context, buf)
 	}
@@ -201,7 +201,7 @@ func AllocCStringWithUnescapeNum2(context *ParseContext, buf []byte, escapeNum i
 	return addr
 }
 
-func AllocCStringWithUnescape(context *ParseContext, buf []byte) AbnfPtr {
+func AllocCStringWithUnescape(context *Context, buf []byte) AbnfPtr {
 	if bytes.IndexByte(buf, '%') == -1 {
 		return AllocCString(context, buf)
 	}
@@ -229,7 +229,7 @@ func ParseUInt(src []byte, pos AbnfPos) (digit uint, num uint32, newPos AbnfPos,
 	return digit, uint32(newPos - pos), newPos, true
 }
 
-func ParseUInt_2(context *ParseContext) (digit uint, p uintptr, ok bool) {
+func ParseUInt_2(context *Context) (digit uint, p uintptr, ok bool) {
 	p = context.parseBegin + uintptr(context.parsePos)
 	end := context.parseEnd
 
@@ -321,7 +321,7 @@ func ParseUInt8(src []byte, pos AbnfPos) (digit uint8, num uint32, newPos AbnfPo
  *
  * HCOLON  =  *( SP / HTAB ) ":" SWS
  */
-func ParseHcolon(context *ParseContext) (ok bool) {
+func ParseHcolon(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(src))
 	newPos := context.parsePos
@@ -349,7 +349,7 @@ func ParseHcolon(context *ParseContext) (ok bool) {
 	return ParseSWS_2(context)
 }
 
-func ParseHcolon2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseHcolon2(context *Context, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	//ref := AbnfRef{}
 	//newPos = ref.ParseWspChar(src, pos)
@@ -376,7 +376,7 @@ func ParseHcolon2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPo
 	return ParseSWS(src, newPos+1)
 }
 
-func ParseSWSMarkCanOmmit(context *ParseContext, mark byte) (matchMark bool, ok bool) {
+func ParseSWSMarkCanOmmit(context *Context, mark byte) (matchMark bool, ok bool) {
 	src := context.parseSrc
 	ok = ParseSWS_2(context)
 	if !ok {
@@ -398,7 +398,7 @@ func ParseSWSMarkCanOmmit(context *ParseContext, mark byte) (matchMark bool, ok 
 	return true, ok
 }
 
-func ParseSWSMarkCanOmmit_2(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, matchMark bool, ok bool) {
+func ParseSWSMarkCanOmmit_2(context *Context, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, matchMark bool, ok bool) {
 	newPos = pos
 	newPos, ok = ParseSWS(src, newPos)
 	if !ok {
@@ -429,7 +429,7 @@ func ParseSWSMarkCanOmmit_2(context *ParseContext, src []byte, pos AbnfPos, mark
  * SEMI    =  SWS ";" SWS ; semicolon
  * COLON   =  SWS ":" SWS ; colon
  */
-func ParseSWSMark(context *ParseContext, mark byte) (ok bool) {
+func ParseSWSMark(context *Context, mark byte) (ok bool) {
 	src := context.parseSrc
 
 	ok = ParseSWS_2(context)
@@ -452,7 +452,7 @@ func ParseSWSMark(context *ParseContext, mark byte) (ok bool) {
 	return ParseSWS_2(context)
 }
 
-func ParseSWSMark_2(context *ParseContext, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, ok bool) {
+func ParseSWSMark_2(context *Context, src []byte, pos AbnfPos, mark byte) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	newPos, ok = ParseSWS(src, newPos)
@@ -479,7 +479,7 @@ func ParseSWSMark_2(context *ParseContext, src []byte, pos AbnfPos, mark byte) (
  *
  * SWS  =  [LWS] ; sep whitespace
  */
-func ParseSWS_2(context *ParseContext) (ok bool) {
+func ParseSWS_2(context *Context) (ok bool) {
 	src := context.parseSrc
 
 	if context.parsePos >= AbnfPos(len(src)) {
@@ -538,7 +538,7 @@ func ParseSWS(src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
  * 2. WSP's defination is from RFC2234 Section 6.1, page 12
  *
  */
-func ParseLWS(context *ParseContext) (ok bool) {
+func ParseLWS(context *Context) (ok bool) {
 	src := context.parseSrc
 	newPos := context.parsePos
 	len1 := AbnfPos(len(src))
@@ -634,7 +634,7 @@ func eatWsp(src []byte, pos AbnfPos) (newPos AbnfPos) {
  * LAQUOT  =  SWS "<"; left angle quote
  *
  */
-func ParseLeftAngleQuote(context *ParseContext) (ok bool) {
+func ParseLeftAngleQuote(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	if context.parsePos >= len1 {
@@ -667,7 +667,7 @@ func ParseLeftAngleQuote(context *ParseContext) (ok bool) {
  * LAQUOT  =  SWS "<"; left angle quote
  *
  */
-func ParseLeftAngleQuote2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseLeftAngleQuote2(context *Context, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	len1 := AbnfPos(len(src))
@@ -700,7 +700,7 @@ func ParseLeftAngleQuote2(context *ParseContext, src []byte, pos AbnfPos) (newPo
  * RAQUOT  =  ">" SWS ; right angle quote
  *
  */
-func ParseRightAngleQuote(context *ParseContext) (ok bool) {
+func ParseRightAngleQuote(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	if context.parsePos >= len1 {
@@ -723,7 +723,7 @@ func ParseRightAngleQuote(context *ParseContext) (ok bool) {
  * RAQUOT  =  ">" SWS ; right angle quote
  *
  */
-func ParseRightAngleQuote2(context *ParseContext, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
+func ParseRightAngleQuote2(context *Context, src []byte, pos AbnfPos) (newPos AbnfPos, ok bool) {
 
 	newPos = pos
 	if newPos >= AbnfPos(len(src)) {
@@ -755,7 +755,7 @@ func IsOnlyCRLF(src []byte, pos AbnfPos) bool {
 	return (pos+2) == len1 && (src[pos] == '\r') && (src[pos+1] == '\n')
 }
 
-func ParseCRLF(context *ParseContext) (ok bool) {
+func ParseCRLF(context *Context) (ok bool) {
 	if ((context.parsePos + 1) < AbnfPos(len(context.parseSrc))) &&
 		(context.parseSrc[context.parsePos] == '\r') &&
 		(context.parseSrc[context.parsePos+1] == '\n') {

@@ -13,7 +13,7 @@ func SizeofSipHeaderExpires() int {
 	return int(unsafe.Sizeof(SipHeaderExpires{}))
 }
 
-func NewSipHeaderExpires(context *ParseContext) AbnfPtr {
+func NewSipHeaderExpires(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderExpires()))
 }
 
@@ -25,16 +25,16 @@ func (this *SipHeaderExpires) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderExpires())
 }
 
-func (this *SipHeaderExpires) String(context *ParseContext) string {
+func (this *SipHeaderExpires) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderExpires) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderExpires) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Expires: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderExpires) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderExpires) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	EncodeUInt(buf, uint64(this.size))
 }
 
@@ -43,12 +43,12 @@ func (this *SipHeaderExpires) EncodeValue(context *ParseContext, buf *AbnfByteBu
  * Expires        =  "Expires" HCOLON delta-seconds
  * delta-seconds  =  1*DIGIT
  */
-func (this *SipHeaderExpires) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderExpires) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderExpires) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderExpires) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Expires header")
@@ -64,12 +64,12 @@ func (this *SipHeaderExpires) ParseWithoutInit(context *ParseContext) (ok bool) 
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderExpires) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderExpires) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderExpires) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderExpires) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -82,7 +82,7 @@ func (this *SipHeaderExpires) ParseValueWithoutInit(context *ParseContext) (ok b
 	return true
 }
 
-func (this *SipHeaderExpires) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderExpires) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -107,7 +107,7 @@ func (this *SipHeaderExpires) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipExpires(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipExpires(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderExpires(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Expires header")
@@ -117,7 +117,7 @@ func ParseSipExpires(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipExpiresValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipExpiresValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

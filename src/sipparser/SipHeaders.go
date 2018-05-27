@@ -7,8 +7,8 @@ import (
 )
 
 type SipHeadersSetter interface {
-	NeedParse(context *ParseContext, headerIndex SipHeaderIndexType) bool
-	SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool
+	NeedParse(context *Context, headerIndex SipHeaderIndexType) bool
+	SetHeaders(context *Context, headerIndex SipHeaderIndexType, header AbnfPtr) bool
 	//EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer)
 }
 
@@ -23,7 +23,7 @@ func SizeofSipHeader() int {
 	return int(unsafe.Sizeof(SipHeader{}))
 }
 
-func NewSipHeader(context *ParseContext) AbnfPtr {
+func NewSipHeader(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeader()))
 }
 
@@ -35,7 +35,7 @@ func (this *SipHeader) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeader())
 }
 
-func appendUnknownSipHeader(context *ParseContext, head AbnfPtr, newHeader AbnfPtr) (ok bool) {
+func appendUnknownSipHeader(context *Context, head AbnfPtr, newHeader AbnfPtr) (ok bool) {
 	for addr := head; addr != ABNF_PTR_NIL; {
 		header := addr.GetSipHeader(context)
 		if header.next == ABNF_PTR_NIL {
@@ -48,7 +48,7 @@ func appendUnknownSipHeader(context *ParseContext, head AbnfPtr, newHeader AbnfP
 	return false
 }
 
-func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool) {
+func ParseHeaders(context *Context, headerSetter SipHeadersSetter) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	for context.parsePos < len1 {
@@ -81,7 +81,7 @@ func ParseHeaders(context *ParseContext, headerSetter SipHeadersSetter) (ok bool
 	return true
 }
 
-func ParseRawHeaders(context *ParseContext) (headers AbnfPtr, ok bool) {
+func ParseRawHeaders(context *Context) (headers AbnfPtr, ok bool) {
 	var prev *SipHeader = nil
 	header := ABNF_PTR_NIL
 
@@ -117,7 +117,7 @@ func ParseRawHeaders(context *ParseContext) (headers AbnfPtr, ok bool) {
 	return headers, true
 }
 
-func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffer) {
+func EncodeRawHeaders(context *Context, headers AbnfPtr, buf *AbnfByteBuffer) {
 	if headers == ABNF_PTR_NIL {
 		//buf.WriteString("empty")
 		return
@@ -140,7 +140,7 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 	}
 }
 
-func FindKnownRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
+func FindKnownRawHeaderByIndex(context *Context, headers AbnfPtr, headerIndex SipHeaderIndexType) (header AbnfPtr, ok bool) {
 	if headers == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL, false
 	}
@@ -155,7 +155,7 @@ func FindKnownRawHeaderByIndex(context *ParseContext, headers AbnfPtr, headerInd
 	return ABNF_PTR_NIL, false
 }
 
-func FindUnknownRawHeaderByName(context *ParseContext, headers AbnfPtr, headerName []byte) (header AbnfPtr, ok bool) {
+func FindUnknownRawHeaderByName(context *Context, headers AbnfPtr, headerName []byte) (header AbnfPtr, ok bool) {
 	if headers == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL, false
 	}
@@ -170,7 +170,7 @@ func FindUnknownRawHeaderByName(context *ParseContext, headers AbnfPtr, headerNa
 	return ABNF_PTR_NIL, false
 }
 
-func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeaderIndexType, ok bool) {
+func ParseHeaderName(context *Context) (hname AbnfPtr, headerIndex SipHeaderIndexType, ok bool) {
 	var newPos AbnfPos
 
 	headerIndex, newPos = GetSipHeaderIndex(context.parseSrc, context.parsePos)
@@ -195,7 +195,7 @@ func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeade
 
 }
 
-func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, headerSetter SipHeadersSetter) (ok bool) {
+func parseKnownHeader(context *Context, headerIndex SipHeaderIndexType, headerSetter SipHeadersSetter) (ok bool) {
 	var header AbnfPtr
 
 	info := context.SipHeaders[headerIndex]
@@ -258,7 +258,7 @@ func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, hea
 	return headerSetter.SetHeaders(context, headerIndex, header)
 }
 
-func parseUnknownHeader(context *ParseContext, hname AbnfPtr, headerSetter SipHeadersSetter) (ok bool) {
+func parseUnknownHeader(context *Context, hname AbnfPtr, headerSetter SipHeadersSetter) (ok bool) {
 	header := NewSipHeader(context)
 	if header == ABNF_PTR_NIL {
 		return false
@@ -280,7 +280,7 @@ func parseUnknownHeader(context *ParseContext, hname AbnfPtr, headerSetter SipHe
 	return ok
 }
 
-func parseRawHeaderEx(context *ParseContext, headerIndex SipHeaderIndexType, hname AbnfPtr) (header AbnfPtr, ok bool) {
+func parseRawHeaderEx(context *Context, headerIndex SipHeaderIndexType, hname AbnfPtr) (header AbnfPtr, ok bool) {
 	header = NewSipHeader(context)
 	if header == ABNF_PTR_NIL {
 		return ABNF_PTR_NIL, false
@@ -297,7 +297,7 @@ func parseRawHeaderEx(context *ParseContext, headerIndex SipHeaderIndexType, hna
 	return header, true
 }
 
-func parseRawHeaderValue(context *ParseContext) (hvalue AbnfPtr) {
+func parseRawHeaderValue(context *Context) (hvalue AbnfPtr) {
 	pos := context.parsePos
 	begin, ok := FindCrlfByRFC3261(context)
 	if !ok {
@@ -312,7 +312,7 @@ func parseRawHeaderValue(context *ParseContext) (hvalue AbnfPtr) {
 	return hvalue
 }
 
-func FindCrlfByRFC3261(context *ParseContext) (begin AbnfPos, ok bool) {
+func FindCrlfByRFC3261(context *Context) (begin AbnfPos, ok bool) {
 	/* state diagram
 	 *                                                              other char/found
 	 *       |----------|    CR    |-------|    LF    |---------|---------------------->end

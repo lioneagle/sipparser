@@ -14,7 +14,7 @@ func SizeofSipHeaderPAssertedIdentity() int {
 	return int(unsafe.Sizeof(SipHeaderPAssertedIdentity{}))
 }
 
-func NewSipHeaderPAssertedIdentity(context *ParseContext) AbnfPtr {
+func NewSipHeaderPAssertedIdentity(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderPAssertedIdentity()))
 }
 
@@ -26,16 +26,16 @@ func (this *SipHeaderPAssertedIdentity) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderPAssertedIdentity())
 }
 
-func (this *SipHeaderPAssertedIdentity) String(context *ParseContext) string {
+func (this *SipHeaderPAssertedIdentity) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderPAssertedIdentity) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderPAssertedIdentity) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("P-Asserted-Identity: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderPAssertedIdentity) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderPAssertedIdentity) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.addr.Encode(context, buf)
 }
 
@@ -45,12 +45,12 @@ func (this *SipHeaderPAssertedIdentity) EncodeValue(context *ParseContext, buf *
  * path-value = name-addr *( SEMI rr-param )
  * rr-param   =  generic-param
  */
-func (this *SipHeaderPAssertedIdentity) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderPAssertedIdentity) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderPAssertedIdentity) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderPAssertedIdentity) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for P-Asserted-Identity header")
@@ -66,12 +66,12 @@ func (this *SipHeaderPAssertedIdentity) ParseWithoutInit(context *ParseContext) 
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderPAssertedIdentity) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderPAssertedIdentity) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderPAssertedIdentity) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderPAssertedIdentity) ParseValueWithoutInit(context *Context) (ok bool) {
 	ok = this.addr.ParseWithoutInit(context, false)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for P-Asserted-Identity header")
@@ -81,7 +81,7 @@ func (this *SipHeaderPAssertedIdentity) ParseValueWithoutInit(context *ParseCont
 	return true
 }
 
-func (this *SipHeaderPAssertedIdentity) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderPAssertedIdentity) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -118,7 +118,7 @@ func (this *SipHeaderPAssertedIdentity) parseHeaderName(context *ParseContext) (
 	return false
 }
 
-func ParseSipPAssertedIdentity(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipPAssertedIdentity(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderPAssertedIdentity(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for P-Asserted-Identity header")
@@ -128,14 +128,14 @@ func ParseSipPAssertedIdentity(context *ParseContext) (parsed AbnfPtr, ok bool) 
 	return addr, ok
 }
 
-func EncodeSipPAssertedIdentityValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipPAssertedIdentityValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
 	parsed.GetSipHeaderPAssertedIdentity(context).EncodeValue(context, buf)
 }
 
-func AppendSipPAssertedIdentityValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+func AppendSipPAssertedIdentityValue(context *Context, parsed AbnfPtr, header AbnfPtr) {
 	for addr := parsed; addr != ABNF_PTR_NIL; {
 		h := addr.GetSipHeaderPAssertedIdentity(context)
 		if h.next == ABNF_PTR_NIL {
@@ -146,6 +146,6 @@ func AppendSipPAssertedIdentityValue(context *ParseContext, parsed AbnfPtr, head
 	}
 }
 
-func GetNextPAssertedIdentityValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+func GetNextPAssertedIdentityValue(context *Context, parsed AbnfPtr) AbnfPtr {
 	return parsed.GetSipHeaderPAssertedIdentity(context).next
 }

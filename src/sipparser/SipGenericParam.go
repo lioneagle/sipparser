@@ -7,8 +7,8 @@ import (
 )
 
 type KnownSipGenericParams interface {
-	SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool
-	EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer)
+	SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool
+	EncodeKnownParams(context *Context, buf *AbnfByteBuffer)
 }
 
 const (
@@ -28,7 +28,7 @@ func SizeofSipGenericParam() int {
 	return int(unsafe.Sizeof(SipGenericParam{}))
 }
 
-func NewSipGenericParam(context *ParseContext) AbnfPtr {
+func NewSipGenericParam(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipGenericParam()))
 }
 
@@ -40,18 +40,18 @@ func (this *SipGenericParam) Init() {
 	ZeroMem(this.memAddr(), SizeofSipGenericParam())
 }
 
-func (this *SipGenericParam) String(context *ParseContext) string {
+func (this *SipGenericParam) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipGenericParam) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipGenericParam) Encode(context *Context, buf *AbnfByteBuffer) {
 	if this.name != ABNF_PTR_NIL {
 		this.name.WriteCString(context, buf)
 		this.EncodeValue(context, buf)
 	}
 }
 
-func (this *SipGenericParam) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipGenericParam) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	if this.value != ABNF_PTR_NIL {
 		buf.WriteByte('=')
 		if this.valueType == SIP_GENERIC_VALUE_TYPE_TOKEN || this.valueType == SIP_GENERIC_VALUE_TYPE_IPV6 {
@@ -67,7 +67,7 @@ func (this *SipGenericParam) EncodeValue(context *ParseContext, buf *AbnfByteBuf
  * gen-value      =  token / host / quoted-string
  *
  */
-func (this *SipGenericParam) Parse(context *ParseContext) (ok bool) {
+func (this *SipGenericParam) Parse(context *Context) (ok bool) {
 	this.name, ok = context.allocator.ParseAndAllocCStringEscapable(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 	if !ok {
 		context.AddError(context.parsePos, "parse generic-name failed")
@@ -98,7 +98,7 @@ func (this *SipGenericParam) Parse(context *ParseContext) (ok bool) {
 	return this.ParseValue(context)
 }
 
-func (this *SipGenericParam) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipGenericParam) ParseValue(context *Context) (ok bool) {
 	if context.parsePos >= AbnfPos(len(context.parseSrc)) {
 		context.AddError(context.parsePos, "empty gen-value")
 		return false
@@ -140,7 +140,7 @@ func (this *SipGenericParam) ParseValue(context *ParseContext) (ok bool) {
 	return false
 }
 
-func (this *SipGenericParam) SetNameAsString(context *ParseContext, name string) bool {
+func (this *SipGenericParam) SetNameAsString(context *Context, name string) bool {
 	addr := AllocCString(context, StringToByteSlice(name))
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "not mem for gen-name when set gen-name")
@@ -150,7 +150,7 @@ func (this *SipGenericParam) SetNameAsString(context *ParseContext, name string)
 	return true
 }
 
-func (this *SipGenericParam) SetValueQuotedString(context *ParseContext, value []byte) bool {
+func (this *SipGenericParam) SetValueQuotedString(context *Context, value []byte) bool {
 	addr := AllocCString(context, value)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "not mem for gen-value when set gen-value as quoted-string")
@@ -168,7 +168,7 @@ func (this *SipGenericParam) SetValueQuotedString(context *ParseContext, value [
  * seperator is usually ';'
  *
  */
-func ParseSipGenericParams(context *ParseContext, seperator byte, knownParams KnownSipGenericParams) (params AbnfPtr, ok bool) {
+func ParseSipGenericParams(context *Context, seperator byte, knownParams KnownSipGenericParams) (params AbnfPtr, ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
 		return ABNF_PTR_NIL, true
@@ -221,7 +221,7 @@ func ParseSipGenericParams(context *ParseContext, seperator byte, knownParams Kn
 	return params, true
 }
 
-func EncodeSipGenericParams(context *ParseContext, buf *AbnfByteBuffer, params AbnfPtr, seperator byte, knownParams KnownSipGenericParams) {
+func EncodeSipGenericParams(context *Context, buf *AbnfByteBuffer, params AbnfPtr, seperator byte, knownParams KnownSipGenericParams) {
 	if knownParams != nil {
 		knownParams.EncodeKnownParams(context, buf)
 	}

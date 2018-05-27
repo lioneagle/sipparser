@@ -18,7 +18,7 @@ func SizeofSipStartLine() int {
 	return int(unsafe.Sizeof(SipStartLine{}))
 }
 
-func NewSipStartLine(context *ParseContext) AbnfPtr {
+func NewSipStartLine(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipStartLine()))
 }
 
@@ -30,11 +30,11 @@ func (this *SipStartLine) Init() {
 	ZeroMem(this.memAddr(), SizeofSipStartLine())
 }
 
-func (this *SipStartLine) String(context *ParseContext) string {
+func (this *SipStartLine) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipStartLine) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipStartLine) Encode(context *Context, buf *AbnfByteBuffer) {
 	if this.isRequest {
 		this.EncodeRequestLine(context, buf)
 	} else {
@@ -45,7 +45,7 @@ func (this *SipStartLine) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	//buf.WriteByte('\n')
 }
 
-func (this *SipStartLine) EncodeRequestLine(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipStartLine) EncodeRequestLine(context *Context, buf *AbnfByteBuffer) {
 	this.method.Encode(context, buf)
 	buf.WriteByte(' ')
 	this.addr.EncodeAddrSpec(context, buf)
@@ -53,7 +53,7 @@ func (this *SipStartLine) EncodeRequestLine(context *ParseContext, buf *AbnfByte
 	this.version.Encode(context, buf)
 }
 
-func (this *SipStartLine) EncodeStatusLine(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipStartLine) EncodeStatusLine(context *Context, buf *AbnfByteBuffer) {
 	this.version.Encode(context, buf)
 	buf.WriteByte(' ')
 	EncodeUInt(buf, uint64(this.statusCode))
@@ -74,12 +74,12 @@ func (this *SipStartLine) EncodeStatusLine(context *ParseContext, buf *AbnfByteB
  *                   / UTF8-NONASCII / UTF8-CONT / SP / HTAB)
  * Request-URI    =  SIP-URI / SIPS-URI / absoluteURI
  */
-func (this *SipStartLine) Parse(context *ParseContext) (ok bool) {
+func (this *SipStartLine) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipStartLine) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipStartLine) ParseWithoutInit(context *Context) (ok bool) {
 	if !this.version.ParseStart(context) {
 		return this.ParseRequestLine(context)
 	}
@@ -93,7 +93,7 @@ func (this *SipStartLine) ParseWithoutInit(context *ParseContext) (ok bool) {
  * SIP-Version    =  "SIP" "/" 1*DIGIT "." 1*DIGIT
  * Request-URI    =  SIP-URI / SIPS-URI / absoluteURI
  */
-func (this *SipStartLine) ParseRequestLine(context *ParseContext) (ok bool) {
+func (this *SipStartLine) ParseRequestLine(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	if !this.method.Parse(context) {
@@ -160,7 +160,7 @@ func (this *SipStartLine) ParseRequestLine(context *ParseContext) (ok bool) {
  *               /   extension-code
  * extension-code  =  3DIGIT
  */
-func (this *SipStartLine) ParseStatusLineAfterVersionStart(context *ParseContext) (ok bool) {
+func (this *SipStartLine) ParseStatusLineAfterVersionStart(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	if !this.version.ParseAfterStart(context) {

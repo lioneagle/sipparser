@@ -131,7 +131,7 @@ func (this *MemAllocator) GetMem(addr AbnfPtr) uintptr {
 	return uintptr(unsafe.Pointer(&this.mem[addr]))
 }
 
-func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocCString(context *Context, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -176,7 +176,7 @@ func (this *MemAllocator) ParseAndAllocCString(context *ParseContext, charsetInd
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndAllocTelNumberRemoveVisualSeperator(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocTelNumberRemoveVisualSeperator(context *Context, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -234,7 +234,7 @@ func (this *MemAllocator) ParseAndAllocTelNumberRemoveVisualSeperator(context *P
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocCStringFromPos(context *Context, pos AbnfPos, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -297,7 +297,7 @@ func (this *MemAllocator) ParseAndAllocCStringFromPos(context *ParseContext, pos
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *Context, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -337,7 +337,7 @@ func (this *MemAllocator) ParseAndAllocCStringEnableEmpty(context *ParseContext,
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocCStringEscapable(context *Context, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -453,7 +453,7 @@ func (this *MemAllocator) ParseAndAllocCStringEscapable(context *ParseContext, c
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *ParseContext, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Context, charsetIndex int, mask uint32) (addr AbnfPtr, ok bool) {
 	charset := &g_charsets[charsetIndex]
 	newPos := context.parsePos
 	src := context.parseSrc
@@ -563,7 +563,7 @@ func (this *MemAllocator) ParseAndAllocCStringEscapableEnableEmpty(context *Pars
  * quoted-pair  =  "\" (%x00-09 / %x0B-0C
  *               / %x0E-7F)
  */
-func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (addr AbnfPtr, ok bool) {
+func (this *MemAllocator) ParseAndAllocSipQuotedString(context *Context) (addr AbnfPtr, ok bool) {
 	src := context.parseSrc
 	newPos := context.parsePos
 	len1 := AbnfPos(len(src))
@@ -638,7 +638,7 @@ func (this *MemAllocator) ParseAndAllocSipQuotedString(context *ParseContext) (a
 	return addr, true
 }
 
-func (this *MemAllocator) ParseAndCopyLWS(context *ParseContext) (ok bool) {
+func (this *MemAllocator) ParseAndCopyLWS(context *Context) (ok bool) {
 	src := context.parseSrc
 	newPos := context.parsePos
 	len1 := AbnfPos(len(src))

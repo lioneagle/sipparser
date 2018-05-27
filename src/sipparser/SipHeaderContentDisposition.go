@@ -27,7 +27,7 @@ func SizeofSipContentDispositionKnownParams() int {
 	return int(unsafe.Sizeof(SipContentDispositionKnownParams{}))
 }
 
-func NewSipContentDispositionKnownParams(context *ParseContext) AbnfPtr {
+func NewSipContentDispositionKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipContentDispositionKnownParams()))
 }
 
@@ -41,7 +41,7 @@ func SizeofSipHeaderContentDisposition() int {
 	return int(unsafe.Sizeof(SipHeaderContentDisposition{}))
 }
 
-func NewSipHeaderContentDisposition(context *ParseContext) AbnfPtr {
+func NewSipHeaderContentDisposition(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderContentDisposition()))
 }
 
@@ -53,16 +53,16 @@ func (this *SipHeaderContentDisposition) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderContentDisposition())
 }
 
-func (this *SipHeaderContentDisposition) String(context *ParseContext) string {
+func (this *SipHeaderContentDisposition) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderContentDisposition) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentDisposition) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Content-Disposition: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderContentDisposition) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentDisposition) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.dispType.WriteCString(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
@@ -81,12 +81,12 @@ func (this *SipHeaderContentDisposition) EncodeValue(context *ParseContext, buf 
  * disp-extension-token  =  token
  *
  */
-func (this *SipHeaderContentDisposition) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentDisposition) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderContentDisposition) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentDisposition) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Content-Disposition header")
@@ -102,12 +102,12 @@ func (this *SipHeaderContentDisposition) ParseWithoutInit(context *ParseContext)
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentDisposition) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentDisposition) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContentDisposition) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentDisposition) ParseValueWithoutInit(context *Context) (ok bool) {
 	this.dispType, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_TOKEN, ABNF_CHARSET_MASK_SIP_TOKEN)
 	if !ok {
 		context.AddError(context.parsePos, "parse disp-type failed for Content-Disposition header")
@@ -127,7 +127,7 @@ func (this *SipHeaderContentDisposition) ParseValueWithoutInit(context *ParseCon
 	return true
 }
 
-func (this *SipHeaderContentDisposition) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContentDisposition) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -144,7 +144,7 @@ func (this *SipHeaderContentDisposition) EncodeKnownParams(context *ParseContext
 	}
 }
 
-func (this *SipHeaderContentDisposition) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderContentDisposition) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipContentDispositionKnownParam {
 		return false
 	}
@@ -170,7 +170,7 @@ func (this *SipHeaderContentDisposition) SetKnownParams(context *ParseContext, n
 	return false
 }
 
-func (this *SipHeaderContentDisposition) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderContentDisposition) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -222,7 +222,7 @@ func (this *SipHeaderContentDisposition) parseHeaderName(context *ParseContext) 
 	return false
 }
 
-func ParseSipContentDisposition(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipContentDisposition(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderContentDisposition(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Content-Disposition header")
@@ -232,7 +232,7 @@ func ParseSipContentDisposition(context *ParseContext) (parsed AbnfPtr, ok bool)
 	return addr, ok
 }
 
-func EncodeSipContentDispositionValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipContentDispositionValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

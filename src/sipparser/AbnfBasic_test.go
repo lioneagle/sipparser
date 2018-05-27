@@ -45,7 +45,7 @@ func TestEncodeUIntWithWidth(t *testing.T) {
 }
 
 func TestAllocCString1(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%39")
 
@@ -56,7 +56,7 @@ func TestAllocCString1(t *testing.T) {
 }
 
 func TestAllocCStringWithUnescape(t *testing.T) {
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%39")
 
@@ -122,7 +122,7 @@ func TestParseLWS1(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024)
 			context.SetParseSrc([]byte(v.src))
 
@@ -279,7 +279,7 @@ func BenchmarkParseUInt(b *testing.B) {
 func BenchmarkParseUInt_2(b *testing.B) {
 	b.StopTimer()
 
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("12345")
 	context.SetParseSrc(src)
@@ -434,7 +434,7 @@ func BenchmarkWriteDigitEscape(b *testing.B) {
 
 func BenchmarkAllocCString(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%39")
 	b.ReportAllocs()
@@ -465,7 +465,7 @@ func BenchmarkAllocCString2(b *testing.B) {
 */
 func BenchmarkAllocCStringWithUnescapeNum(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("01234560123456%37%38%39")
 	b.ReportAllocs()
@@ -480,7 +480,7 @@ func BenchmarkAllocCStringWithUnescapeNum(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescapeNum2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%390123456")
 	b.ReportAllocs()
@@ -495,7 +495,7 @@ func BenchmarkAllocCStringWithUnescapeNum2(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescapeNum3(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("01234560123456137138139")
 	b.ReportAllocs()
@@ -510,7 +510,7 @@ func BenchmarkAllocCStringWithUnescapeNum3(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescapeNum_2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("01234560123456%37%38%39")
 	b.ReportAllocs()
@@ -525,7 +525,7 @@ func BenchmarkAllocCStringWithUnescapeNum_2(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescapeNum2_2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%390123456")
 	b.ReportAllocs()
@@ -540,7 +540,7 @@ func BenchmarkAllocCStringWithUnescapeNum2_2(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescapeNum3_2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("01234560123456137138139")
 	b.ReportAllocs()
@@ -555,7 +555,7 @@ func BenchmarkAllocCStringWithUnescapeNum3_2(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescape(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456%37%38%39")
 	b.ReportAllocs()
@@ -570,7 +570,7 @@ func BenchmarkAllocCStringWithUnescape(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescape2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("%37%38%390123456")
 	b.ReportAllocs()
@@ -585,7 +585,7 @@ func BenchmarkAllocCStringWithUnescape2(b *testing.B) {
 
 func BenchmarkAllocCStringWithUnescape3(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 10)
 	src := []byte("0123456137138139")
 	b.ReportAllocs()
@@ -689,7 +689,7 @@ func BenchmarkMemcpy2(b *testing.B) {
 func BenchmarkMemcpy3(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 1024)
 	len1 := 1024
 	src := context.allocator.Alloc(uint32(len1))
@@ -706,7 +706,7 @@ func BenchmarkMemcpy3(b *testing.B) {
 func BenchmarkMemcpy4(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 1024)
 	len1 := 1024
 	src := context.allocator.Alloc(uint32(len1))
@@ -723,7 +723,7 @@ func BenchmarkMemcpy4(b *testing.B) {
 func BenchmarkParseEscapable1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -741,7 +741,7 @@ func BenchmarkParseEscapable1_1(b *testing.B) {
 func BenchmarkParseEscapable1_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+012345678901230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -759,7 +759,7 @@ func BenchmarkParseEscapable1_2(b *testing.B) {
 func BenchmarkParseEscapable2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -777,7 +777,7 @@ func BenchmarkParseEscapable2_1(b *testing.B) {
 func BenchmarkParseLWS1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -795,7 +795,7 @@ func BenchmarkParseLWS1(b *testing.B) {
 func BenchmarkParseLWS2(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -813,7 +813,7 @@ func BenchmarkParseLWS2(b *testing.B) {
 func BenchmarkParseSWS1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -831,7 +831,7 @@ func BenchmarkParseSWS1_1(b *testing.B) {
 func BenchmarkParseSWS1_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -849,7 +849,7 @@ func BenchmarkParseSWS1_2(b *testing.B) {
 func BenchmarkParseSWS2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("     \t\t\t\t\t\r\n    ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -867,7 +867,7 @@ func BenchmarkParseSWS2_1(b *testing.B) {
 func BenchmarkParseSWS2_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -885,7 +885,7 @@ func BenchmarkParseSWS2_2(b *testing.B) {
 func BenchmarkParseLeftAngleQuote1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" <>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -903,7 +903,7 @@ func BenchmarkParseLeftAngleQuote1_1(b *testing.B) {
 func BenchmarkParseLeftAngleQuote1_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte("  \r\n\t <>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -921,7 +921,7 @@ func BenchmarkParseLeftAngleQuote1_2(b *testing.B) {
 func BenchmarkParseLeftAngleQuote2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" <>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -939,7 +939,7 @@ func BenchmarkParseLeftAngleQuote2_1(b *testing.B) {
 func BenchmarkParseLeftAngleQuote2_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte("  \r\n\t <>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -957,7 +957,7 @@ func BenchmarkParseLeftAngleQuote2_2(b *testing.B) {
 func BenchmarkParseRightAngleQuote1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("> ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -975,7 +975,7 @@ func BenchmarkParseRightAngleQuote1_1(b *testing.B) {
 func BenchmarkParseRightAngleQuote1_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(">  \r\n\t")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -993,7 +993,7 @@ func BenchmarkParseRightAngleQuote1_2(b *testing.B) {
 func BenchmarkParseRightAngleQuote2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("> ")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -1011,7 +1011,7 @@ func BenchmarkParseRightAngleQuote2_1(b *testing.B) {
 func BenchmarkParseRightAngleQuote2_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(">  \r\n\t")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -1029,7 +1029,7 @@ func BenchmarkParseRightAngleQuote2_2(b *testing.B) {
 func BenchmarkParseSWSMark1_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("=")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -1047,7 +1047,7 @@ func BenchmarkParseSWSMark1_1(b *testing.B) {
 func BenchmarkParseSWSMark1_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" \r\n = \r\n\t")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -1065,7 +1065,7 @@ func BenchmarkParseSWSMark1_2(b *testing.B) {
 func BenchmarkParseSWSMark2_1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("=")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -1083,7 +1083,7 @@ func BenchmarkParseSWSMark2_1(b *testing.B) {
 func BenchmarkParseSWSMark2_2(b *testing.B) {
 	b.StopTimer()
 	src := []byte(" \r\n = \r\n\t")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 

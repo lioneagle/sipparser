@@ -29,7 +29,7 @@ func TestTelUriParseOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -73,7 +73,7 @@ func TestTelUriParseNOK(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -106,7 +106,7 @@ func TestTelUriEncode(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 10)
 
 			addr := NewTelUri(context)
@@ -129,7 +129,7 @@ func BenchmarkTelUriParse1(b *testing.B) {
 	//v := []byte("tel:861234;x1=5;y;phone-context=abc.com;zz")
 	//v := []byte("tel:861234;x1=5;phone-context=abc.com;zz")
 	v := []byte("tel:861234;x1=5;phone-context=abc.com")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetTelUriKnownParam = false
@@ -154,7 +154,7 @@ func BenchmarkTelUriParse2(b *testing.B) {
 	//v := []byte("tel:861234;x1=5;y;phone-context=abc.com;zz")
 	//v := []byte("tel:861234;x1=5;phone-context=abc.com;zz")
 	v := []byte("tel:861234;x1=5;phone-context=abc.com")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetTelUriKnownParam = true
@@ -179,7 +179,7 @@ func BenchmarkTelUriEncode1(b *testing.B) {
 	//v := []byte("tel:861234;x1=5;y;phone-context=abc.com;zz")
 	v := []byte("tel:861234;x1=5;y;phone-context=abc.com")
 	//v := []byte("tel:861234")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetTelUriKnownParam = false
@@ -206,7 +206,7 @@ func BenchmarkTelUriEncode2(b *testing.B) {
 	//v := []byte("tel:861234;x1=5;y;phone-context=abc.com;zz")
 	v := []byte("tel:861234;x1=5;y;phone-context=abc.com")
 	//v := []byte("tel:861234")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetTelUriKnownParam = true

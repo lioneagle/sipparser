@@ -17,7 +17,7 @@ func SizeofSipVersion() int {
 	return int(unsafe.Sizeof(SipVersion{}))
 }
 
-func NewSipVersion(context *ParseContext) AbnfPtr {
+func NewSipVersion(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipVersion()))
 }
 
@@ -29,11 +29,11 @@ func (this *SipVersion) memAddr() uintptr {
 	return uintptr(unsafe.Pointer(this))
 }
 
-func (this *SipVersion) String(context *ParseContext) string {
+func (this *SipVersion) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipVersion) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipVersion) Encode(context *Context, buf *AbnfByteBuffer) {
 	if !this.version.IsAbnfPtr() {
 		buf.WriteString("SIP/2.0")
 	} else {
@@ -46,7 +46,7 @@ func (this *SipVersion) Encode(context *ParseContext, buf *AbnfByteBuffer) {
  *
  * SIP-Version    =  "SIP" "/" 1*DIGIT "." 1*DIGIT
  */
-func (this *SipVersion) Parse(context *ParseContext) (ok bool) {
+func (this *SipVersion) Parse(context *Context) (ok bool) {
 	ok = this.ParseStart(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse start of SIP-Version failed")
@@ -56,7 +56,7 @@ func (this *SipVersion) Parse(context *ParseContext) (ok bool) {
 	return this.ParseAfterStart(context)
 }
 
-func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
+func (this *SipVersion) ParseAfterStart(context *Context) (ok bool) {
 	if (context.parseSrc[context.parsePos] == '2') &&
 		(context.parseSrc[context.parsePos+1] == '.') &&
 		(context.parseSrc[context.parsePos+2] == '0') {
@@ -100,7 +100,7 @@ func (this *SipVersion) ParseAfterStart(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipVersion) ParseStart(context *ParseContext) (ok bool) {
+func (this *SipVersion) ParseStart(context *Context) (ok bool) {
 	/* 7 characters at least, such as SIP/2.0 */
 	if (context.parsePos + 6) >= AbnfPos(len(context.parseSrc)) {
 		return false

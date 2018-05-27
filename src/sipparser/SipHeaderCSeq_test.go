@@ -29,7 +29,7 @@ func TestSipHeaderCSeqParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -58,7 +58,7 @@ func TestSipHeaderCSeqParse(t *testing.T) {
 func BenchmarkSipHeaderCSeqParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("CSeq: 101 INVITE")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderCSeq(context)
@@ -83,7 +83,7 @@ func BenchmarkSipHeaderCSeqParse(b *testing.B) {
 func BenchmarkSipHeaderCSeqEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("CSeq: 101 INVITE")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderCSeq(context)

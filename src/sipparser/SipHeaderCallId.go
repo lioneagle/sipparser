@@ -14,7 +14,7 @@ func SizeofSipHeaderCallID() int {
 	return int(unsafe.Sizeof(SipHeaderCallID{}))
 }
 
-func NewSipHeaderCallID(context *ParseContext) AbnfPtr {
+func NewSipHeaderCallID(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderCallID()))
 }
 
@@ -26,16 +26,16 @@ func (this *SipHeaderCallID) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderCallID())
 }
 
-func (this *SipHeaderCallID) String(context *ParseContext) string {
+func (this *SipHeaderCallID) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderCallID) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderCallID) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Call-ID: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderCallID) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderCallID) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.id1.WriteCString(context, buf)
 	if this.id2 != ABNF_PTR_NIL {
 		buf.WriteByte('@')
@@ -48,12 +48,12 @@ func (this *SipHeaderCallID) EncodeValue(context *ParseContext, buf *AbnfByteBuf
  * Call-ID  =  ( "Call-ID" / "i" ) HCOLON callid
  * callid   =  word [ "@" word ]
  */
-func (this *SipHeaderCallID) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderCallID) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderCallID) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderCallID) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Call-ID header")
@@ -69,12 +69,12 @@ func (this *SipHeaderCallID) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderCallID) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderCallID) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderCallID) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderCallID) ParseValueWithoutInit(context *Context) (ok bool) {
 	this.id1, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_WORD, ABNF_CHARSET_MASK_SIP_WORD)
 	if this.id1 == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "parse id1 failed for Call-ID header")
@@ -97,7 +97,7 @@ func (this *SipHeaderCallID) ParseValueWithoutInit(context *ParseContext) (ok bo
 	return true
 }
 
-func (this *SipHeaderCallID) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderCallID) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -138,7 +138,7 @@ func (this *SipHeaderCallID) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipCallID(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipCallID(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderCallID(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Call-ID header")
@@ -148,7 +148,7 @@ func ParseSipCallID(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipCallIDValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipCallIDValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

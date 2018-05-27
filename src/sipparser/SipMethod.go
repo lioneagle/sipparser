@@ -32,7 +32,7 @@ func SizeofSipMethod() int {
 	return int(unsafe.Sizeof(SipMethod{}))
 }
 
-func NewSipMethod(context *ParseContext) AbnfPtr {
+func NewSipMethod(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipMethod()))
 }
 
@@ -44,11 +44,11 @@ func (this *SipMethod) Init() {
 	ZeroMem(this.memAddr(), SizeofSipMethod())
 }
 
-func (this *SipMethod) String(context *ParseContext) string {
+func (this *SipMethod) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipMethod) Encode(context *Context, buf *AbnfByteBuffer) {
 	if !this.method.IsAbnfPtr() {
 		buf.WriteString(g_sipMethodName[this.method.GetValue()])
 	} else {
@@ -62,7 +62,7 @@ func (this *SipMethod) Encode(context *ParseContext, buf *AbnfByteBuffer) {
  *                     / extension-method
  * extension-method  =  token
  */
-func (this *SipMethod) Parse(context *ParseContext) (ok bool) {
+func (this *SipMethod) Parse(context *Context) (ok bool) {
 	method, newPos := GetSipMethodIndex(context.parseSrc, context.parsePos)
 
 	if method == SIP_METHOD_UNKNOWN {

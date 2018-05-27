@@ -53,7 +53,7 @@ func TestSipStartLineParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -82,7 +82,7 @@ func TestSipStartLineParse(t *testing.T) {
 func BenchmarkSipRequestLineParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("INVITE sip:6135000@24.15.255.4 SIP/2.0\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipStartLine(context)
@@ -107,7 +107,7 @@ func BenchmarkSipRequestLineParse(b *testing.B) {
 func BenchmarkSipRequestLineEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("INVITE sip:6135000@24.15.255.4 SIP/2.0\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipStartLine(context)
@@ -133,7 +133,7 @@ func BenchmarkSipRequestLineEncode(b *testing.B) {
 func BenchmarkSipStatusLineParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("SIP/2.0 200 OK\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipStartLine(context)
@@ -158,7 +158,7 @@ func BenchmarkSipStatusLineParse(b *testing.B) {
 func BenchmarkSipStatusLineEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("SIP/2.0 200 OK\r\n")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipStartLine(context)

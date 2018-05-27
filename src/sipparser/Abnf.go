@@ -25,10 +25,10 @@ type AbnfPos = uint
 type AbnfIsInCharset func(ch byte) bool
 
 type AbnfEncoder interface {
-	Encode(context *ParseContext, buf *AbnfByteBuffer)
+	Encode(context *Context, buf *AbnfByteBuffer)
 }
 
-func AbnfEncoderToString(context *ParseContext, encoder AbnfEncoder) string {
+func AbnfEncoderToString(context *Context, encoder AbnfEncoder) string {
 	//var buf AbnfByteBuffer
 	buf := NewAbnfByteBuffer(make([]byte, 64))
 	encoder.Encode(context, buf)

@@ -20,7 +20,7 @@ func TestAbnfPtrCStringEqualNoCase(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 10)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -36,7 +36,7 @@ func TestAbnfPtrCStringEqualNoCase(t *testing.T) {
 
 func BenchmarkAbnfPtrStrlen(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	data := []byte("01234567890123456789")
 	addr := AllocCString(context, data)
@@ -55,7 +55,7 @@ func BenchmarkAbnfPtrStrlen(b *testing.B) {
 
 func BenchmarkAbnfPtrStrlen2(b *testing.B) {
 	b.StopTimer()
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	data := []byte("01234567890123456789")
 	addr := AllocCString(context, data)

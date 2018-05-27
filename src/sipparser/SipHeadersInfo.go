@@ -1,9 +1,9 @@
 package sipparser
 
-type SipPaseOneHeaderValue func(context *ParseContext) (parsed AbnfPtr, ok bool)
-type SipEncodeOneHeaderValue func(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer)
-type SipAppendOneHeaderValue func(context *ParseContext, parsed AbnfPtr, header AbnfPtr)
-type SipGetNextHeaderValue func(context *ParseContext, parsed AbnfPtr) AbnfPtr
+type SipPaseOneHeaderValue func(context *Context) (parsed AbnfPtr, ok bool)
+type SipEncodeOneHeaderValue func(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer)
+type SipAppendOneHeaderValue func(context *Context, parsed AbnfPtr, header AbnfPtr)
+type SipGetNextHeaderValue func(context *Context, parsed AbnfPtr) AbnfPtr
 
 type SipHeaderIndexType uint16
 

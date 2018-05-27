@@ -15,7 +15,7 @@ func SizeofSipHeaderRAck() int {
 	return int(unsafe.Sizeof(SipHeaderRAck{}))
 }
 
-func NewSipHeaderRAck(context *ParseContext) AbnfPtr {
+func NewSipHeaderRAck(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderRAck()))
 }
 
@@ -27,16 +27,16 @@ func (this *SipHeaderRAck) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderRAck())
 }
 
-func (this *SipHeaderRAck) String(context *ParseContext) string {
+func (this *SipHeaderRAck) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderRAck) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderRAck) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("RAck: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderRAck) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderRAck) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	EncodeUInt(buf, uint64(this.rseq))
 	buf.WriteByte(' ')
 	EncodeUInt(buf, uint64(this.cseq))
@@ -51,12 +51,12 @@ func (this *SipHeaderRAck) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
  * CSeq-num      =  1*DIGIT
  *
  */
-func (this *SipHeaderRAck) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderRAck) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderRAck) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderRAck) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for RAck header")
@@ -72,12 +72,12 @@ func (this *SipHeaderRAck) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderRAck) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderRAck) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderRAck) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderRAck) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -119,7 +119,7 @@ func (this *SipHeaderRAck) ParseValueWithoutInit(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipHeaderRAck) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderRAck) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -141,7 +141,7 @@ func (this *SipHeaderRAck) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipRAck(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipRAck(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderRAck(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for RAck header")
@@ -151,7 +151,7 @@ func ParseSipRAck(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipRAckValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipRAckValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

@@ -14,7 +14,7 @@ func SizeofSipHeaderCSeq() int {
 	return int(unsafe.Sizeof(SipHeaderCSeq{}))
 }
 
-func NewSipHeaderCSeq(context *ParseContext) AbnfPtr {
+func NewSipHeaderCSeq(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderCSeq()))
 }
 
@@ -26,16 +26,16 @@ func (this *SipHeaderCSeq) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderCSeq())
 }
 
-func (this *SipHeaderCSeq) String(context *ParseContext) string {
+func (this *SipHeaderCSeq) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderCSeq) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderCSeq) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("CSeq: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderCSeq) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderCSeq) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	EncodeUInt(buf, uint64(this.id))
 	buf.WriteByte(' ')
 	this.method.Encode(context, buf)
@@ -46,12 +46,12 @@ func (this *SipHeaderCSeq) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
  * CSeq  =  "CSeq" HCOLON 1*DIGIT LWS Method
  *
  */
-func (this *SipHeaderCSeq) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderCSeq) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderCSeq) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderCSeq) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for CSeq header")
@@ -67,12 +67,12 @@ func (this *SipHeaderCSeq) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderCSeq) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderCSeq) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderCSeq) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderCSeq) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -98,7 +98,7 @@ func (this *SipHeaderCSeq) ParseValueWithoutInit(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipHeaderCSeq) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderCSeq) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -120,7 +120,7 @@ func (this *SipHeaderCSeq) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipCSeq(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipCSeq(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderCSeq(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for CSeq header")
@@ -130,7 +130,7 @@ func ParseSipCSeq(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipCSeqValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipCSeqValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

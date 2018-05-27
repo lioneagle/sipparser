@@ -13,7 +13,7 @@ func SizeofSipHeaderRSeq() int {
 	return int(unsafe.Sizeof(SipHeaderRSeq{}))
 }
 
-func NewSipHeaderRSeq(context *ParseContext) AbnfPtr {
+func NewSipHeaderRSeq(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderRSeq()))
 }
 
@@ -25,16 +25,16 @@ func (this *SipHeaderRSeq) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderRSeq())
 }
 
-func (this *SipHeaderRSeq) String(context *ParseContext) string {
+func (this *SipHeaderRSeq) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderRSeq) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderRSeq) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("RSeq: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderRSeq) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderRSeq) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	EncodeUInt(buf, uint64(this.size))
 }
 
@@ -43,12 +43,12 @@ func (this *SipHeaderRSeq) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
  * RSeq          =  "RSeq" HCOLON response-num
  * response-num  =  1*DIGIT
  */
-func (this *SipHeaderRSeq) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderRSeq) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderRSeq) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderRSeq) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for RSeq header")
@@ -64,12 +64,12 @@ func (this *SipHeaderRSeq) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderRSeq) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderRSeq) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderRSeq) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderRSeq) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -82,7 +82,7 @@ func (this *SipHeaderRSeq) ParseValueWithoutInit(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipHeaderRSeq) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderRSeq) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -104,7 +104,7 @@ func (this *SipHeaderRSeq) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipRSeq(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipRSeq(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderRSeq(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for RSeq header")
@@ -114,7 +114,7 @@ func ParseSipRSeq(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipRSeqValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipRSeqValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

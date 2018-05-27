@@ -37,7 +37,7 @@ func SizeofTelUriKnownParams() int {
 	return int(unsafe.Sizeof(TelUriKnownParams{}))
 }
 
-func NewTelUriKnownParams(context *ParseContext) AbnfPtr {
+func NewTelUriKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofTelUriKnownParams()))
 }
 
@@ -54,7 +54,7 @@ func SizeofTelUri() int {
 	return int(unsafe.Sizeof(TelUri{}))
 }
 
-func NewTelUri(context *ParseContext) AbnfPtr {
+func NewTelUri(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofTelUri()))
 }
 
@@ -66,11 +66,11 @@ func (this *TelUri) memAddr() uintptr {
 	return uintptr(unsafe.Pointer(this))
 }
 
-func (this *TelUri) String(context *ParseContext) string {
+func (this *TelUri) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *TelUri) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *TelUri) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("tel:")
 	this.number.WriteCString(context, buf)
 
@@ -88,7 +88,7 @@ func (this *TelUri) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *TelUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *TelUri) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -105,7 +105,7 @@ func (this *TelUri) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer
 	}
 }
 
-func (this *TelUri) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) (ok bool) {
+func (this *TelUri) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) (ok bool) {
 	if name.CStringEqualNoCase(context, StringToByteSlice("phone-context")) {
 		this.context = param
 		this.ContextIsDomain = (param.GetUriParam(context).value.GetCStringAsByteSlice(context)[0] != '+')
@@ -140,12 +140,12 @@ func (this *TelUri) SetKnownParams(context *ParseContext, name AbnfPtr, param Ab
 	return false
 }
 
-func (this *TelUri) Parse(context *ParseContext) (ok bool) {
+func (this *TelUri) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *TelUri) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *TelUri) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseScheme(context)
 	if !ok {
 		return false
@@ -154,11 +154,11 @@ func (this *TelUri) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseAfterSchemeWithoutInit(context)
 }
 
-func (this *TelUri) ParseAfterScheme(context *ParseContext) (ok bool) {
+func (this *TelUri) ParseAfterScheme(context *Context) (ok bool) {
 	return this.ParseAfterSchemeWithoutInit(context)
 }
 
-func (this *TelUri) ParseAfterSchemeWithoutInit(context *ParseContext) (ok bool) {
+func (this *TelUri) ParseAfterSchemeWithoutInit(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	ok = this.parseNumber(context)
 	if !ok {
@@ -182,11 +182,11 @@ func (this *TelUri) ParseAfterSchemeWithoutInit(context *ParseContext) (ok bool)
 	return true
 }
 
-func (this *TelUri) ParseAfterSchemeWithoutParam(context *ParseContext) (ok bool) {
+func (this *TelUri) ParseAfterSchemeWithoutParam(context *Context) (ok bool) {
 	return this.parseNumber(context)
 }
 
-func (this *TelUri) parseNumber(context *ParseContext) (ok bool) {
+func (this *TelUri) parseNumber(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	if context.parsePos >= len1 {
@@ -210,7 +210,7 @@ func (this *TelUri) parseNumber(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *TelUri) parseGlobalNumber(context *ParseContext) (ok bool) {
+func (this *TelUri) parseGlobalNumber(context *Context) (ok bool) {
 	this.number, ok = context.allocator.ParseAndAllocTelNumberRemoveVisualSeperator(context, ABNF_CHARSET_TEL_PHONE_DIGIT, ABNF_CHARSET_MASK_TEL_PHONE_DIGIT)
 	if !ok {
 		context.AddError(context.parsePos, "parse global-number failed for tel uri")
@@ -219,7 +219,7 @@ func (this *TelUri) parseGlobalNumber(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *TelUri) parseLocalNumber(context *ParseContext) (ok bool) {
+func (this *TelUri) parseLocalNumber(context *Context) (ok bool) {
 	this.number, ok = context.allocator.ParseAndAllocTelNumberRemoveVisualSeperator(context, ABNF_CHARSET_TEL_PHONE_DIGIT_HEX, ABNF_CHARSET_MASK_TEL_PHONE_DIGIT_HEX)
 	if !ok {
 		context.AddError(context.parsePos, "parse local-number failed for tel uri")
@@ -228,7 +228,7 @@ func (this *TelUri) parseLocalNumber(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *TelUri) parseScheme(context *ParseContext) (ok bool) {
+func (this *TelUri) parseScheme(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos

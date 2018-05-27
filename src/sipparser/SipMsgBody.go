@@ -38,7 +38,7 @@ func SizeofSipMsgBody() int {
 	return int(unsafe.Sizeof(SipMsgBody{}))
 }
 
-func NewSipMsgBody(context *ParseContext) AbnfPtr {
+func NewSipMsgBody(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipMsgBody()))
 }
 
@@ -50,7 +50,7 @@ func (this *SipMsgBody) Init() {
 	ZeroMem(this.memAddr(), SizeofSipMsgBody())
 }
 
-func (this *SipMsgBody) NeedParse(context *ParseContext, headerIndex SipHeaderIndexType) bool {
+func (this *SipMsgBody) NeedParse(context *Context, headerIndex SipHeaderIndexType) bool {
 	if context.ParseSipHeaderAsRaw {
 		return headerIndex == SIP_HDR_CONTENT_TYPE || headerIndex == SIP_HDR_CONTENT_LENGTH ||
 			headerIndex == SIP_HDR_CONTENT_DISPOSITION
@@ -58,7 +58,7 @@ func (this *SipMsgBody) NeedParse(context *ParseContext, headerIndex SipHeaderIn
 	return g_SipMsgBodyHeaderIndexToCommonIndex[headerIndex] != 0
 }
 
-func (this *SipMsgBody) SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
+func (this *SipMsgBody) SetHeaders(context *Context, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
 	commomHeaderIndex := g_SipMsgBodyHeaderIndexToCommonIndex[headerIndex]
 	if this.NeedParse(context, headerIndex) {
 		if context.SipHeaders[headerIndex].AllowMulti {
@@ -84,7 +84,7 @@ func (this *SipMsgBody) SetHeaders(context *ParseContext, headerIndex SipHeaderI
 	return true
 }
 
-func (this *SipMsgBody) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipMsgBody) Encode(context *Context, buf *AbnfByteBuffer) {
 	ptr := this.commonHeaders[SIP_BODY_COMMON_HDR_CONTENT_LENGTH]
 	if ptr != ABNF_PTR_NIL {
 		ptr.GetSipHeaderContentLength(context).size = uint32(this.body.Strlen(context))
@@ -95,7 +95,7 @@ func (this *SipMsgBody) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	this.body.WriteCString(context, buf)
 }
 
-func (this *SipMsgBody) EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipMsgBody) EncodeHeaders(context *Context, buf *AbnfByteBuffer) {
 	len1 := len(this.commonHeaders)
 	for i := 1; i < len1; i++ {
 		v := this.commonHeaders[i]

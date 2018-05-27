@@ -29,7 +29,7 @@ func SizeofSipContactKnownParams() int {
 	return int(unsafe.Sizeof(SipContactKnownParams{}))
 }
 
-func NewSipContactKnownParams(context *ParseContext) AbnfPtr {
+func NewSipContactKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipContactKnownParams()))
 }
 
@@ -45,7 +45,7 @@ func SizeofSipHeaderContact() int {
 	return int(unsafe.Sizeof(SipHeaderContact{}))
 }
 
-func NewSipHeaderContact(context *ParseContext) AbnfPtr {
+func NewSipHeaderContact(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderContact()))
 }
 
@@ -57,16 +57,16 @@ func (this *SipHeaderContact) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderContact())
 }
 
-func (this *SipHeaderContact) String(context *ParseContext) string {
+func (this *SipHeaderContact) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderContact) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContact) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Contact: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderContact) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContact) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	if this.isStar {
 		buf.WriteByte('*')
 	} else {
@@ -137,12 +137,12 @@ func (this *SipHeaderContact) EncodeValue(context *ParseContext, buf *AbnfByteBu
  * instance-val   = *uric ; defined in RFC 2396
  *
  */
-func (this *SipHeaderContact) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderContact) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderContact) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContact) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Contact header")
@@ -158,12 +158,12 @@ func (this *SipHeaderContact) ParseWithoutInit(context *ParseContext) (ok bool) 
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContact) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderContact) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderContact) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderContact) ParseValueWithoutInit(context *Context) (ok bool) {
 	ok = ParseSWS_2(context)
 	if !ok {
 		return false
@@ -199,7 +199,7 @@ func (this *SipHeaderContact) ParseValueWithoutInit(context *ParseContext) (ok b
 	return true
 }
 
-func (this *SipHeaderContact) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderContact) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -216,7 +216,7 @@ func (this *SipHeaderContact) EncodeKnownParams(context *ParseContext, buf *Abnf
 	}
 }
 
-func (this *SipHeaderContact) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderContact) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipContactKnownParam {
 		return false
 	}
@@ -243,7 +243,7 @@ func (this *SipHeaderContact) SetKnownParams(context *ParseContext, name AbnfPtr
 	return false
 }
 
-func (this *SipHeaderContact) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderContact) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -284,7 +284,7 @@ func (this *SipHeaderContact) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipContact(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipContact(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderContact(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Contact header")
@@ -294,14 +294,14 @@ func ParseSipContact(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipContactValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipContactValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
 	parsed.GetSipHeaderContact(context).EncodeValue(context, buf)
 }
 
-func AppendSipContactValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+func AppendSipContactValue(context *Context, parsed AbnfPtr, header AbnfPtr) {
 	for addr := parsed; addr != ABNF_PTR_NIL; {
 		h := addr.GetSipHeaderContact(context)
 		if h.next == ABNF_PTR_NIL {
@@ -312,6 +312,6 @@ func AppendSipContactValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr
 	}
 }
 
-func GetNextContactValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+func GetNextContactValue(context *Context, parsed AbnfPtr) AbnfPtr {
 	return parsed.GetSipHeaderContact(context).next
 }

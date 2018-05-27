@@ -31,7 +31,7 @@ func TestSipHeaderServiceRouteParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -60,7 +60,7 @@ func TestSipHeaderServiceRouteParse(t *testing.T) {
 func BenchmarkSipHeaderServiceRouteParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Service-Route: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderServiceRoute(context)
@@ -85,7 +85,7 @@ func BenchmarkSipHeaderServiceRouteParse(b *testing.B) {
 func BenchmarkSipHeaderServiceRouteEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Service-Route: <sip:abc@biloxi.com;transport=tcp;method=REGISTER>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderServiceRoute(context)

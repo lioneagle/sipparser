@@ -24,7 +24,7 @@ func SizeofSipHostPort() int {
 	return int(unsafe.Sizeof(SipHostPort{}))
 }
 
-func NewSipHostPort(context *ParseContext) AbnfPtr {
+func NewSipHostPort(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHostPort()))
 }
 
@@ -48,11 +48,11 @@ func (this *SipHostPort) memAddr() uintptr {
 	return uintptr(unsafe.Pointer(this))
 }
 
-func (this *SipHostPort) String(context *ParseContext) string {
+func (this *SipHostPort) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHostPort) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHostPort) Encode(context *Context, buf *AbnfByteBuffer) {
 	this.EncodeHost(context, buf)
 	if this.hasPort {
 		buf.WriteByte(':')
@@ -60,7 +60,7 @@ func (this *SipHostPort) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *SipHostPort) EncodeHost(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHostPort) EncodeHost(context *Context, buf *AbnfByteBuffer) {
 	/*
 		if this.id == HOST_TYPE_IPV4 {
 			this.WriteIpv4AsString(context, buf)
@@ -89,7 +89,7 @@ func (this *SipHostPort) EncodeHost(context *ParseContext, buf *AbnfByteBuffer) 
 	} //*/
 }
 
-func (this *SipHostPort) WriteIpv4AsString(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHostPort) WriteIpv4AsString(context *Context, buf *AbnfByteBuffer) {
 	ip := this.data.GetAsByteSlice(context, 4)
 
 	WriteByteAsString(buf, ip[0])
@@ -125,12 +125,12 @@ func WriteByteAsString(buf *AbnfByteBuffer, v byte) {
 
 }
 
-func (this *SipHostPort) Parse(context *ParseContext) (ok bool) {
+func (this *SipHostPort) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHostPort) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHostPort) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.ParseHost(context)
 	if !ok {
 		context.AddError(context.parsePos, "sip-hostport parse: parse host failed")
@@ -165,7 +165,7 @@ func (this *SipHostPort) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipHostPort) ParseHost(context *ParseContext) (ok bool) {
+func (this *SipHostPort) ParseHost(context *Context) (ok bool) {
 	if context.parsePos >= AbnfPos(len(context.parseSrc)) {
 		context.AddError(context.parsePos, "sip-hostport parse: reach end at beginning")
 		return false
@@ -197,7 +197,7 @@ func (this *SipHostPort) ParseHost(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipHostPort) parseIpv6(context *ParseContext) (ok bool) {
+func (this *SipHostPort) parseIpv6(context *Context) (ok bool) {
 	pos := context.parsePos
 	len1 := AbnfPos(len(context.parseSrc))
 	for ; context.parsePos < len1; context.parsePos++ {
@@ -226,7 +226,7 @@ func (this *SipHostPort) parseIpv6(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipHostPort) parseIpv4(context *ParseContext) (ip [4]byte, ok bool) {
+func (this *SipHostPort) parseIpv4(context *Context) (ip [4]byte, ok bool) {
 	src := context.parseSrc
 	newPos := context.parsePos
 	len1 := AbnfPos(len(src))
@@ -276,7 +276,7 @@ func (this *SipHostPort) parseIpv4(context *ParseContext) (ip [4]byte, ok bool) 
 	return ip, true
 }
 
-func (this *SipHostPort) parseHostname(context *ParseContext) (ok bool) {
+func (this *SipHostPort) parseHostname(context *Context) (ok bool) {
 	//*
 	this.data, ok = context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_HOSTNAME, ABNF_CHARSET_MASK_HOSTNAME)
 	if ok {
@@ -312,7 +312,7 @@ func (this *SipHostPort) parseHostname(context *ParseContext) (ok bool) {
 
 }
 
-func (this *SipHostPort) SetIpv4(context *ParseContext, ip []byte) bool {
+func (this *SipHostPort) SetIpv4(context *Context, ip []byte) bool {
 	addr := context.allocator.Alloc(4)
 	if addr == ABNF_PTR_NIL {
 		return false
@@ -343,7 +343,7 @@ func (this *SipHostPort) SetIpv4(context *ParseContext, ip []byte) bool {
 	return true
 }
 
-func (this *SipHostPort) SetIpv6(context *ParseContext, ip net.IP) bool {
+func (this *SipHostPort) SetIpv6(context *Context, ip net.IP) bool {
 	addr := context.allocator.Alloc(16)
 	if addr == ABNF_PTR_NIL {
 		return false
@@ -375,7 +375,7 @@ func (this *SipHostPort) SetIpv6(context *ParseContext, ip net.IP) bool {
 	return true
 }
 
-func (this *SipHostPort) SetHostname(context *ParseContext, hostname []byte) bool {
+func (this *SipHostPort) SetHostname(context *Context, hostname []byte) bool {
 	addr := AllocCString(context, hostname)
 	if addr == ABNF_PTR_NIL {
 		return false

@@ -29,7 +29,7 @@ func TestSipHeaderContentDispositionParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -71,7 +71,7 @@ func TestSipHeaderContentDispositionParse2(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -101,7 +101,7 @@ func TestSipHeaderContentDispositionParse2(t *testing.T) {
 func BenchmarkSipHeaderContentDispositionParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Content-Disposition: early-session;handling=optional")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderContentDisposition(context)
@@ -126,7 +126,7 @@ func BenchmarkSipHeaderContentDispositionParse(b *testing.B) {
 func BenchmarkSipHeaderContentDispositionEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Content-Disposition: early-session;handling=optional")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderContentDisposition(context)

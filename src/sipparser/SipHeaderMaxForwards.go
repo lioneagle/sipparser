@@ -13,7 +13,7 @@ func SizeofSipHeaderMaxForwards() int {
 	return int(unsafe.Sizeof(SipHeaderMaxForwards{}))
 }
 
-func NewSipHeaderMaxForwards(context *ParseContext) AbnfPtr {
+func NewSipHeaderMaxForwards(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderMaxForwards()))
 }
 
@@ -25,16 +25,16 @@ func (this *SipHeaderMaxForwards) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderMaxForwards())
 }
 
-func (this *SipHeaderMaxForwards) String(context *ParseContext) string {
+func (this *SipHeaderMaxForwards) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderMaxForwards) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderMaxForwards) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Max-Forwards: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderMaxForwards) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderMaxForwards) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	EncodeUInt(buf, uint64(this.size))
 }
 
@@ -43,12 +43,12 @@ func (this *SipHeaderMaxForwards) EncodeValue(context *ParseContext, buf *AbnfBy
  * Max-Forwards  =  "Max-Forwards" HCOLON 1*DIGIT
  *
  */
-func (this *SipHeaderMaxForwards) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderMaxForwards) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderMaxForwards) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderMaxForwards) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for CSeq header")
@@ -64,12 +64,12 @@ func (this *SipHeaderMaxForwards) ParseWithoutInit(context *ParseContext) (ok bo
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderMaxForwards) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderMaxForwards) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderMaxForwards) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderMaxForwards) ParseValueWithoutInit(context *Context) (ok bool) {
 	digit, _, newPos, ok := ParseUInt(context.parseSrc, context.parsePos)
 	if !ok {
 		context.parsePos = newPos
@@ -82,7 +82,7 @@ func (this *SipHeaderMaxForwards) ParseValueWithoutInit(context *ParseContext) (
 	return true
 }
 
-func (this *SipHeaderMaxForwards) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderMaxForwards) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -112,7 +112,7 @@ func (this *SipHeaderMaxForwards) parseHeaderName(context *ParseContext) (ok boo
 	return false
 }
 
-func ParseSipMaxForwards(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipMaxForwards(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderMaxForwards(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Max-Forwards header")
@@ -122,7 +122,7 @@ func ParseSipMaxForwards(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipMaxForwardsValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipMaxForwardsValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

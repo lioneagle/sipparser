@@ -31,7 +31,7 @@ func TestSipHeaderContactParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -74,7 +74,7 @@ func TestSipHeaderContactParse2(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -105,7 +105,7 @@ func TestSipHeaderContactParse2(t *testing.T) {
 func BenchmarkSipHeaderContactParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: sip:6140000@24.15.255.101:5060")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderContact(context)
@@ -130,7 +130,7 @@ func BenchmarkSipHeaderContactParse(b *testing.B) {
 func BenchmarkSipHeaderContactEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: sip:6140000@24.15.255.101:5060")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderContact(context)
@@ -156,7 +156,7 @@ func BenchmarkSipHeaderContactEncode(b *testing.B) {
 func BenchmarkSipHeaderContactWith2KnownParamsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetSipContactKnownParam = true
@@ -183,7 +183,7 @@ func BenchmarkSipHeaderContactWith2UnknownParamsParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
 	//v := []byte("Contact: <sip:6140000@24.15.255.101:5060>")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetSipContactKnownParam = false
@@ -209,7 +209,7 @@ func BenchmarkSipHeaderContactWith2UnknownParamsParse(b *testing.B) {
 func BenchmarkSipHeaderContactWith2KnownParamsEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetSipContactKnownParam = true
@@ -236,7 +236,7 @@ func BenchmarkSipHeaderContactWith2KnownParamsEncode(b *testing.B) {
 func BenchmarkSipHeaderContactWith2UnknownParamsEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Contact: <sip:6140000@24.15.255.101:5060>;expires=3600;q=0.1")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	context.ParseSetSipContactKnownParam = false

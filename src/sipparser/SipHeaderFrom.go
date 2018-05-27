@@ -27,7 +27,7 @@ func SizeofSipFromKnownParams() int {
 	return int(unsafe.Sizeof(SipFromKnownParams{}))
 }
 
-func NewSipFromKnownParams(context *ParseContext) AbnfPtr {
+func NewSipFromKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipFromKnownParams()))
 }
 
@@ -41,7 +41,7 @@ func SizeofSipHeaderFrom() int {
 	return int(unsafe.Sizeof(SipHeaderFrom{}))
 }
 
-func NewSipHeaderFrom(context *ParseContext) AbnfPtr {
+func NewSipHeaderFrom(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderFrom()))
 }
 
@@ -53,16 +53,16 @@ func (this *SipHeaderFrom) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderFrom())
 }
 
-func (this *SipHeaderFrom) String(context *ParseContext) string {
+func (this *SipHeaderFrom) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderFrom) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderFrom) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("From: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderFrom) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderFrom) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	this.addr.Encode(context, buf)
 	EncodeSipGenericParams(context, buf, this.params, ';', this)
 }
@@ -75,12 +75,12 @@ func (this *SipHeaderFrom) EncodeValue(context *ParseContext, buf *AbnfByteBuffe
  * from-param  =  tag-param / generic-param
  * tag-param   =  "tag" EQUAL token
  */
-func (this *SipHeaderFrom) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderFrom) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderFrom) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderFrom) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for From header")
@@ -96,12 +96,12 @@ func (this *SipHeaderFrom) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderFrom) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderFrom) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderFrom) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderFrom) ParseValueWithoutInit(context *Context) (ok bool) {
 	ok = this.addr.ParseWithoutInit(context, false)
 	if !ok {
 		context.AddError(context.parsePos, "parse sip-addr failed for From header")
@@ -121,7 +121,7 @@ func (this *SipHeaderFrom) ParseValueWithoutInit(context *ParseContext) (ok bool
 	return true
 }
 
-func (this *SipHeaderFrom) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderFrom) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -138,7 +138,7 @@ func (this *SipHeaderFrom) EncodeKnownParams(context *ParseContext, buf *AbnfByt
 	}
 }
 
-func (this *SipHeaderFrom) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderFrom) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipFromKnownParam {
 		return false
 	}
@@ -164,7 +164,7 @@ func (this *SipHeaderFrom) SetKnownParams(context *ParseContext, name AbnfPtr, p
 	return false
 }
 
-func (this *SipHeaderFrom) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderFrom) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -200,7 +200,7 @@ func (this *SipHeaderFrom) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipFrom(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipFrom(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderFrom(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for From header")
@@ -210,7 +210,7 @@ func ParseSipFrom(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipFromValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipFromValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}

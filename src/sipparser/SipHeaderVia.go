@@ -35,7 +35,7 @@ func SizeofSipViaKnownParams() int {
 	return int(unsafe.Sizeof(SipViaKnownParams{}))
 }
 
-func NewSipViaKnownParams(context *ParseContext) AbnfPtr {
+func NewSipViaKnownParams(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipViaKnownParams()))
 }
 
@@ -48,7 +48,7 @@ func SizeofSipSentProtocol() int {
 	return int(unsafe.Sizeof(SipSentProtocol{}))
 }
 
-func NewSipSentProtocol(context *ParseContext) AbnfPtr {
+func NewSipSentProtocol(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipSentProtocol()))
 }
 
@@ -65,7 +65,7 @@ func SizeofSipHeaderVia() int {
 	return int(unsafe.Sizeof(SipHeaderVia{}))
 }
 
-func NewSipHeaderVia(context *ParseContext) AbnfPtr {
+func NewSipHeaderVia(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipHeaderVia()))
 }
 
@@ -77,16 +77,16 @@ func (this *SipHeaderVia) Init() {
 	ZeroMem(this.memAddr(), SizeofSipHeaderTo())
 }
 
-func (this *SipHeaderVia) String(context *ParseContext) string {
+func (this *SipHeaderVia) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipHeaderVia) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderVia) Encode(context *Context, buf *AbnfByteBuffer) {
 	buf.WriteString("Via: ")
 	this.EncodeValue(context, buf)
 }
 
-func (this *SipHeaderVia) EncodeValue(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderVia) EncodeValue(context *Context, buf *AbnfByteBuffer) {
 	if !this.sentProtocol.IsAbnfPtr() {
 		buf.WriteString("SIP/2.0/")
 	} else {
@@ -132,12 +132,12 @@ func (this *SipHeaderVia) EncodeValue(context *ParseContext, buf *AbnfByteBuffer
  *                      / response-port / via-extension
  *
  */
-func (this *SipHeaderVia) Parse(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) Parse(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context)
 }
 
-func (this *SipHeaderVia) ParseWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) ParseWithoutInit(context *Context) (ok bool) {
 	ok = this.parseHeaderName(context)
 	if !ok {
 		context.AddError(context.parsePos, "parse header-name failed for Via header")
@@ -153,12 +153,12 @@ func (this *SipHeaderVia) ParseWithoutInit(context *ParseContext) (ok bool) {
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderVia) ParseValue(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) ParseValue(context *Context) (ok bool) {
 	this.Init()
 	return this.ParseValueWithoutInit(context)
 }
 
-func (this *SipHeaderVia) ParseValueWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) ParseValueWithoutInit(context *Context) (ok bool) {
 	if !this.parseSentProtocol(context) {
 		context.AddError(context.parsePos, "parse sent-protocol failed for Via header")
 		return false
@@ -193,7 +193,7 @@ func (this *SipHeaderVia) ParseValueWithoutInit(context *ParseContext) (ok bool)
 	return true
 }
 
-func (this *SipHeaderVia) parseSentProtocol(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) parseSentProtocol(context *Context) (ok bool) {
 	if ((context.parsePos+6) < AbnfPos(len(context.parseSrc)) &&
 		(context.parseSrc[context.parsePos]|0x20) == 's') &&
 		((context.parseSrc[context.parsePos+1] | 0x20) == 'i') &&
@@ -249,7 +249,7 @@ func (this *SipHeaderVia) parseSentProtocol(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipHeaderVia) EncodeKnownParams(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipHeaderVia) EncodeKnownParams(context *Context, buf *AbnfByteBuffer) {
 	if this.knownParams == ABNF_PTR_NIL {
 		return
 	}
@@ -266,7 +266,7 @@ func (this *SipHeaderVia) EncodeKnownParams(context *ParseContext, buf *AbnfByte
 	}
 }
 
-func (this *SipHeaderVia) SetKnownParams(context *ParseContext, name AbnfPtr, param AbnfPtr) bool {
+func (this *SipHeaderVia) SetKnownParams(context *Context, name AbnfPtr, param AbnfPtr) bool {
 	if !context.ParseSetSipViaKnownParam {
 		return false
 	}
@@ -292,7 +292,7 @@ func (this *SipHeaderVia) SetKnownParams(context *ParseContext, name AbnfPtr, pa
 	return false
 }
 
-func (this *SipHeaderVia) parseHeaderName(context *ParseContext) (ok bool) {
+func (this *SipHeaderVia) parseHeaderName(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos
@@ -327,7 +327,7 @@ func (this *SipHeaderVia) parseHeaderName(context *ParseContext) (ok bool) {
 	return false
 }
 
-func ParseSipVia(context *ParseContext) (parsed AbnfPtr, ok bool) {
+func ParseSipVia(context *Context) (parsed AbnfPtr, ok bool) {
 	addr := NewSipHeaderVia(context)
 	if addr == ABNF_PTR_NIL {
 		context.AddError(context.parsePos, "no mem for Via header")
@@ -337,14 +337,14 @@ func ParseSipVia(context *ParseContext) (parsed AbnfPtr, ok bool) {
 	return addr, ok
 }
 
-func EncodeSipViaValue(parsed AbnfPtr, context *ParseContext, buf *AbnfByteBuffer) {
+func EncodeSipViaValue(parsed AbnfPtr, context *Context, buf *AbnfByteBuffer) {
 	if parsed == ABNF_PTR_NIL {
 		return
 	}
 	parsed.GetSipHeaderVia(context).EncodeValue(context, buf)
 }
 
-func AppendSipViaValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
+func AppendSipViaValue(context *Context, parsed AbnfPtr, header AbnfPtr) {
 	for addr := parsed; addr != ABNF_PTR_NIL; {
 		h := addr.GetSipHeaderVia(context)
 		if h.next == ABNF_PTR_NIL {
@@ -355,6 +355,6 @@ func AppendSipViaValue(context *ParseContext, parsed AbnfPtr, header AbnfPtr) {
 	}
 }
 
-func GetNextViaValue(context *ParseContext, parsed AbnfPtr) AbnfPtr {
+func GetNextViaValue(context *Context, parsed AbnfPtr) AbnfPtr {
 	return parsed.GetSipHeaderVia(context).next
 }

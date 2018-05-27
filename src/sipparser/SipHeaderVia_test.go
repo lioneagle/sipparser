@@ -32,7 +32,7 @@ func TestSipHeaderViaParse(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -74,7 +74,7 @@ func TestSipHeaderViaParse2(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			context := NewParseContext()
+			context := NewContext()
 			context.allocator = NewMemAllocator(1024 * 2)
 			context.SetParseSrc([]byte(v.src))
 			context.SetParsePos(0)
@@ -104,7 +104,7 @@ func TestSipHeaderViaParse2(t *testing.T) {
 func BenchmarkSipHeaderViaParse(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Via: SIP/2.0/UDP 24.15.255.101:5060;branch=072c09e5.0")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderVia(context)
@@ -129,7 +129,7 @@ func BenchmarkSipHeaderViaParse(b *testing.B) {
 func BenchmarkSipHeaderViaEncode(b *testing.B) {
 	b.StopTimer()
 	v := []byte("Via: SIP/2.0/UDP 24.15.255.101:5060;branch=072c09e5.0")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024 * 30)
 	context.SetParseSrc(v)
 	addr := NewSipHeaderVia(context)

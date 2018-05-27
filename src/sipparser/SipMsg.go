@@ -106,7 +106,7 @@ func SizeofSipMsg() int {
 	return int(unsafe.Sizeof(SipMsg{}))
 }
 
-func NewSipMsg(context *ParseContext) AbnfPtr {
+func NewSipMsg(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipMsg()))
 }
 
@@ -118,15 +118,19 @@ func (this *SipMsg) Init() {
 	ZeroMem(this.memAddr(), SizeofSipMsg())
 }
 
-func (this *SipMsg) NeedParse(context *ParseContext, headerIndex SipHeaderIndexType) bool {
+func (this *SipMsg) NeedParse(context *Context, headerIndex SipHeaderIndexType) bool {
 	if context.ParseSipHeaderAsRaw {
 		return headerIndex == SIP_HDR_CONTENT_TYPE || headerIndex == SIP_HDR_CONTENT_LENGTH ||
 			headerIndex == SIP_HDR_CONTENT_DISPOSITION
 	}
-	return g_SipMsgHeaderIndexToCommonIndex[headerIndex] != 0
+
+	if g_SipMsgHeaderIndexToCommonIndex[headerIndex] != 0 {
+		return context.SipHeaders[headerIndex].NeedParse
+	}
+	return false
 }
 
-func (this *SipMsg) SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
+func (this *SipMsg) SetHeaders(context *Context, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
 	commomHeaderIndex := g_SipMsgHeaderIndexToCommonIndex[headerIndex]
 	if this.NeedParse(context, headerIndex) {
 		if context.SipHeaders[headerIndex].AllowMulti {
@@ -154,7 +158,7 @@ func (this *SipMsg) SetHeaders(context *ParseContext, headerIndex SipHeaderIndex
 	return true
 }
 
-func (this *SipMsg) EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipMsg) EncodeHeaders(context *Context, buf *AbnfByteBuffer) {
 	len1 := len(this.commonHeaders)
 	for i := 1; i < len1; i++ {
 		v := this.commonHeaders[i]
@@ -181,13 +185,13 @@ func (this *SipMsg) EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *SipMsg) String(context *ParseContext) string {
+func (this *SipMsg) String(context *Context) string {
 	var buf AbnfByteBuffer
 	this.Encode(context, &buf)
 	return buf.String()
 }
 
-func (this *SipMsg) Encode(context *ParseContext, buf *AbnfByteBuffer) (ok bool) {
+func (this *SipMsg) Encode(context *Context, buf *AbnfByteBuffer) (ok bool) {
 
 	hasMultiBody := this.HasMultiBody(context)
 
@@ -249,7 +253,7 @@ func (this *SipMsg) Encode(context *ParseContext, buf *AbnfByteBuffer) (ok bool)
 	return true
 }
 
-func (this *SipMsg) FindOrCreateBoundary(context *ParseContext) (boundary []byte) {
+func (this *SipMsg) FindOrCreateBoundary(context *Context) (boundary []byte) {
 	var contentType *SipHeaderContentType
 
 	if this.commonHeaders[SIP_MSG_COMMON_HDR_CONTENT_TYPE] == ABNF_PTR_NIL {
@@ -286,7 +290,7 @@ func (this *SipMsg) FindOrCreateBoundary(context *ParseContext) (boundary []byte
 	return addr.GetSipGenericParam(context).value.GetCStringAsByteSlice(context)
 }
 
-func (this *SipMsg) GetHeaderByIndex(context *ParseContext, headerIndex SipHeaderIndexType) (header AbnfPtr, isCommonHeader bool) {
+func (this *SipMsg) GetHeaderByIndex(context *Context, headerIndex SipHeaderIndexType) (header AbnfPtr, isCommonHeader bool) {
 	for i, v := range this.commonHeaders {
 		if (v != ABNF_PTR_NIL) && (g_SipMsgCommonIndexToHeaderIndex[i] == headerIndex) {
 			return v, true
@@ -305,7 +309,7 @@ func (this *SipMsg) GetHeaderByIndex(context *ParseContext, headerIndex SipHeade
 }
 
 // remove Content-* headers from sip msg except Content-Length and Content-Type
-func (this *SipMsg) RemoveContentHeaders(context *ParseContext) (ok bool) {
+func (this *SipMsg) RemoveContentHeaders(context *Context) (ok bool) {
 	// Content-Length, Content-Type and Content-Disposition are common headers
 	// now there is no other Content-* headers for sip msg common headers
 	var prevHeader *SipHeader = nil
@@ -338,7 +342,7 @@ func (this *SipMsg) RemoveContentHeaders(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipMsg) EncodeSingleMsgBody(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipMsg) EncodeSingleMsgBody(context *Context, buf *AbnfByteBuffer) {
 	for _, v := range this.commonBodies {
 		if v != ABNF_PTR_NIL {
 			v.GetSipMsgBody(context).body.WriteCString(context, buf)
@@ -351,7 +355,7 @@ func (this *SipMsg) EncodeSingleMsgBody(context *ParseContext, buf *AbnfByteBuff
 	}
 }
 
-func (this *SipMsg) EncodeMultiMsgBody(context *ParseContext, buf *AbnfByteBuffer, boundary []byte) {
+func (this *SipMsg) EncodeMultiMsgBody(context *Context, buf *AbnfByteBuffer, boundary []byte) {
 	for _, v := range this.commonBodies {
 		if v != ABNF_PTR_NIL {
 			// dash-boundary
@@ -382,7 +386,7 @@ func (this *SipMsg) EncodeMultiMsgBody(context *ParseContext, buf *AbnfByteBuffe
 	buf.WriteString("--")
 }
 
-func (this *SipMsg) HasMultiBody(context *ParseContext) bool {
+func (this *SipMsg) HasMultiBody(context *Context) bool {
 	count := 0
 	for _, v := range this.commonBodies {
 		if v != ABNF_PTR_NIL {
@@ -404,7 +408,7 @@ func (this *SipMsg) HasMultiBody(context *ParseContext) bool {
 	return false
 }
 
-func (this *SipMsg) Parse(context *ParseContext) (ok bool) {
+func (this *SipMsg) Parse(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 
 	this.Init()
@@ -434,7 +438,7 @@ func (this *SipMsg) Parse(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipMsg) ParseMsgBody(context *ParseContext) (ok bool) {
+func (this *SipMsg) ParseMsgBody(context *Context) (ok bool) {
 	ptr := this.commonHeaders[SIP_MSG_COMMON_HDR_CONTENT_TYPE]
 	if ptr == ABNF_PTR_NIL {
 		// no Content-Type means no msg-body
@@ -458,7 +462,7 @@ func (this *SipMsg) ParseMsgBody(context *ParseContext) (ok bool) {
 	return this.ParseSingleBody(context)
 }
 
-func (this *SipMsg) ParseSingleBody(context *ParseContext) (ok bool) {
+func (this *SipMsg) ParseSingleBody(context *Context) (ok bool) {
 	var bodySize int
 
 	left := len(context.parseSrc) - int(context.parsePos)
@@ -645,7 +649,7 @@ func (this *SipMsg) CopyContentToSipMsgBody(context *ParseContext, body *SipMsgB
  *                                             ;  NOT recognized.
  * LWSP-char   =  SPACE / HTAB                 ; semantics = SPACE
  */
-func (this *SipMsg) ParseMultiBody(context *ParseContext, boundary AbnfPtr) (ok bool) {
+func (this *SipMsg) ParseMultiBody(context *Context, boundary AbnfPtr) (ok bool) {
 	b := boundary.GetCStringAsByteSlice(context)
 
 	dash_boundary := append([]byte{'-', '-'}, b...)
@@ -719,7 +723,7 @@ func (this *SipMsg) ParseMultiBody(context *ParseContext, boundary AbnfPtr) (ok 
 	return false
 }
 
-func SipMsgRawScan(context *ParseContext) (ok bool) {
+func SipMsgRawScan(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 
@@ -778,7 +782,7 @@ func ByteSliceIndexNoCase(src []byte, pos AbnfPos, find []byte) (newPos AbnfPos,
 	return newPos - 1, true
 }
 
-func FindSipHeader1(context *ParseContext, name []byte, buf *AbnfByteBuffer) (ok bool) {
+func FindSipHeader1(context *Context, name []byte, buf *AbnfByteBuffer) (ok bool) {
 	src := context.parseSrc
 	newPos := context.parsePos
 	firstTime := true
@@ -872,7 +876,7 @@ func FindSipHeader1(context *ParseContext, name []byte, buf *AbnfByteBuffer) (ok
 	return num > 0
 }
 
-func FindSipHeader2(context *ParseContext, name []byte, shortname []byte) (newPos AbnfPos, ok bool) {
+func FindSipHeader2(context *Context, name []byte, shortname []byte) (newPos AbnfPos, ok bool) {
 	src := context.parseSrc
 	newPos = context.parsePos
 	len1 := AbnfPos(len(src))

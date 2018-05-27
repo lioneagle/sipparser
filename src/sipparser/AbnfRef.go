@@ -185,7 +185,7 @@ func (this *AbnfRef) ParseEscapable2(src []byte, pos AbnfPos, charset *[256]uint
 	return escapeNum, newPos, true
 }
 
-func ParseAndAllocSipToken(context *ParseContext, src []byte, pos AbnfPos) (addr AbnfPtr, ok bool) {
+func ParseAndAllocSipToken(context *Context, src []byte, pos AbnfPos) (addr AbnfPtr, ok bool) {
 	ref := AbnfRef{}
 	newPos := ref.Parse(src, pos, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
 
@@ -199,6 +199,6 @@ func ParseAndAllocSipToken(context *ParseContext, src []byte, pos AbnfPos) (addr
 	return addr, true
 }
 
-func ParseAndAllocSipToken2(context *ParseContext) (addr AbnfPtr, ok bool) {
+func ParseAndAllocSipToken2(context *Context) (addr AbnfPtr, ok bool) {
 	return context.allocator.ParseAndAllocCString(context, ABNF_CHARSET_SIP_USER, ABNF_CHARSET_MASK_SIP_USER)
 }

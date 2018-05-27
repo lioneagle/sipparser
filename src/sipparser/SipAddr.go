@@ -32,7 +32,7 @@ func SizeofSipAddr() int {
 	return int(unsafe.Sizeof(SipAddr{}))
 }
 
-func NewSipAddr(context *ParseContext) AbnfPtr {
+func NewSipAddr(context *Context) AbnfPtr {
 	return context.allocator.AllocWithClear(uint32(SizeofSipAddr()))
 }
 
@@ -48,11 +48,11 @@ func (this *SipAddr) hasDisplayName() bool { return this.displayName == ABNF_PTR
 func (this *SipAddr) IsSipUri() bool       { return this.uriType == ABNF_URI_SIP }
 func (this *SipAddr) IsSipsUri() bool      { return this.uriType == ABNF_URI_SIPS }
 
-func (this *SipAddr) String(context *ParseContext) string {
+func (this *SipAddr) String(context *Context) string {
 	return AbnfEncoderToString(context, this)
 }
 
-func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipAddr) Encode(context *Context, buf *AbnfByteBuffer) {
 	if this.addrType == ABNF_SIP_NAME_ADDR || context.EncodeUriAsNameSpace {
 		if this.displayName != ABNF_PTR_NIL {
 			if this.displayNameIsQuotedString {
@@ -82,7 +82,7 @@ func (this *SipAddr) Encode(context *ParseContext, buf *AbnfByteBuffer) {
 	}
 }
 
-func (this *SipAddr) EncodeAddrSpec(context *ParseContext, buf *AbnfByteBuffer) {
+func (this *SipAddr) EncodeAddrSpec(context *Context, buf *AbnfByteBuffer) {
 	if this.addr != ABNF_PTR_NIL {
 		switch this.uriType {
 		case ABNF_URI_SIP:
@@ -100,7 +100,7 @@ func (this *SipAddr) EncodeAddrSpec(context *ParseContext, buf *AbnfByteBuffer) 
  * RAQUOT  =  ">" SWS ; right angle quote
  * LAQUOT  =  SWS "<"; left angle quote
  */
-func (this *SipAddr) Parse(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+func (this *SipAddr) Parse(context *Context, parseAddrSpecParam bool) (ok bool) {
 	this.Init()
 	return this.ParseWithoutInit(context, parseAddrSpecParam)
 }
@@ -112,7 +112,7 @@ func (this *SipAddr) Parse(context *ParseContext, parseAddrSpecParam bool) (ok b
  * RAQUOT  =  ">" SWS ; right angle quote
  * LAQUOT  =  SWS "<"; left angle quote
  */
-func (this *SipAddr) ParseWithoutInit(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+func (this *SipAddr) ParseWithoutInit(context *Context, parseAddrSpecParam bool) (ok bool) {
 	begin := context.parsePos
 	if context.parsePos >= AbnfPos(len(context.parseSrc)) {
 		context.AddError(context.parsePos, "no value for sip addr")
@@ -133,7 +133,7 @@ func (this *SipAddr) ParseWithoutInit(context *ParseContext, parseAddrSpecParam 
 
 }
 
-func (this *SipAddr) ParseNameAddrWithoutInit(context *ParseContext) (ok bool) {
+func (this *SipAddr) ParseNameAddrWithoutInit(context *Context) (ok bool) {
 	context.parsePos, ok = ParseSWS(context.parseSrc, context.parsePos)
 	if !ok {
 		return false
@@ -178,7 +178,7 @@ func (this *SipAddr) ParseNameAddrWithoutInit(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipAddr) parsAddrSpecWithoutInit(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+func (this *SipAddr) parsAddrSpecWithoutInit(context *Context, parseAddrSpecParam bool) (ok bool) {
 	ok = this.ParseScheme(context)
 	if !ok {
 		return false
@@ -194,7 +194,7 @@ func (this *SipAddr) parsAddrSpecWithoutInit(context *ParseContext, parseAddrSpe
 	return true
 }
 
-func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpecParam bool) (ok bool) {
+func (this *SipAddr) parsAddrSpecAfterScheme(context *Context, parseAddrSpecParam bool) (ok bool) {
 	switch this.uriType {
 	case ABNF_URI_SIP:
 		this.addr = NewSipUri(context)
@@ -242,7 +242,7 @@ func (this *SipAddr) parsAddrSpecAfterScheme(context *ParseContext, parseAddrSpe
  *
  * display-name   =  *(token LWS)/ quoted-string
  */
-func (this *SipAddr) parseDisplayName(context *ParseContext) (ok bool) {
+func (this *SipAddr) parseDisplayName(context *Context) (ok bool) {
 	len1 := AbnfPos(len(context.parseSrc))
 	if context.parsePos >= len1 {
 		return true
@@ -262,7 +262,7 @@ func (this *SipAddr) parseDisplayName(context *ParseContext) (ok bool) {
 
 }
 
-func (this *SipAddr) parseTokens(context *ParseContext) (ok bool) {
+func (this *SipAddr) parseTokens(context *Context) (ok bool) {
 	//TODO: parse and alloc mem in future
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
@@ -296,7 +296,7 @@ func (this *SipAddr) parseTokens(context *ParseContext) (ok bool) {
 	return true
 }
 
-func (this *SipAddr) ParseScheme(context *ParseContext) (ok bool) {
+func (this *SipAddr) ParseScheme(context *Context) (ok bool) {
 	src := context.parseSrc
 	len1 := AbnfPos(len(context.parseSrc))
 	pos := context.parsePos

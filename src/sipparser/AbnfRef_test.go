@@ -152,7 +152,7 @@ func BenchmarkAbnfRefParseEscapableSipUser3(b *testing.B) {
 func BenchmarkParseAndAllocSipToken1(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
@@ -170,7 +170,7 @@ func BenchmarkParseAndAllocSipToken1(b *testing.B) {
 func BenchmarkParseAndAllocSipToken2(b *testing.B) {
 	b.StopTimer()
 	src := []byte("+01234567890%230123456789")
-	context := NewParseContext()
+	context := NewContext()
 	context.allocator = NewMemAllocator(1024)
 	context.SetParseSrc(src)
 
