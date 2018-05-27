@@ -129,11 +129,11 @@ func (this *SipMsg) NeedParse(context *ParseContext, headerIndex SipHeaderIndexT
 func (this *SipMsg) SetHeaders(context *ParseContext, headerIndex SipHeaderIndexType, header AbnfPtr) bool {
 	commomHeaderIndex := g_SipMsgHeaderIndexToCommonIndex[headerIndex]
 	if this.NeedParse(context, headerIndex) {
-		if g_SipHeaderInfos[headerIndex].allowMulti {
+		if context.SipHeaders[headerIndex].AllowMulti {
 			if this.commonHeaders[commomHeaderIndex] == ABNF_PTR_NIL {
 				this.commonHeaders[commomHeaderIndex] = header
 			} else {
-				g_SipHeaderInfos[headerIndex].appendFunc(context, this.commonHeaders[commomHeaderIndex], header)
+				context.SipHeaders[headerIndex].AppendFunc(context, this.commonHeaders[commomHeaderIndex], header)
 			}
 		} else {
 			this.commonHeaders[commomHeaderIndex] = header
@@ -161,16 +161,16 @@ func (this *SipMsg) EncodeHeaders(context *ParseContext, buf *AbnfByteBuffer) {
 		if v == ABNF_PTR_NIL {
 			continue
 		}
-		info := g_SipHeaderInfos[g_SipMsgCommonIndexToHeaderIndex[i]]
-		buf.Write(info.name)
+		info := context.SipHeaders[g_SipMsgCommonIndexToHeaderIndex[i]]
+		buf.Write(info.Name)
 		buf.WriteString(": ")
-		info.encodeFunc(v, context, buf)
-		if info.allowMulti {
-			header := info.getNextFunc(context, v)
+		info.EncodeFunc(v, context, buf)
+		if info.AllowMulti {
+			header := info.GetNextFunc(context, v)
 			for header != ABNF_PTR_NIL {
 				buf.WriteString(", ")
-				info.encodeFunc(header, context, buf)
-				header = info.getNextFunc(context, header)
+				info.EncodeFunc(header, context, buf)
+				header = info.GetNextFunc(context, header)
 			}
 		}
 		buf.WriteString("\r\n")

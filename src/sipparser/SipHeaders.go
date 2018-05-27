@@ -122,12 +122,12 @@ func EncodeRawHeaders(context *ParseContext, headers AbnfPtr, buf *AbnfByteBuffe
 		//buf.WriteString("empty")
 		return
 	}
-	infos := g_SipHeaderInfos
+	infos := context.SipHeaders
 
 	for headers != ABNF_PTR_NIL {
 		header := headers.GetSipHeader(context)
 		if (header.id != SIP_HDR_UNKNOWN) && (infos[header.id] != nil) {
-			buf.Write(infos[header.id].name)
+			buf.Write(infos[header.id].Name)
 		} else {
 			header.hname.WriteCString(context, buf)
 		}
@@ -198,14 +198,14 @@ func ParseHeaderName(context *ParseContext) (hname AbnfPtr, headerIndex SipHeade
 func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, headerSetter SipHeadersSetter) (ok bool) {
 	var header AbnfPtr
 
-	info := g_SipHeaderInfos[headerIndex]
+	info := context.SipHeaders[headerIndex]
 	needParse := headerSetter.NeedParse(context, headerIndex)
-	if needParse && info != nil && info.needParse {
-		header, ok = info.parseFunc(context)
+	if needParse && info != nil && info.NeedParse {
+		header, ok = info.ParseFunc(context)
 		if !ok {
 			return false
 		}
-		if !info.allowMulti {
+		if !info.AllowMulti {
 			if !ParseCRLF(context) {
 				return false
 			}
@@ -235,7 +235,7 @@ func parseKnownHeader(context *ParseContext, headerIndex SipHeaderIndexType, hea
 					return ParseCRLF(context)
 				}
 
-				header, ok = info.parseFunc(context)
+				header, ok = info.ParseFunc(context)
 				if !ok {
 					return false
 				}

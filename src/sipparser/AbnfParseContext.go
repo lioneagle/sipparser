@@ -34,12 +34,15 @@ type ParseContext struct {
 	EncodeUriAsNameSpace       bool
 	EncodeUriNoEscape          bool
 	EncodeReasonPhraseNoEscape bool
+
+	SipHeaders SipHeaderInfos
 }
 
 func NewParseContext() *ParseContext {
 	ret := &ParseContext{}
 	ret.ParseSetSipContentTypeKnownParam = true
 	ret.EncodeUriAsNameSpace = true
+	ret.SipHeaders = g_SipHeaderInfos
 	return ret
 }
 

@@ -166,9 +166,9 @@ func BenchmarkParseHeaderNameAndGetSipHeaderIndex(b *testing.B) {
 	context.allocator = NewMemAllocator(1024 * 30)
 
 	var testdata [][]byte
-	for _, v := range g_SipHeaderInfos {
+	for _, v := range context.SipHeaders {
 		if v != nil {
-			name := []byte(fmt.Sprintf("%s: ", string(v.name)))
+			name := []byte(fmt.Sprintf("%s: ", string(v.Name)))
 			testdata = append(testdata, name)
 		}
 	}
