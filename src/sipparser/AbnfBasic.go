@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	//"fmt"
+	"reflect"
 	"unsafe"
 
 	"github.com/lioneagle/goutil/src/chars"
@@ -901,10 +902,23 @@ func ZeroByteSlice(src []byte) {
 	}
 }
 
+func ZeroByteSlice2(src []byte) {
+	for j := range src {
+		//for j := 0; j < len(src); j++ {
+		src[j] = 0
+	}
+}
+
 func ZeroMem(addr uintptr, size int) {
 	if size == 0 {
 		return
 	}
+
+	if size > 32 {
+		ZeroMem2(addr, size)
+		return
+	}
+
 	p := addr
 	end := p + uintptr(size)
 	//end1 := ((p + 7) >> 3) << 3
@@ -926,6 +940,14 @@ func ZeroMem(addr uintptr, size int) {
 	}
 }
 
+func ZeroMem2(addr uintptr, size int) {
+	h := reflect.SliceHeader{Data: addr, Len: size, Cap: size}
+	x := *(*[]byte)(unsafe.Pointer(&h))
+
+	for i := range x {
+		x[i] = 0
+	}
+}
 func Memcpy(addr1, addr2 uintptr, size int) {
 	p1 := addr1
 	p2 := addr2

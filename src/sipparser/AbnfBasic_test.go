@@ -602,7 +602,7 @@ func BenchmarkAllocCStringWithUnescape3(b *testing.B) {
 func BenchmarkZeroByteSlice(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 30)
+	src := make([]byte, 1024)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -612,10 +612,23 @@ func BenchmarkZeroByteSlice(b *testing.B) {
 	}
 }
 
+func BenchmarkZeroByteSlice2(b *testing.B) {
+	b.StopTimer()
+	//src := []byte("012345678901234567890123456789")
+	src := make([]byte, 1024)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ZeroByteSlice2(src)
+	}
+}
+
 func BenchmarkZeroMem(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 30)
+	src := make([]byte, 1024)
 	addr := uintptr(unsafe.Pointer(&src[0]))
 	len1 := len(src)
 	b.ReportAllocs()
@@ -627,11 +640,26 @@ func BenchmarkZeroMem(b *testing.B) {
 	}
 }
 
+func BenchmarkZeroMem2(b *testing.B) {
+	b.StopTimer()
+	//src := []byte("012345678901234567890123456789")
+	src := make([]byte, 1024)
+	addr := uintptr(unsafe.Pointer(&src[0]))
+	len1 := len(src)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ZeroMem2(addr, len1)
+	}
+}
+
 func BenchmarkMemcpy1(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 128)
-	dst := make([]byte, 128)
+	src := make([]byte, 1024)
+	dst := make([]byte, 1024)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -644,8 +672,8 @@ func BenchmarkMemcpy1(b *testing.B) {
 func BenchmarkMemcpy2(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 128)
-	dst := make([]byte, 128)
+	src := make([]byte, 1024)
+	dst := make([]byte, 1024)
 	addr1 := uintptr(unsafe.Pointer(&src[0]))
 	addr2 := uintptr(unsafe.Pointer(&dst[0]))
 	len1 := len(src)
@@ -663,7 +691,7 @@ func BenchmarkMemcpy3(b *testing.B) {
 	//src := []byte("012345678901234567890123456789")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 1024)
-	len1 := 128
+	len1 := 1024
 	src := context.allocator.Alloc(uint32(len1))
 	dst := context.allocator.Alloc(uint32(len1))
 	b.ReportAllocs()
@@ -680,7 +708,7 @@ func BenchmarkMemcpy4(b *testing.B) {
 	//src := []byte("012345678901234567890123456789")
 	context := NewParseContext()
 	context.allocator = NewMemAllocator(1024 * 1024)
-	len1 := 128
+	len1 := 1024
 	src := context.allocator.Alloc(uint32(len1))
 	dst := context.allocator.Alloc(uint32(len1))
 	b.ReportAllocs()

@@ -222,17 +222,23 @@ func (this AbnfPtr) GetAsByteSlice(context *ParseContext, size int) []byte {
 	if this == ABNF_PTR_NIL {
 		return nil
 	}
+	//*
 	header := reflect.SliceHeader{Data: this.GetUintptr(context), Len: size, Cap: size}
 	return *(*[]byte)(unsafe.Pointer(&header))
+	//*/
+	//return context.allocator.mem[int(this) : int(this)+size]
 }
 
 func (this AbnfPtr) CopyFrom(context *ParseContext, src AbnfPtr, size int) {
 	if this == ABNF_PTR_NIL || src == ABNF_PTR_NIL {
 		return
 	}
-	header1 := reflect.SliceHeader{Data: this.GetUintptr(context), Len: size, Cap: size}
-	header2 := reflect.SliceHeader{Data: src.GetUintptr(context), Len: size, Cap: size}
-	copy(*(*[]byte)(unsafe.Pointer(&header1)), *(*[]byte)(unsafe.Pointer(&header2)))
+	/*
+		    header1 := reflect.SliceHeader{Data: this.GetUintptr(context), Len: size, Cap: size}
+			header2 := reflect.SliceHeader{Data: src.GetUintptr(context), Len: size, Cap: size}
+			copy(*(*[]byte)(unsafe.Pointer(&header1)), *(*[]byte)(unsafe.Pointer(&header2)))
+		    //*/
+	copy(context.allocator.mem[int(this):int(this)+size], context.allocator.mem[int(src):int(src)+size])
 }
 
 func (this AbnfPtr) Strlen2(context *ParseContext) int {

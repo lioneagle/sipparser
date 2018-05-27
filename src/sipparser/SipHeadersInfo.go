@@ -25,7 +25,9 @@ func (this *SipHeaderInfo) AllowMulti() bool   { return this.allowMulti }
 func (this *SipHeaderInfo) HasShortName() bool { return this.hasShortName }
 func (this *SipHeaderInfo) ShortName() []byte  { return this.shortName }
 
-var g_SipHeaderInfos = [SIP_HDR_MAX_NUM]*SipHeaderInfo{
+type SipHeadersInfo [SIP_HDR_MAX_NUM]*SipHeaderInfo
+
+var g_SipHeaderInfos = SipHeadersInfo{
 	SIP_HDR_UNKNOWN:             &SipHeaderInfo{name: []byte("unknown"), hasShortName: false, needParse: false},
 	SIP_HDR_FROM:                &SipHeaderInfo{name: []byte("From"), isKeyheader: true, hasShortName: true, shortName: []byte("f"), needParse: true, parseFunc: ParseSipFrom, encodeFunc: EncodeSipFromValue},
 	SIP_HDR_TO:                  &SipHeaderInfo{name: []byte("To"), isKeyheader: true, hasShortName: true, shortName: []byte("t"), needParse: true, parseFunc: ParseSipTo, encodeFunc: EncodeSipToValue},
