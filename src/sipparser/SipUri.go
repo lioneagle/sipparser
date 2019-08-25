@@ -3,7 +3,6 @@ package sipparser
 import (
 	//"fmt"
 	"unsafe"
-
 	//"github.com/lioneagle/goutil/src/chars"
 )
 

@@ -109,7 +109,7 @@ func TestSipHostPortParseHostOk(t *testing.T) {
 
 			ok := host.ParseHost(context)
 
-			test.ASSERT_TRUE(t, ok, "err =", context.Errors.String())
+			test.ASSERT_TRUE(t, ok, "err = %s", context.Errors.String())
 			test.EXPECT_EQ(t, context.parsePos, AbnfPos(v.newPos), "")
 			test.EXPECT_EQ(t, host.id, v.id, "")
 

@@ -282,7 +282,7 @@ func BenchmarkMemAlloc(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		allocator.FreeAll()
-		allocator.Alloc(1000)
+		allocator.Alloc(1024)
 	}
 	//fmt.Printf("uri = %s\n", uri.String())
 	//fmt.Printf("")
@@ -296,7 +296,7 @@ func BenchmarkMemAllocEx(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		allocator.FreeAll()
-		_, _ = allocator.AllocEx(1000)
+		_, _ = allocator.AllocEx(1024)
 	}
 	//fmt.Printf("uri = %s\n", uri.String())
 	//fmt.Printf("")

@@ -602,7 +602,7 @@ func BenchmarkAllocCStringWithUnescape3(b *testing.B) {
 func BenchmarkZeroByteSlice(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 1024)
+	src := make([]byte, 64)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -615,7 +615,7 @@ func BenchmarkZeroByteSlice(b *testing.B) {
 func BenchmarkZeroByteSlice2(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 1024)
+	src := make([]byte, 64)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -628,7 +628,7 @@ func BenchmarkZeroByteSlice2(b *testing.B) {
 func BenchmarkZeroMem(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 1024)
+	src := make([]byte, 64)
 	addr := uintptr(unsafe.Pointer(&src[0]))
 	len1 := len(src)
 	b.ReportAllocs()
@@ -643,7 +643,7 @@ func BenchmarkZeroMem(b *testing.B) {
 func BenchmarkZeroMem2(b *testing.B) {
 	b.StopTimer()
 	//src := []byte("012345678901234567890123456789")
-	src := make([]byte, 1024)
+	src := make([]byte, 64)
 	addr := uintptr(unsafe.Pointer(&src[0]))
 	len1 := len(src)
 	b.ReportAllocs()

@@ -148,7 +148,7 @@ func (this *SipMsgBufs) ReadFromFile(filename string) bool {
 
 	src, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Errorf("ERROR: read file %s failed, err =\n", filename, err.Error())
+		fmt.Errorf("ERROR: read file %s failed, err = %s\n", filename, err.Error())
 		return false
 	}
 
@@ -766,7 +766,7 @@ func BenchmarkSipMsgsRawScan(b *testing.B) {
 				context.parsePos = 0
 				ok := SipMsgRawScan(context)
 				if !ok {
-					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Printf("%s parse failed, err = %s\n", v.Name, context.Errors.String())
 					fmt.Println("msg = \n", string(msg))
 					return
 				}
@@ -811,7 +811,7 @@ func BenchmarkSipMsgsParse(b *testing.B) {
 				context.allocator.FreePart(remain)
 				ok := sipmsg.Parse(context)
 				if !ok {
-					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Printf("%s parse failed, err = %s\n", v.Name, context.Errors.String())
 					fmt.Println("msg = \n", string(msg))
 					return
 				}
@@ -914,7 +914,7 @@ func BenchmarkSipMsgsForKeyHeadersParse(b *testing.B) {
 				context.allocator.FreePart(remain)
 				ok := sipmsg.Parse(context)
 				if !ok {
-					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Printf("%s parse failed, err = %s\n", v.Name, context.Errors.String())
 					fmt.Println("msg = \n", string(msg))
 					return
 				}
@@ -1018,7 +1018,7 @@ func BenchmarkSipMsgsRawParse(b *testing.B) {
 				context.allocator.FreePart(remain)
 				ok := sipmsg.Parse(context)
 				if !ok {
-					fmt.Println("%s parse failed, err =", v.Name, context.Errors.String())
+					fmt.Printf("%s parse failed, err = %s\n", v.Name, context.Errors.String())
 					fmt.Println("msg = \n", string(msg))
 					return
 				}
